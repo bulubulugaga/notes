@@ -1,0 +1,340 @@
+<html>
+  <head>
+	  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>i5ting_ztree_toc:markdown</title>
+		<link href="toc/style/github-bf51422f4bb36427d391e4b75a1daa083c2d840e.css" media="all" rel="stylesheet" type="text/css"/>
+		<link href="toc/style/github2-d731afd4f624c99a4b19ad69f3083cd6d02b81d5.css" media="all" rel="stylesheet" type="text/css"/>
+		<link href="toc/css/zTreeStyle/zTreeStyle.css" media="all" rel="stylesheet" type="text/css"/>
+	  <style>
+		pre {
+		    counter-reset: line-numbering;
+		    border: solid 1px #d9d9d9;
+		    border-radius: 0;
+		    background: #fff;
+		    padding: 0;
+		    line-height: 23px;
+		    margin-bottom: 30px;
+		    white-space: pre;
+		    overflow-x: auto;
+		    word-break: inherit;
+		    word-wrap: inherit;
+		}
+
+		pre a::before {
+		  content: counter(line-numbering);
+		  counter-increment: line-numbering;
+		  padding-right: 1em; /* space after numbers */
+		  width: 25px;
+		  text-align: right;
+		  opacity: 0.7;
+		  display: inline-block;
+		  color: #aaa;
+		  background: #eee;
+		  margin-right: 16px;
+		  padding: 2px 10px;
+		  font-size: 13px;
+		  -webkit-touch-callout: none;
+		  -webkit-user-select: none;
+		  -khtml-user-select: none;
+		  -moz-user-select: none;
+		  -ms-user-select: none;
+		  user-select: none;
+		}
+
+		pre a:first-of-type::before {
+		  padding-top: 10px;
+		}
+
+		pre a:last-of-type::before {
+		  padding-bottom: 10px;
+		}
+
+		pre a:only-of-type::before {
+		  padding: 10px;
+		}
+
+		.highlight { background-color: #ffffcc } /* RIGHT */
+		</style>
+  </head>
+  <body>
+	  <div>
+				<div style='width:25%;'>
+						<ul id="tree" class="ztree" style='width:100%'>
+
+						</ul>
+				</div>
+        <div id='readme' style='width:70%;margin-left:20%;'>
+          	<article class='markdown-body'>
+            	<h1 id="markdowm-md-">markdowm文件（.md）</h1>
+<p><strong>1. 简介</strong></p>
+<pre><code>* Markdown 是一种轻量级标记语言，它允许人们使用易读易写的纯文本格式编写文档。
+
+* Markdown 语言在 2004 由约翰·格鲁伯（英语：John Gruber）创建。
+
+* Markdown 编写的文档可以导出 HTML 、Word、图像、PDF、Epub 等多种格式的文档。
+
+* Markdown 编写的文档后缀为 **.md**, **.markdown**。
+</code></pre><p><strong>2. 转换为html文件</strong></p>
+<pre><code>1. 利用编辑器直接转换  
+2. 使用插件类型（i5ting_toc）  
+    &gt; * 全局安装 &amp;emsp; npm install -g i5ting_toc  
+    &gt; * 编辑文件&amp;emsp; i5ting_toc -f 文件名 生成preview文件，含有生成的html
+</code></pre><p><strong>3. 书籍推荐</strong></p>
+<pre><code>《了不起的Markdown》  
+</code></pre><h1 id="markdown-">markdown 标题</h1>
+<p><strong>1. 使用=和-标记一级和二级标题</strong></p>
+<pre><code>一级标题
+=======
+二级标题
+-------
+</code></pre><p><strong>2. 使用#号可代表1-6级标题，最好中间留空格</strong></p>
+<pre><code># 一级标题
+## 二级标题
+### 三级标题
+#### 四级标题
+##### 五级标题
+###### 六级标题
+</code></pre><h1 id="markdown-">markdown 段落格式</h1>
+<p><strong>1. 某些编辑器两个空格以上加回车</strong></p>
+<p><img src="./toc/images/3-img1.png" alt="段落格式" title="段落格式"></p>
+<p><strong>2. 可以用空行表示开始下一个段落</strong></p>
+<p><img src="./toc/images/3-img2.png" alt="段落格式" title="段落格式"></p>
+<h1 id="-">特殊文字格式</h1>
+<pre><code>*斜体文本*
+_斜体文本_
+**粗体文本**
+__粗体文本__
+***粗斜体文本***
+___粗斜体文本___
+~~删除线~~
+&lt;u&gt;下划线&lt;/u&gt;
+</code></pre><p>演示结果如下</p>
+<p><em>斜体文本</em><br><em>斜体文本</em><br><strong>粗体文本</strong><br><strong>粗体文本</strong><br><strong><em>粗斜体文本</em></strong><br><strong><em>粗斜体文本</em></strong><br><del>删除线</del><br><u>下划线</u>   </p>
+<h1 id="-">分割线</h1>
+<pre><code>---
+----
+***
+*****
+</code></pre><h1 id="markdown-">markdown 列表</h1>
+<h2 id="-">无序列表</h2>
+<pre><code>* 第一项
+* 第二项   
+*******
++ 第一项
++ 第二项   
+*******
+- 第一项
+- 第二项
+</code></pre><p>演示结果如下</p>
+<ul>
+<li>第一项</li>
+<li>第二项   </li>
+</ul>
+<hr>
+<ul>
+<li>第一项</li>
+<li>第二项   </li>
+</ul>
+<hr>
+<ul>
+<li>第一项</li>
+<li>第二项</li>
+</ul>
+<h2 id="-">有序列表</h2>
+<pre><code>1. 第一项
+2. 第二项
+</code></pre><p>演示结果如下</p>
+<ol>
+<li>第一项</li>
+<li>第二项</li>
+</ol>
+<h2 id="-">列表嵌套</h2>
+<p>列表嵌套只需要在子列表选项前加4个空格</p>
+<pre><code>1. 第一项
+    1. 第一项嵌套第一层
+      * 第一项嵌套第二层
+      * 第一项嵌套第二层
+    2. 第一项嵌套第一层
+2. 第二项
+    *  第二项嵌套第一层
+      1. 第二项嵌套第二层
+      1. 第二项嵌套第二层
+    *  第二项嵌套第一层
+</code></pre><p>演示结果如下</p>
+<ol>
+<li>第一项<ol>
+<li>第一项嵌套第一层<ul>
+<li>第一项嵌套第二层</li>
+<li>第一项嵌套第二层</li>
+</ul>
+</li>
+<li>第一项嵌套第一层</li>
+</ol>
+</li>
+<li>第二项<ul>
+<li>第二项嵌套第一层<ol>
+<li>第二项嵌套第二层</li>
+<li>第二项嵌套第二层</li>
+</ol>
+</li>
+<li>第二项嵌套第一层</li>
+</ul>
+</li>
+</ol>
+<h1 id="markdown-">markdown 区块</h1>
+<p><strong>1. 在段落开头用&gt;号，并用空格隔开，用多个表示嵌套</strong></p>
+<pre><code>&gt; 区块运用
+&gt; 区块运用
+&gt; &gt; 区块运用
+</code></pre><p>显示结果如下</p>
+<blockquote>
+<p>区块运用<br>区块运用</p>
+<blockquote>
+<p>区块运用</p>
+</blockquote>
+</blockquote>
+<p><strong>2. 在区块中使用列表</strong></p>
+<pre><code>&gt; 区块中使用列表
+&gt; 1. 第一项
+&gt;    * 第一项中的第一项
+&gt; 2. 第二项
+</code></pre><p>显示结果如下</p>
+<blockquote>
+<p>区块中使用列表</p>
+<ol>
+<li>第一项<ul>
+<li>第一项中的第一项</li>
+</ul>
+</li>
+<li>第二项</li>
+</ol>
+</blockquote>
+<p><strong>3. 在列表中使用区块（规范角度应在&gt;前4个空格）</strong></p>
+<pre><code>1. 第一项
+    &gt; 区块内容
+2. 第二项
+</code></pre><p>显示结果如下</p>
+<ol>
+<li>第一项<blockquote>
+<p>区块内容</p>
+</blockquote>
+</li>
+<li>第二项</li>
+</ol>
+<h1 id="markdown-">markdown 代码</h1>
+<p><strong>1.如果是段落上的一个函数或代码片段，可以用<code></code>包起来</strong></p>
+<pre><code>演示代码片段`console.log(&#39;a&#39;);`
+</code></pre><p>演示结果如下</p>
+<p>演示代码片段<code>console.log(&#39;a&#39;);</code></p>
+<p><strong>2.代码区块：四个空格或制表符，或者用```指定语言</strong></p>
+<blockquote>
+<p>```javascript<br>function a() {<br>  console.log(&#39;a&#39;);<br>}<br>```</p>
+</blockquote>
+<p>显示结果如下</p>
+<pre><code class="lang-javascript">function a() {
+  console.log(&#39;a&#39;);
+}
+</code></pre>
+<h1 id="markdown-">markdown 链接</h1>
+<p><strong>1. 基本使用</strong></p>
+<pre><code>[链接名称](链接地址) 或者 (链接地址)
+</code></pre><pre><code>例如：这是一个链接[菜鸟教程](https://www.runoob.com) || &lt;https://www.runoob.com&gt;
+</code></pre><p>显示结果如下</p>
+<p>这是一个链接<a href="https://www.runoob.com">菜鸟教程</a> || <a href="https://www.runoob.com">https://www.runoob.com</a></p>
+<p><strong>2. 高级链接</strong></p>
+<p>通过变量来设置一个链接，变量赋值在文档末尾进行</p>
+<pre><code>这个链接用 1 作为网址变量 [Google][1]  
+这个链接用 runoob 作为网址变量 [Runoob][runoob]  
+然后在文档的结尾为变量赋值（网址）  
+
+[1]: http://www.google.com/  
+[runoob]: http://www.runoob.com/
+</code></pre><p>显示结果如下</p>
+<p>这个链接用 1 作为网址变量 <a href="http://www.google.com/">Google</a><br>这个链接用 runoob 作为网址变量 <a href="http://www.runoob.com/">Runoob</a><br>然后在文档的结尾为变量赋值（网址）  </p>
+<h1 id="markdown-">markdown图片</h1>
+<p>格式如下</p>
+<pre><code>![alt 属性文本](图片地址)
+![alt 属性文本](图片地址 &quot;可选标题&quot;)
+</code></pre><pre><code>例如：
+![RUNOOB 图标](http://static.runoob.com/images/runoob-logo.png)
+![RUNOOB 图标](http://static.runoob.com/images/runoob-logo.png &quot;RUNOOB&quot;)
+</code></pre><p>显示结果如下</p>
+<p><img src="http://static.runoob.com/images/runoob-logo.png" alt="RUNOOB 图标"><br><img src="http://static.runoob.com/images/runoob-logo.png" alt="RUNOOB 图标" title="RUNOOB"></p>
+<h1 id="markdown-">markdown表格</h1>
+<p>用|分隔不同的单元格，用-分隔表头和其它行。<br>-: 设置内容和标题栏右对齐<br>:- 设置内容和标题栏左对齐<br>:-:设置内容和标题居中对齐   </p>
+<pre><code>| 左对齐(占位) | 右对齐(占位) | 居中对齐(占位) |
+| :---- | -----: | :-----: |
+| 单元格 | 单元格 | 单元格 |
+| 单元格 | 单元格 | 单元格 |
+</code></pre><p>显示结果如下</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">左对齐(占位)</th>
+<th style="text-align:right">右对齐(占位)</th>
+<th style="text-align:center">居中对齐(占位)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">单元格</td>
+<td style="text-align:right">单元格</td>
+<td style="text-align:center">单元格</td>
+</tr>
+<tr>
+<td style="text-align:left">单元格</td>
+<td style="text-align:right">单元格</td>
+<td style="text-align:center">单元格</td>
+</tr>
+</tbody>
+</table>
+<h1 id="markdown-">markdown高级技巧</h1>
+<p><strong>1. 支持HTML元素</strong></p>
+<pre><code>目前支持的 HTML 元素有：&lt;kbd&gt; &lt;b&gt; &lt;i&gt; &lt;em&gt; &lt;sup&gt; &lt;sub&gt; &lt;br&gt;等
+</code></pre><pre><code>使用 &lt;kbd&gt;Ctrl&lt;/kbd&gt;+&lt;kbd&gt;Alt&lt;/kbd&gt;+&lt;kbd&gt;Del&lt;/kbd&gt; 重启电脑
+&lt;b&gt;加粗文本&lt;/b&gt;
+&lt;i&gt;斜体文本&lt;/i&gt;
+</code></pre><p>演示结果如下</p>
+<p>使用 <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>Del</kbd> 重启电脑<br><b>加粗文本</b><br><i>斜体文本</i> </p>
+<p><strong>2. 转义,用\</strong></p>
+<p>支持以下符号前面加反斜杠来帮助插入普通符号</p>
+<pre><code>\   反斜线
+`   反引号
+*   星号
+_   下划线
+{}  花括号
+[]  方括号
+()  小括号
+#   井字号
++   加号
+-   减号
+.   英文句点
+!   感叹号
+</code></pre><pre><code>**加粗文本**
+\*\*加粗文本**
+</code></pre><p>演示结果如下</p>
+<p><strong>加粗文本</strong><br>**加粗文本**</p>
+<p><strong>3. 公式</strong></p>
+<p>公式太复杂了，告辞</p>
+
+          	</article>
+        </div>
+		</div>
+  </body>
+</html>
+<script type="text/javascript" src="toc/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="toc/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="toc/js/ztree_toc.js"></script>
+<script type="text/javascript" src="toc_conf.js"></script>
+
+<SCRIPT type="text/javascript" >
+<!--
+$(document).ready(function(){
+    var css_conf = eval(markdown_panel_style);
+    $('#readme').css(css_conf)
+    
+    var conf = eval(jquery_ztree_toc_opts);
+		$('#tree').ztree_toc(conf);
+});
+//-->
+</SCRIPT>
