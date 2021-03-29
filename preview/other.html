@@ -1,0 +1,141 @@
+<html>
+  <head>
+	  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>i5ting_ztree_toc:other</title>
+		<link href="toc/style/github-bf51422f4bb36427d391e4b75a1daa083c2d840e.css" media="all" rel="stylesheet" type="text/css"/>
+		<link href="toc/style/github2-d731afd4f624c99a4b19ad69f3083cd6d02b81d5.css" media="all" rel="stylesheet" type="text/css"/>
+		<link href="toc/css/zTreeStyle/zTreeStyle.css" media="all" rel="stylesheet" type="text/css"/>
+	  <style>
+		pre {
+		    counter-reset: line-numbering;
+		    border: solid 1px #d9d9d9;
+		    border-radius: 0;
+		    background: #fff;
+		    padding: 0;
+		    line-height: 23px;
+		    margin-bottom: 30px;
+		    white-space: pre;
+		    overflow-x: auto;
+		    word-break: inherit;
+		    word-wrap: inherit;
+		}
+
+		pre a::before {
+		  content: counter(line-numbering);
+		  counter-increment: line-numbering;
+		  padding-right: 1em; /* space after numbers */
+		  width: 25px;
+		  text-align: right;
+		  opacity: 0.7;
+		  display: inline-block;
+		  color: #aaa;
+		  background: #eee;
+		  margin-right: 16px;
+		  padding: 2px 10px;
+		  font-size: 13px;
+		  -webkit-touch-callout: none;
+		  -webkit-user-select: none;
+		  -khtml-user-select: none;
+		  -moz-user-select: none;
+		  -ms-user-select: none;
+		  user-select: none;
+		}
+
+		pre a:first-of-type::before {
+		  padding-top: 10px;
+		}
+
+		pre a:last-of-type::before {
+		  padding-bottom: 10px;
+		}
+
+		pre a:only-of-type::before {
+		  padding: 10px;
+		}
+
+		.highlight { background-color: #ffffcc } /* RIGHT */
+		</style>
+  </head>
+  <body>
+	  <div>
+				<div style='width:25%;'>
+						<ul id="tree" class="ztree" style='width:100%'>
+
+						</ul>
+				</div>
+        <div id='readme' style='width:70%;margin-left:20%;'>
+          	<article class='markdown-body'>
+            	<h1 id="-">以管理员身份打开某文件</h1>
+<p><strong>以hosts文件为例</strong></p>
+<p><strong>某些文件直接修改会提示没有权限，此时可以用管理员身份进行修改</strong></p>
+<ol>
+<li>hosts文件一般在c:window/system32/drivers/etc，打开至此文件</li>
+<li>点击左上角文件选项卡</li>
+<li>鼠标移至打开window powershell，选择以管理员身份打开</li>
+<li>输入notepad hosts，打开之后就能修改该文件。</li>
+</ol>
+<p><strong>win+x可以直接打开快捷菜单，也能打开powershell面板</strong></p>
+<h1 id="-">某些外网打开失败</h1>
+<p><strong>以github为例</strong></p>
+<ol>
+<li>准备修改hosts文件</li>
+<li>查询github网址：<a href="https://github.com.ipaddress.com/">https://github.com.ipaddress.com/</a><br><img src="./toc/images/other01.png" alt="ip实例">   </li>
+<li>文件最后附上即可<blockquote>
+<p>140.82.112.4 github.com</p>
+</blockquote>
+</li>
+<li>本条参照<a href="https://zhuanlan.zhihu.com/p/158938544">https://zhuanlan.zhihu.com/p/158938544</a></li>
+</ol>
+<h1 id="-">常用快捷键</h1>
+<table>
+<thead>
+<tr>
+<th>快捷键</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>win + R</td>
+<td>打开运行对话框(可打开cmd等面板)</td>
+</tr>
+<tr>
+<td>win + Tab</td>
+<td>显示所有已经打开的窗口</td>
+</tr>
+<tr>
+<td>win + Alt</td>
+<td>切换打开的窗口</td>
+</tr>
+<tr>
+<td>Ctrl + Shift + Esc</td>
+<td>打开任务管理器</td>
+</tr>
+<tr>
+<td>win + v</td>
+<td>多重剪切板</td>
+</tr>
+</tbody>
+</table>
+
+          	</article>
+        </div>
+		</div>
+  </body>
+</html>
+<script type="text/javascript" src="toc/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="toc/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="toc/js/ztree_toc.js"></script>
+<script type="text/javascript" src="toc_conf.js"></script>
+
+<SCRIPT type="text/javascript" >
+<!--
+$(document).ready(function(){
+    var css_conf = eval(markdown_panel_style);
+    $('#readme').css(css_conf)
+    
+    var conf = eval(jquery_ztree_toc_opts);
+		$('#tree').ztree_toc(conf);
+});
+//-->
+</SCRIPT>
