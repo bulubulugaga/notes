@@ -1,0 +1,195 @@
+<html>
+  <head>
+	  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>i5ting_ztree_toc:css</title>
+		<link href="toc/style/github-bf51422f4bb36427d391e4b75a1daa083c2d840e.css" media="all" rel="stylesheet" type="text/css"/>
+		<link href="toc/style/github2-d731afd4f624c99a4b19ad69f3083cd6d02b81d5.css" media="all" rel="stylesheet" type="text/css"/>
+		<link href="toc/css/zTreeStyle/zTreeStyle.css" media="all" rel="stylesheet" type="text/css"/>
+	  <style>
+		pre {
+		    counter-reset: line-numbering;
+		    border: solid 1px #d9d9d9;
+		    border-radius: 0;
+		    background: #fff;
+		    padding: 0;
+		    line-height: 23px;
+		    margin-bottom: 30px;
+		    white-space: pre;
+		    overflow-x: auto;
+		    word-break: inherit;
+		    word-wrap: inherit;
+		}
+
+		pre a::before {
+		  content: counter(line-numbering);
+		  counter-increment: line-numbering;
+		  padding-right: 1em; /* space after numbers */
+		  width: 25px;
+		  text-align: right;
+		  opacity: 0.7;
+		  display: inline-block;
+		  color: #aaa;
+		  background: #eee;
+		  margin-right: 16px;
+		  padding: 2px 10px;
+		  font-size: 13px;
+		  -webkit-touch-callout: none;
+		  -webkit-user-select: none;
+		  -khtml-user-select: none;
+		  -moz-user-select: none;
+		  -ms-user-select: none;
+		  user-select: none;
+		}
+
+		pre a:first-of-type::before {
+		  padding-top: 10px;
+		}
+
+		pre a:last-of-type::before {
+		  padding-bottom: 10px;
+		}
+
+		pre a:only-of-type::before {
+		  padding: 10px;
+		}
+
+		.highlight { background-color: #ffffcc } /* RIGHT */
+		</style>
+  </head>
+  <body>
+	  <div>
+				<div style='width:25%;'>
+						<ul id="tree" class="ztree" style='width:100%'>
+
+						</ul>
+				</div>
+        <div id='readme' style='width:70%;margin-left:20%;'>
+          	<article class='markdown-body'>
+            	<h1 id="-">伪类和伪元素</h1>
+<p>css3为了区分伪类和伪元素，伪元素采用双冒号写法</p>
+<ul>
+<li>常见伪类  :hover, :link, :active, :target, :not(), :focus。</li>
+<li>常见伪元素  ::first-letter, ::first-line, ::before, ::after, ::selection。   </li>
+</ul>
+<h2 id="-after-before">::after和::before</h2>
+<p>::before和::after下特有的content，用于在css渲染中向元素逻辑上的头部或尾部添加内容。<br>这些添加不会出现在DOM中，不会改变文档内容，不可复制，仅仅是在css渲染层加入。<br>所以不要用:before或:after展示有实际意义的内容，尽量使用它们显示修饰性内容，例如图标。</p>
+<pre><code>&lt;style type=&quot;text/css&quot;&gt;
+    .phoneNumber::before {
+      content: &#39;\260E&#39;;
+      font-size: 15px;
+    }
+  &lt;/style&gt;
+  &lt;p class=&quot;phoneNumber&quot;&gt;12345645654&lt;/p&gt;
+</code></pre><p>运行结果：<br><img src="./toc/images/css01.png" alt="运行显示"></p>
+<h3 id="content-">content属性</h3>
+<p>::before和::after必须配合content属性来使用，content用来定义插入的内容，content必须有值，至少是空。默认情况下，伪类元素的display是默认值inline，可以通过设置display:block来改变其显示。
+content可以取以下值   </p>
+<p><strong>1、String</strong>   </p>
+<pre><code>&lt;style type=&quot;text/css&quot;&gt;
+p::before{
+    content: &quot;《&quot;;
+    color: blue;
+}
+p::after{
+    content: &quot;》&quot;;
+    color: blue;
+}
+&lt;/style&gt;
+&lt;p&gt;平凡的世界&lt;/p&gt;
+</code></pre><p>运行结果：《平凡的世界》</p>
+<p><strong>2、attr()</strong><br>通过attr()调用当前元素的属性，比如将图片alt提示文字或者链接的href地址显示出来</p>
+<pre><code>&lt;style type=&quot;text/css&quot;&gt;
+a::after{
+    content: &quot;(&quot; attr(href) &quot;)&quot;;
+}
+&lt;/style&gt;
+&lt;a href=&quot;http://www.cnblogs.com/starof&quot;&gt;starof&lt;/a&gt;
+</code></pre><p>运行结果：starof（<a href="http://www.cnblogs.com/starof）">http://www.cnblogs.com/starof）</a></p>
+<p><strong>3、url/uri()</strong><br>用于引用媒体文件，例如“百度”前面给出图片，后面给出href属性   </p>
+<pre><code>&lt;style&gt;
+a::before{
+    content: url(&quot;https://www.baidu.com/img/baidu_jgylogo3.gif&quot;);
+}
+a::after{
+    content:&quot;(&quot;attr(href)&quot;)&quot;;
+}
+&lt;/style&gt;
+&lt;a href=&quot;http://www.baidu.com&quot;&gt;百度&lt;/a&gt;
+</code></pre><p>运行结果：<br><img src="https://www.baidu.com/img/baidu_jgylogo3.gif" alt="百度logo">百度(<a href="https://www.baidu.com/img/baidu_jgylogo3.gif">https://www.baidu.com/img/baidu_jgylogo3.gif</a>)</p>
+<h3 id="-">使用</h3>
+<p>1、清楚浮动</p>
+<pre><code>.row:after { 
+    width:0;
+    height:0;
+    content:&#39;&#39;;
+    display: block;
+    clear: both;
+}
+</code></pre><p>2、绘制图形效果</p>
+<pre><code>&lt;style&gt;
+#star-six {
+  width: 0;
+  height: 0;
+  border-left: 50px solid transparent;
+  border-right: 50px solid transparent;
+  border-bottom: 100px solid red;
+  position: relative;
+}
+#star-six::after {
+  width: 0;
+  height: 0;
+  border-left: 50px solid transparent;
+  border-right: 50px solid transparent;
+  border-top: 100px solid red;
+  position: absolute;
+  content: &quot;&quot;;
+  top: 30px;
+  left: -50px;
+}
+&lt;/style&gt;
+&lt;body&gt;
+&lt;div id=&quot;star-six&quot;&gt;&lt;/div&gt;
+&lt;/body&gt;
+</code></pre><p><img src="./toc/images/css02.png" alt="运行显示"></p>
+<h2 id="-before-before-">:before和::before的区别</h2>
+<ul>
+<li>相同点   <ol>
+<li>都可以用来表示伪类对象，用来设置对象前的内容   </li>
+<li>:befor和::before写法是等效的   </li>
+</ol>
+</li>
+<li>不同点  <ol>
+<li>:befor是Css2的写法，::before是Css3的写法   </li>
+<li>:before的兼容性要比::before好 ，不过在H5开发中建议使用::before比较好   </li>
+</ol>
+</li>
+<li>其它<ol>
+<li>伪类对象要配合content属性一起使用</li>
+<li>伪类对象不会出现在DOM中，所以不能通过js来操作，仅仅是在 CSS 渲染层加入</li>
+<li>伪类对象的特效通常要使用:hover伪类样式来激活<pre><code>.test:hover::before { /* 这时animation和transition才生效 */ }
+</code></pre></li>
+</ol>
+</li>
+</ul>
+
+          	</article>
+        </div>
+		</div>
+  </body>
+</html>
+<script type="text/javascript" src="toc/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="toc/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="toc/js/ztree_toc.js"></script>
+<script type="text/javascript" src="toc_conf.js"></script>
+
+<SCRIPT type="text/javascript" >
+<!--
+$(document).ready(function(){
+    var css_conf = eval(markdown_panel_style);
+    $('#readme').css(css_conf)
+    
+    var conf = eval(jquery_ztree_toc_opts);
+		$('#tree').ztree_toc(conf);
+});
+//-->
+</SCRIPT>
