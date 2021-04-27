@@ -1,0 +1,181 @@
+<html>
+  <head>
+	  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>i5ting_ztree_toc:vue</title>
+		<link href="toc/style/github-bf51422f4bb36427d391e4b75a1daa083c2d840e.css" media="all" rel="stylesheet" type="text/css"/>
+		<link href="toc/style/github2-d731afd4f624c99a4b19ad69f3083cd6d02b81d5.css" media="all" rel="stylesheet" type="text/css"/>
+		<link href="toc/css/zTreeStyle/zTreeStyle.css" media="all" rel="stylesheet" type="text/css"/>
+	  <style>
+		pre {
+		    counter-reset: line-numbering;
+		    border: solid 1px #d9d9d9;
+		    border-radius: 0;
+		    background: #fff;
+		    padding: 0;
+		    line-height: 23px;
+		    margin-bottom: 30px;
+		    white-space: pre;
+		    overflow-x: auto;
+		    word-break: inherit;
+		    word-wrap: inherit;
+		}
+
+		pre a::before {
+		  content: counter(line-numbering);
+		  counter-increment: line-numbering;
+		  padding-right: 1em; /* space after numbers */
+		  width: 25px;
+		  text-align: right;
+		  opacity: 0.7;
+		  display: inline-block;
+		  color: #aaa;
+		  background: #eee;
+		  margin-right: 16px;
+		  padding: 2px 10px;
+		  font-size: 13px;
+		  -webkit-touch-callout: none;
+		  -webkit-user-select: none;
+		  -khtml-user-select: none;
+		  -moz-user-select: none;
+		  -ms-user-select: none;
+		  user-select: none;
+		}
+
+		pre a:first-of-type::before {
+		  padding-top: 10px;
+		}
+
+		pre a:last-of-type::before {
+		  padding-bottom: 10px;
+		}
+
+		pre a:only-of-type::before {
+		  padding: 10px;
+		}
+
+		.highlight { background-color: #ffffcc } /* RIGHT */
+		</style>
+  </head>
+  <body>
+	  <div>
+				<div style='width:25%;'>
+						<ul id="tree" class="ztree" style='width:100%'>
+
+						</ul>
+				</div>
+        <div id='readme' style='width:70%;margin-left:20%;'>
+          	<article class='markdown-body'>
+            	<h1 id="-">项目中遇到的一些问题</h1>
+<h2 id="props-">props传参时，父组件数据改变，子组件未更新</h2>
+<p>在父组件创建的时候，已经创建了相关的子组件，该子组件已经缓存在内存中，在通过其他事件改变父组件传给子组件的值时就会不生效
+parent.vue</p>
+<pre><code>&lt;templete&gt;
+  &lt;child :info=&quot;info&quot;&gt;&lt;/child&gt;
+&lt;/templete&gt;
+&lt;script&gt;
+  export defalt {
+    data() {
+      info: []
+    },
+    getList() {
+      api.getDetail().then(res =&gt; {
+        // 通常是调取后端接口修改数据后子组件没有及时更新
+        // 尤其是内部数据多，多重数组和对象嵌套时，内部数据更新问题
+        this.info = res.data
+      })
+    }
+  }
+&lt;/script&gt;
+</code></pre><p>child.vue</p>
+<pre><code>&lt;templete&gt;
+  &lt;div&gt;
+    &lt;el-table :props=&quot;info.table&gt;
+      &lt;el-table-column :props=&quot;name&gt;&lt;/el-table-column&gt;
+      ···
+    &lt;/el-table&gt;
+    &lt;div&gt;
+      &lt;!-- 内部多次嵌套组件，更容易出现这种情况 --&gt;
+      ··· info.other.other.data ···
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/templete&gt;
+&lt;script&gt;
+  export defalt {
+    props: {
+      info: Object
+    }
+  }
+&lt;/script&gt;
+</code></pre><p><strong>1、子组件加上v-if，等父组件数据获取后再渲染</strong><br>如果提交信息时含有必填项目或者某些表格至少填一项，可用获取到数据的某一项对子组件用v-if判断渲染</p>
+<pre><code>&lt;child v-if=&quot;info.table.length !== 0&quot; :info=&quot;info&quot;&gt;&lt;/child&gt;
+// 如果有报错类似info下没有table, 修改父组件定义变量
+info: { 
+  table: [] 
+}
+</code></pre><p><strong>2、用$nextTick()</strong><br>在赋值时使用，可以先赋值，后渲染或者更新DOM</p>
+<pre><code>getList() {
+  api.getDetail().then(res =&gt; {
+    this.$nextTick(() =&gt; {
+      this.info = res.data
+    })
+  })
+}
+</code></pre><p><strong>3、利用watch监听</strong><br>多次看到这种方法，但是有时候监听不到变化，或者出现监听到也没有更新DOM</p>
+<pre><code>//修改子组件
+&lt;script&gt;
+  export defalt {
+    props: {
+      info: Object
+    },
+    data() {
+      return {
+        infoChild: this.info
+      }
+    },
+    watch: {
+      info(val) {
+        this.infoChild = val;
+      },
+      infoChild(val) {
+        // 这里的监听是看到了，但是没有实践过
+        this.$emit(&#39;info&#39;, val);
+      }
+    }
+  }
+&lt;/script&gt;
+</code></pre><p><strong>4、1和2相结合</strong>  </p>
+<pre><code>&lt;child v-if=&quot;flag&quot; :info=&quot;info&quot;&gt;&lt;/child&gt;
+···
+getList() {
+  这种方式不局限于api请求，包括赋值情况也可这么做
+  this.flag = false;
+  api.getDetail().then(res =&gt; {
+    this.$nextTick(() =&gt; {
+      this.info = res.data
+      this.flag = true;
+    })
+  })
+}
+</code></pre><p><strong>如果有子组件调用父组件方法（子组件点击事件，父组件需要执行一些相关操作），与平时无异</strong></p>
+
+          	</article>
+        </div>
+		</div>
+  </body>
+</html>
+<script type="text/javascript" src="toc/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="toc/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="toc/js/ztree_toc.js"></script>
+<script type="text/javascript" src="toc_conf.js"></script>
+
+<SCRIPT type="text/javascript" >
+<!--
+$(document).ready(function(){
+    var css_conf = eval(markdown_panel_style);
+    $('#readme').css(css_conf)
+    
+    var conf = eval(jquery_ztree_toc_opts);
+		$('#tree').ztree_toc(conf);
+});
+//-->
+</SCRIPT>
