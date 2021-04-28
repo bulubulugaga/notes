@@ -17,7 +17,7 @@ css3为了区分伪类和伪元素，伪元素采用双冒号写法
   <p class="phoneNumber">12345645654</p>
 ```
 运行结果：  
-![运行显示](./toc/images/css01.png)
+![运行显示](./toc/images/css/伪类01.png)
 
 ### content属性
 ::before和::after必须配合content属性来使用，content用来定义插入的内容，content必须有值，至少是空。默认情况下，伪类元素的display是默认值inline，可以通过设置display:block来改变其显示。
@@ -105,7 +105,7 @@ a::after{
 <div id="star-six"></div>
 </body>
 ```
-![运行显示](./toc/images/css02.png)
+![运行显示](./toc/images/css/伪类02.png)
 
 ## :before和::before的区别  
 

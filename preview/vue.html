@@ -69,9 +69,9 @@
 <h2 id="props-">props传参时，父组件数据改变，子组件未更新</h2>
 <p>在父组件创建的时候，已经创建了相关的子组件，该子组件已经缓存在内存中，在通过其他事件改变父组件传给子组件的值时就会不生效
 parent.vue</p>
-<pre><code>&lt;templete&gt;
+<pre><code>&lt;template&gt;
   &lt;child :info=&quot;info&quot;&gt;&lt;/child&gt;
-&lt;/templete&gt;
+&lt;/template&gt;
 &lt;script&gt;
   export defalt {
     data() {
@@ -87,7 +87,7 @@ parent.vue</p>
   }
 &lt;/script&gt;
 </code></pre><p>child.vue</p>
-<pre><code>&lt;templete&gt;
+<pre><code>&lt;template&gt;
   &lt;div&gt;
     &lt;el-table :props=&quot;info.table&gt;
       &lt;el-table-column :props=&quot;name&gt;&lt;/el-table-column&gt;
@@ -98,7 +98,7 @@ parent.vue</p>
       ··· info.other.other.data ···
     &lt;/div&gt;
   &lt;/div&gt;
-&lt;/templete&gt;
+&lt;/template&gt;
 &lt;script&gt;
   export defalt {
     props: {
@@ -157,7 +157,485 @@ getList() {
   })
 }
 </code></pre><p><strong>如果有子组件调用父组件方法（子组件点击事件，父组件需要执行一些相关操作），与平时无异</strong></p>
+<h2 id="vue-elementui-">vue+elementUI拆分单元格</h2>
+<p>数组中嵌套数组（多级分类），需要拆分单元格来展示表格数据的情况<br>具体表现为一行对应多行的格式  </p>
+<pre><code>list: [   // 三级分类实例数据，第一层是申请表格，可填多个物品信息，第二层为物品信息，第三层为物品下的入库记录
+  {
+    id: 1, 
+    purchase: [  //物品
+      {
+        name: &#39;物品1&#39;, 
+        type: &#39;科目1&#39;,
+        number: 2,
+        purchaseIn: [   //入库
+          { person: &#39;小红&#39;, time: &#39;2021-4-15&#39;, number: 1},
+          { person: &#39;小明&#39;, time: &#39;2021-4-16&#39;, number: 2}
+        ]
+      },
+      {
+        name: &#39;物品2&#39;, 
+        type: &#39;科目2&#39;,
+        number: 10,
+        purchaseIn: [
+          { person: &#39;小王&#39;, time: &#39;2021-4-17&#39;, number: 3},
+          { person: &#39;小赵&#39;, time: &#39;2021-4-18&#39;, number: 4},
+          { person: &#39;小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴&#39;, time: &#39;2021-4-18&#39;, number: 4}
+        ]
+      },
+    ]
+  }, {
+    id: 2, 
+    purchase: [
+      {
+        name: &#39;物品1&#39;, 
+        type: &#39;科目1&#39;,
+        number: 2,
+        purchaseIn: [
+          { person: &#39;小红&#39;, time: &#39;2021-4-15&#39;, number: 1},
+        ]
+      },
+      {
+        name: &#39;物品2&#39;, 
+        type: &#39;科目2&#39;,
+        number: 10,
+        purchaseIn: [
+          { person: &#39;小王&#39;, time: &#39;2021-4-17&#39;, number: 3},
+          { person: &#39;小赵&#39;, time: &#39;2021-4-18&#39;, number: 4},
+          { person: &#39;小吴&#39;, time: &#39;2021-4-18&#39;, number: 4}
+        ]
+      },
+    ]
+  }, {
+    id: 2, 
+    purchase: [
+      {
+        name: &#39;物品1&#39;, 
+        type: &#39;科目1&#39;,
+        number: 2,
+        purchaseIn: []
+      },
+      {
+        name: &#39;物品2&#39;, 
+        type: &#39;科目2&#39;,
+        number: 10,
+        purchaseIn: [
+          { person: &#39;小王&#39;, time: &#39;2021-4-17&#39;, number: 3},
+          { person: &#39;小赵&#39;, time: &#39;2021-4-18&#39;, number: 4},
+          { person: &#39;小吴&#39;, time: &#39;2021-4-18&#39;, number: 4}
+        ]
+      },
+    ]
+  }
+]
+</code></pre><p><strong>1、只嵌套了一层（无内部purchaseIn）</strong><br>当时参考了之前的代码，用嵌套table的方式来实现拆分展示</p>
+<pre><code>&lt;template&gt;
+  &lt;el-table :data=&quot;List&quot; border class=&quot;launch-purchase-l-t&quot;&gt;
+    &lt;el-table-column type=&quot;index&quot; width=&quot;80&quot; align=&quot;center&quot; label=&quot;序号&quot;&gt;&lt;/el-table-column&gt;
+    &lt;el-table-column label=&quot;物品名称&quot; class-name=&quot;none-padding&quot; align=&quot;center&quot;&gt;
+      &lt;template slot-scope=&quot;scope&quot;&gt;
+        &lt;el-table :data=&quot;scope.row.purchase&quot; :show-header=&quot;false&quot;&gt;
+          &lt;el-table-column prop=&quot;name&quot; align=&quot;center&quot;&gt;&lt;/el-table-column&gt;
+        &lt;/el-table&gt;
+      &lt;/template&gt;
+    &lt;/el-table-column&gt;
+    &lt;el-table-column label=&quot;科目&quot; class-name=&quot;none-padding&quot; align=&quot;center&quot;&gt;
+      &lt;template slot-scope=&quot;scope&quot;&gt;
+        &lt;el-table :data=&quot;scope.row.purchase&quot; :show-header=&quot;false&quot;&gt;
+          &lt;el-table-column prop=&quot;type&quot; align=&quot;center&quot;&gt;&lt;/el-table-column&gt;
+        &lt;/el-table&gt;
+      &lt;/template&gt;
+    &lt;/el-table-column&gt;
+  &lt;el-table&gt;
+&lt;/template&gt;
+&lt;style&gt;
+.launch-purchase-l-t {
+  // 去除内部嵌套表格的边框
+  .none-padding .cell {
+    padding: 0;
+    .el-table {
+      border: none;
+    }
+    .el-table::before, .el-table::after {
+      background-color: #FFFFFF;
+    }
+  }
+  td {
+    height: 44px;
+  }
+}
+&lt;/style&gt;
+</code></pre><p>如果没有分页，且数据不多，不考虑固定列的情况下可以直接使用原生table，进行合并单元格（ele 1.4版本不支持，后新版本的可合并单元格，但分页仍不适用），可支持表格外层嵌套div用于表格过宽，scroll展示，且不用考虑td内部数据过长的问题，会自动换行</p>
+<pre><code>&lt;table class=&quot;span-table&quot; border cellspacing=&quot;0&quot; style=&quot;width: 100%&quot;&gt;
+  &lt;thead&gt;
+    &lt;th style=&quot;width: 80px;&quot;&gt;序号&lt;/th&gt;
+    &lt;th style=&quot;width: 160px;&quot;&gt;ID&lt;/th&gt;
+    &lt;th style=&quot;width: 240px;&quot;&gt;姓名&lt;/th&gt;
+    &lt;th style=&quot;width: 320px;&quot;&gt;数量&lt;/th&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;template v-if=&quot;list.length &gt; 0&quot;&gt;
+      &lt;template v-for=&quot;(item, index) in list&quot;&gt; 
+        &lt;tr v-for=&quot;(good, i) in item.purchase&quot; :key=&quot;i&quot;&gt;
+          &lt;td :rowspan=&quot;item.purchase.length&quot; v-if=&quot;i === 0&quot;&gt;{{index + 1}}&lt;/td&gt;
+          &lt;td :rowspan=&quot;item.purchase.length&quot; v-if=&quot;i === 0&quot;&gt;{{item.id}}&lt;/td&gt;
+          &lt;td&gt;{{good.name}}&lt;/td&gt;
+          &lt;td&gt;{{good.number}}&lt;/td&gt;
+        &lt;/tr&gt;
+      &lt;/template&gt;
+    &lt;/template&gt;
+    &lt;template v-else&gt;
+      &lt;!-- 没有数据展示为一行提示 --&gt;
+      &lt;tr&gt;
+        &lt;td colspan=&quot;7&quot;&gt;&lt;/td&gt;   
+      &lt;/tr&gt;
+    &lt;/template&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+</code></pre><p><img src="./toc/images/vue/项目01.png" alt="运行结果展示"><br><strong>2、三层（内部含有purchaseIn）</strong><br>内部嵌套div，这种方式应该也可用于两层嵌套，且不用考虑单元格高度（自动撑开）和去除内部单元格边框</p>
+<pre><code>&lt;template&gt;
+  &lt;el-table :data=&quot;list&quot; border style=&quot;width: 100%&quot;&gt; 
+    &lt;el-table-column label=&quot;序号&quot; type=&quot;index&quot; width=&quot;200&quot; fixed align=&quot;center&quot;&gt;&lt;/el-table-column&gt;
+    &lt;el-table-column label=&quot;姓名&quot; prop=&quot;name&quot; width=&quot;200&quot; fixed align=&quot;center&quot;&gt;
+      &lt;template slot-scope=&quot;scope&quot;&gt;
+        &lt;!-- 第二层div的高度需要根据第三层数据判断，且考虑第三层有空数据的情况 --&gt;
+        &lt;div v-for=&quot;(item, index) in scope.row.purchase&quot; 
+          class=&quot;internal-td internal-td-middle&quot; 
+          :style=&quot;{ height: 40 * (scope.row.purchase[index].purchaseIn.length || 1) + scope.row.purchase[index].purchaseIn.length + &#39;px&#39; }&quot;&gt;
+          {{ item.name }}
+        &lt;/div&gt;
+      &lt;/template&gt;
+    &lt;/el-table-column&gt;
+    &lt;el-table-column label=&quot;采购人&quot; prop=&quot;number&quot; width=&quot;400&quot; align=&quot;center&quot;&gt;
+      &lt;template slot-scope=&quot;scope&quot;&gt;
+        &lt;div v-for=&quot;item in scope.row.purchase&quot; class=&quot;internal-td&quot;&gt;
+          &lt;div v-if=&quot;item.purchaseIn.length === 0&quot; class=&quot;internal-td&quot; style=&quot;height: 39px;&quot;&gt;&lt;/div&gt;
+          &lt;div v-else v-for=&quot;item1 in item.purchaseIn&quot; class=&quot;internal-td internal-td-middle&quot; style=&quot;line-height: 40px;&quot;&gt;
+            &lt;span&gt;{{ item1.person }}&lt;/span&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/template&gt;
+    &lt;/el-table-column&gt;
+    &lt;el-table-column label=&quot;科目&quot; prop=&quot;type&quot; width=&quot;400&quot;&gt;&lt;/el-table-column&gt;
+    &lt;el-table-column label=&quot;数量&quot; prop=&quot;number&quot; width=&quot;400&quot;&gt;&lt;/el-table-column&gt;
+    &lt;el-table-column label=&quot;采购时间&quot; prop=&quot;number&quot; width=&quot;400&quot;&gt;&lt;/el-table-column&gt;
+    &lt;el-table-column label=&quot;采购数量&quot; prop=&quot;number&quot; width=&quot;400&quot;&gt;&lt;/el-table-column&gt;
+    &lt;el-table-column label=&quot;操作&quot; width=&quot;200&quot; fixed=&quot;right&quot;&gt;
+      &lt;template&gt;
+        查看
+      &lt;/template&gt;
+    &lt;/el-table-column&gt;
+  &lt;/el-table&gt;
+&lt;/template&gt;
+&lt;style&gt;
+  // 消除单元格内边距，内部div需要添加边框，判断数据长度和鼠标移入效果
+  .el-table .cell {
+    padding: 0;
+  }
+  .internal-td {
+    border-bottom: 1px solid #dfe6ec;
+    background-color: white;
+    transition: background-color .25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .internal-td:hover {
+    background-color: #EEF1F6;
+  }
+  .internal-td:last-child {
+    border-bottom: 1px solid white;
+  }
+  .internal-td-middle span {
+    height: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+&lt;/style&gt;
+</code></pre><p>合并单元格方式</p>
+<pre><code>&lt;div style=&quot;width: 100%; overflow-x: scroll;&quot;&gt;
+  &lt;table class=&quot;span-table&quot; border cellspacing=&quot;0&quot; style=&quot;width: 200%&quot;&gt;
+    &lt;thead&gt;
+      &lt;th style=&quot;width: 80px;&quot;&gt;序号&lt;/th&gt;
+      &lt;th style=&quot;width: 160px;&quot;&gt;ID&lt;/th&gt;
+      &lt;th style=&quot;width: 240px;&quot;&gt;姓名&lt;/th&gt;
+      &lt;th style=&quot;width: 320px;&quot;&gt;采购人&lt;/th&gt;
+      &lt;th style=&quot;width: 2000px;&quot;&gt;数量&lt;/th&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+      &lt;template v-if=&quot;list.length &gt; 0&quot;&gt;
+        &lt;template v-for=&quot;(item, index) in list&quot;&gt; 
+          &lt;template v-for=&quot;(good, goodIndex) in item.purchase&quot;&gt; 
+            &lt;tr v-for=&quot;(purchaseIn, purchaseIndex) in good.purchaseIn&quot;&gt;
+              &lt;td 
+                :rowspan=&quot;item.purchase.reduce((m, n) =&gt; { return m.purchaseIn.length + n.purchaseIn.length })&quot;
+                v-if=&quot;goodIndex === 0 &amp;&amp; purchaseIndex === 0&quot;
+              &gt;{{ index + 1 }}&lt;/td&gt;
+              &lt;td
+                :rowspan=&quot;item.purchase.reduce((m, n) =&gt; { return m.purchaseIn.length + n.purchaseIn.length })&quot;
+                v-if=&quot;goodIndex === 0 &amp;&amp; purchaseIndex === 0&quot;
+              &gt;{{item.id}}&lt;/td&gt;
+              &lt;td :rowspan=&quot;good.purchaseIn.length&quot; v-if=&quot;purchaseIndex === 0&quot;&gt;{{good.name}}&lt;/td&gt;
+              &lt;td&gt;{{purchaseIn.person}}&lt;/td&gt;
+              &lt;td :rowspan=&quot;good.purchaseIn.length&quot; v-if=&quot;purchaseIndex === 0&quot;&gt;{{good.number}}&lt;/td&gt;
+            &lt;/tr&gt;
+          &lt;/template&gt;
+        &lt;/template&gt;
+      &lt;/template&gt;
+      &lt;template v-else&gt;
+        &lt;tr&gt;
+          &lt;td colspan=&quot;7&quot;&gt;&lt;/td&gt;   
+        &lt;/tr&gt;
+      &lt;/template&gt;
+    &lt;/tbody&gt;
+  &lt;/table&gt;
+&lt;/div&gt;
+</code></pre><p><img src="./toc/images/vue/项目02.png" alt="运行演示">     </p>
+<p><strong>上述实例部分代码，引入elementUI和vue可直接测试使用</strong></p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+  &lt;title&gt;element表格三级分类&lt;/title&gt;
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;./elementui@1.4.css&quot;&gt;
+  &lt;style&gt;
+    .el-table {
+      border: none;
+    }
+    .el-table .cell {
+      padding: 0;
+    }
+    .el-table::after, .el-table::before {
+      background: white;
+    }
+    .internal-td {
+      border-bottom: 1px solid #dfe6ec;
+      background-color: white;
+      transition: background-color .25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .internal-td:hover {
+      background-color: #EEF1F6;
+    }
+    .internal-td:last-child {
+      border-bottom: 1px solid white;
+    }
+    .internal-td-middle span {
+      height: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
+    .span-table {
+      border-color: #DFE6EC;
+    }
+    .span-table th, .span-table td {
+      text-align: center;
+      height: 44px;
+      border-color: #DFE6EC;
+    }
+    .span-table th {
+      background: #EEF1F6;
+    }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div id=&quot;app&quot;&gt;
+    &lt;el-table :data=&quot;list&quot; border style=&quot;width: 100%&quot;&gt; 
+      &lt;el-table-column label=&quot;序号&quot; type=&quot;index&quot; width=&quot;200&quot; fixed align=&quot;center&quot;&gt;&lt;/el-table-column&gt;
+      &lt;el-table-column label=&quot;姓名&quot; prop=&quot;name&quot; width=&quot;200&quot; fixed align=&quot;center&quot;&gt;
+        &lt;template slot-scope=&quot;scope&quot;&gt;
+          &lt;div v-for=&quot;(item, index) in scope.row.purchase&quot; 
+            class=&quot;internal-td internal-td-middle&quot; 
+            :style=&quot;{ height: 40 * (scope.row.purchase[index].purchaseIn.length || 1) + scope.row.purchase[index].purchaseIn.length + &#39;px&#39; }&quot;&gt;
+            {{ item.name }}
+          &lt;/div&gt;
+        &lt;/template&gt;
+      &lt;/el-table-column&gt;
+      &lt;el-table-column label=&quot;采购人&quot; prop=&quot;number&quot; width=&quot;400&quot; align=&quot;center&quot;&gt;
+        &lt;template slot-scope=&quot;scope&quot;&gt;
+          &lt;div v-for=&quot;item in scope.row.purchase&quot; class=&quot;internal-td&quot;&gt;
+            &lt;div v-if=&quot;item.purchaseIn.length === 0&quot; class=&quot;internal-td&quot; style=&quot;height: 39px;&quot;&gt;&lt;/div&gt;
+            &lt;div v-else v-for=&quot;item1 in item.purchaseIn&quot; class=&quot;internal-td internal-td-middle&quot; style=&quot;line-height: 40px;&quot;&gt;
+              &lt;span&gt;{{ item1.person }}&lt;/span&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        &lt;/template&gt;
+      &lt;/el-table-column&gt;
+      &lt;el-table-column label=&quot;科目&quot; prop=&quot;type&quot; width=&quot;400&quot;&gt;&lt;/el-table-column&gt;
+      &lt;el-table-column label=&quot;数量&quot; prop=&quot;number&quot; width=&quot;400&quot;&gt;&lt;/el-table-column&gt;
+      &lt;el-table-column label=&quot;采购时间&quot; prop=&quot;number&quot; width=&quot;400&quot;&gt;&lt;/el-table-column&gt;
+      &lt;el-table-column label=&quot;采购数量&quot; prop=&quot;number&quot; width=&quot;400&quot;&gt;&lt;/el-table-column&gt;
+      &lt;el-table-column label=&quot;操作&quot; width=&quot;200&quot; fixed=&quot;right&quot;&gt;
+        &lt;template&gt;
+          查看
+        &lt;/template&gt;
+      &lt;/el-table-column&gt;
+    &lt;/el-table&gt;
+
+    &lt;div style=&quot;margin: 30px 0; height: 1px; background: #ddd;&quot;&gt;&lt;/div&gt;
+
+    &lt;table class=&quot;span-table&quot; border cellspacing=&quot;0&quot; style=&quot;width: 100%&quot;&gt;
+      &lt;thead&gt;
+        &lt;th style=&quot;width: 80px;&quot;&gt;序号&lt;/th&gt;
+        &lt;th style=&quot;width: 160px;&quot;&gt;ID&lt;/th&gt;
+        &lt;th style=&quot;width: 240px;&quot;&gt;姓名&lt;/th&gt;
+        &lt;th style=&quot;width: 320px;&quot;&gt;数量&lt;/th&gt;
+      &lt;/thead&gt;
+      &lt;tbody&gt;
+        &lt;template v-if=&quot;list.length &gt; 0&quot;&gt;
+          &lt;template v-for=&quot;(item, index) in list&quot;&gt; 
+            &lt;tr v-for=&quot;(good, i) in item.purchase&quot; :key=&quot;i&quot;&gt;
+              &lt;td :rowspan=&quot;item.purchase.length&quot; v-if=&quot;i === 0&quot;&gt;{{index + 1}}&lt;/td&gt;
+              &lt;td :rowspan=&quot;item.purchase.length&quot; v-if=&quot;i === 0&quot;&gt;{{item.id}}&lt;/td&gt;
+              &lt;td&gt;{{good.name}}&lt;/td&gt;
+              &lt;td&gt;{{good.number}}&lt;/td&gt;
+            &lt;/tr&gt;
+          &lt;/template&gt;
+        &lt;/template&gt;
+        &lt;template v-else&gt;
+          &lt;!-- 没有数据展示为一行提示 --&gt;
+          &lt;tr&gt;
+            &lt;td colspan=&quot;7&quot;&gt;&lt;/td&gt;   
+          &lt;/tr&gt;
+        &lt;/template&gt;
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+
+    &lt;div style=&quot;margin: 30px 0; height: 1px; background: #ddd;&quot;&gt;&lt;/div&gt;
+
+    &lt;div style=&quot;width: 100%; overflow-x: scroll;&quot;&gt;
+      &lt;table class=&quot;span-table&quot; border cellspacing=&quot;0&quot; style=&quot;width: 200%&quot;&gt;
+        &lt;thead&gt;
+          &lt;th style=&quot;width: 80px;&quot;&gt;序号&lt;/th&gt;
+          &lt;th style=&quot;width: 160px;&quot;&gt;ID&lt;/th&gt;
+          &lt;th style=&quot;width: 240px;&quot;&gt;姓名&lt;/th&gt;
+          &lt;th style=&quot;width: 320px;&quot;&gt;采购人&lt;/th&gt;
+          &lt;th style=&quot;width: 2000px;&quot;&gt;数量&lt;/th&gt;
+        &lt;/thead&gt;
+        &lt;tbody&gt;
+          &lt;template v-if=&quot;list.length &gt; 0&quot;&gt;
+            &lt;template v-for=&quot;(item, index) in list&quot;&gt; 
+              &lt;template v-for=&quot;(good, goodIndex) in item.purchase&quot;&gt; 
+                &lt;tr v-for=&quot;(purchaseIn, purchaseIndex) in good.purchaseIn&quot;&gt;
+                  &lt;td 
+                    :rowspan=&quot;item.purchase.reduce((m, n) =&gt; { return m.purchaseIn.length + n.purchaseIn.length })&quot;
+                    v-if=&quot;goodIndex === 0 &amp;&amp; purchaseIndex === 0&quot;
+                  &gt;{{ index + 1 }}&lt;/td&gt;
+                  &lt;td
+                    :rowspan=&quot;item.purchase.reduce((m, n) =&gt; { return m.purchaseIn.length + n.purchaseIn.length })&quot;
+                    v-if=&quot;goodIndex === 0 &amp;&amp; purchaseIndex === 0&quot;
+                  &gt;{{item.id}}&lt;/td&gt;
+                  &lt;td :rowspan=&quot;good.purchaseIn.length&quot; v-if=&quot;purchaseIndex === 0&quot;&gt;{{good.name}}&lt;/td&gt;
+                  &lt;td&gt;{{purchaseIn.person}}&lt;/td&gt;
+                  &lt;td :rowspan=&quot;good.purchaseIn.length&quot; v-if=&quot;purchaseIndex === 0&quot;&gt;{{good.number}}&lt;/td&gt;
+                &lt;/tr&gt;
+              &lt;/template&gt;
+            &lt;/template&gt;
+          &lt;/template&gt;
+          &lt;template v-else&gt;
+            &lt;tr&gt;
+              &lt;td colspan=&quot;7&quot;&gt;&lt;/td&gt;   
+            &lt;/tr&gt;
+          &lt;/template&gt;
+        &lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/div&gt;
+
+    &lt;div style=&quot;margin: 30px 0 100px; height: 1px; background: #ddd;&quot;&gt;&lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;script src=&quot;./vue-min.js&quot;&gt;&lt;/script&gt;
+  &lt;script src=&quot;./elementui@1.4.js&quot;&gt;&lt;/script&gt;
+  &lt;script&gt;
+    new Vue({
+      el: &#39;#app&#39;,
+      data() {
+        return { 
+          list: [
+            {
+              id: &#39;AZ10000000&#39;, 
+              purchase: [
+                {
+                  name: &#39;aaa&#39;, 
+                  type: &#39;科目1&#39;,
+                  number: 2,
+                  purchaseIn: [
+                    { person: &#39;小红&#39;, time: &#39;2021-4-15&#39;, number: 1},
+                    { person: &#39;小明&#39;, time: &#39;2021-4-16&#39;, number: 2}
+                  ]
+                },
+                {
+                  name: &#39;bbb&#39;, 
+                  type: &#39;科目2&#39;,
+                  number: 10,
+                  purchaseIn: [
+                    { person: &#39;小王&#39;, time: &#39;2021-4-17&#39;, number: 3},
+                    { person: &#39;小赵&#39;, time: &#39;2021-4-18&#39;, number: 4},
+                    { person: &#39;小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴小吴&#39;, time: &#39;2021-4-18&#39;, number: 4}
+                  ]
+                },
+              ]
+            }, {
+              id: &#39;AZ10000001&#39;, 
+              purchase: [
+                {
+                  name: &#39;aaa&#39;, 
+                  type: &#39;科目1&#39;,
+                  number: 2,
+                  purchaseIn: [
+                    { person: &#39;小红&#39;, time: &#39;2021-4-15&#39;, number: 1},
+                  ]
+                },
+                {
+                  name: &#39;bbb&#39;, 
+                  type: &#39;科目2&#39;,
+                  number: 10,
+                  purchaseIn: [
+                    { person: &#39;小王&#39;, time: &#39;2021-4-17&#39;, number: 3},
+                    { person: &#39;小赵&#39;, time: &#39;2021-4-18&#39;, number: 4},
+                    { person: &#39;小吴&#39;, time: &#39;2021-4-18&#39;, number: 4}
+                  ]
+                },
+              ]
+            }, {
+              id: &#39;AZ10000002&#39;, 
+              purchase: [
+                {
+                  name: &#39;aaa&#39;, 
+                  type: &#39;科目1&#39;,
+                  number: 2,
+                  purchaseIn: [{ person: &#39;小王&#39;, time: &#39;2021-4-17&#39;, number: 3}]
+                },
+                {
+                  name: &#39;bbb&#39;, 
+                  type: &#39;科目2&#39;,
+                  number: 10,
+                  purchaseIn: [
+                    { person: &#39;小王&#39;, time: &#39;2021-4-17&#39;, number: 3},
+                    { person: &#39;小赵&#39;, time: &#39;2021-4-18&#39;, number: 4},
+                    { person: &#39;小吴&#39;, time: &#39;2021-4-18&#39;, number: 4}
+                  ]
+                },
+              ]
+            }
+          ]
+         }
+      }
+    })
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
           	</article>
         </div>
 		</div>

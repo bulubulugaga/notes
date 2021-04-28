@@ -153,7 +153,7 @@ var obj1 = {//定义了一个object类型
   name:'obj'
 };
 ```
-![内存分配](./toc/images/js01.png)
+![内存分配](./toc/images/js/深浅拷贝01.png)
 
 1、基本类型的复制
 ```
@@ -174,7 +174,7 @@ color1.push('black') ;  //改变color1的值
 console.log(color2)  //['red','green','black']
 ```
 color1与color2指向堆内存中同一地址的同一对象，复制的只是引用地址。    
-![引用类型内存分配](./toc/images/js02.png)
+![引用类型内存分配](./toc/images/js/深浅拷贝02.png)
 
 ## 深浅拷贝
 >浅拷贝只复制指向某个对象的指针，而不复制对象本身，新旧对象还是共享同一块内存。但深拷贝会另外创造一个一模一样的对象，新对象跟原对象不共享内存，修改新对象不会改到原对象。

@@ -15,7 +15,7 @@
 
 1. 准备修改hosts文件
 2. 查询github网址：<https://github.com.ipaddress.com/>   
-  ![ip实例](./toc/images/other01.png)   
+  ![ip实例](./toc/images/other/管理员01.png)   
 3. 文件最后附上即可
 > 140.82.112.4 github.com
 4. 本条参照<https://zhuanlan.zhihu.com/p/158938544>
