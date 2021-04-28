@@ -65,7 +65,77 @@
 				</div>
         <div id='readme' style='width:70%;margin-left:20%;'>
           	<article class='markdown-body'>
-            	<h1 id="object">Object</h1>
+            	<h1 id="-">数组</h1>
+<h2 id="-">判断对象是否有元素不为空</h2>
+<p>全为空返回false, 含有非空元素返回true</p>
+<pre><code>// lodash.js
+isHasEle(obj) {
+  let flag = false;
+  _.forIn(obj, value =&gt; {
+    if(value || value === 0) {
+      // 0保证元素可能为0的情况
+      flag = true;
+    }
+  })
+  return flag;
+}
+// 普通使用
+function isHasEle(obj) {
+  let flag = false;
+  for(let key in obj) {
+    if(obj[key] || obj[key] === 0) {
+      flag = true;
+    }
+  }
+  return flag;
+}
+console.log(isHasEle({a: &#39;&#39;, b: &#39;&#39;}));  //false
+console.log(isHasEle({a: 1, b: &#39;&#39;}));  //true
+console.log(isHasEle({a: 0, b: &#39;&#39;}));  //true
+</code></pre><h2 id="-">去除对象数组中的全空对象元素</h2>
+<pre><code>let arr = [
+  {name: &#39;aaa&#39;, number: &#39;&#39;, compony: &#39;&#39;},
+  {name: &#39;&#39;, number: 2, compony: &#39;&#39;},
+  {name: &#39;&#39;, number: &#39;&#39;, compony: &#39;aaa科技&#39;},
+  {name: &#39;&#39;, number: &#39;&#39;, compony: &#39;&#39;},
+  {name: &#39;aaa&#39;, number: 2, compony: &#39;aaa科技&#39;}
+]
+console.log(_.filter(arr, o =&gt; isHasEle(o)));
+console.log(arr.filter(o =&gt; isHasEle(o)));
+// 返回数据
+    [
+      {name: &#39;aaa&#39;, number: &#39;&#39;, compony: &#39;&#39;},
+      {name: &#39;&#39;, number: 2, compony: &#39;&#39;},
+      {name: &#39;&#39;, number: &#39;&#39;, compony: &#39;aaa科技&#39;},
+      {name: &#39;aaa&#39;, number: 2, compony: &#39;aaa科技&#39;}
+    ]
+</code></pre><p>添加判断: 只要填写（有非空元素），其它数据也必须存在（这里用了elementUI）</p>
+<pre><code>oBtn.click = function () {
+  let arr1 = arr.filter(o =&gt; isHasEle(o));
+  if (arr1.length === 0) {
+    // 未填写内容
+    this.$message.error(&#39;请输入物品名称&#39;);
+    return;
+  }
+  // 判断必填字段
+  for(let i = 0; i &lt; arr.length; i++) {
+    if(!arr[i].name) {
+      this.$message.error(&#39;请输入物品名称&#39;);
+      return;
+    } 
+    else if (!arr[i].number) {
+      this.$message.error(&#39;请输入数量&#39;);
+      return;
+    }
+    else if (!arr[i].compony) {
+      this.$message.error(&#39;请输入公司&#39;);
+      return;
+    }
+  }
+  // 进行下一步操作，如提交
+  api.post(arr1).then(res =&gt; { ··· })
+}
+</code></pre><h1 id="object">Object</h1>
 <h2 id="object-assign">Object.assign</h2>
 <ul>
 <li>简单的说就是通过复制一个或多个对象来创建一个新的对象。  </li>

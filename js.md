@@ -1,3 +1,81 @@
+# 数组
+
+## 判断对象是否有元素不为空    
+全为空返回false, 含有非空元素返回true
+```
+// lodash.js
+isHasEle(obj) {
+  let flag = false;
+  _.forIn(obj, value => {
+    if(value || value === 0) {
+      // 0保证元素可能为0的情况
+      flag = true;
+    }
+  })
+  return flag;
+}
+// 普通使用
+function isHasEle(obj) {
+  let flag = false;
+  for(let key in obj) {
+    if(obj[key] || obj[key] === 0) {
+      flag = true;
+    }
+  }
+  return flag;
+}
+console.log(isHasEle({a: '', b: ''}));  //false
+console.log(isHasEle({a: 1, b: ''}));  //true
+console.log(isHasEle({a: 0, b: ''}));  //true
+```
+## 去除对象数组中的全空对象元素
+```
+let arr = [
+  {name: 'aaa', number: '', compony: ''},
+  {name: '', number: 2, compony: ''},
+  {name: '', number: '', compony: 'aaa科技'},
+  {name: '', number: '', compony: ''},
+  {name: 'aaa', number: 2, compony: 'aaa科技'}
+]
+console.log(_.filter(arr, o => isHasEle(o)));
+console.log(arr.filter(o => isHasEle(o)));
+// 返回数据
+    [
+      {name: 'aaa', number: '', compony: ''},
+      {name: '', number: 2, compony: ''},
+      {name: '', number: '', compony: 'aaa科技'},
+      {name: 'aaa', number: 2, compony: 'aaa科技'}
+    ]
+```
+添加判断: 只要填写（有非空元素），其它数据也必须存在（这里用了elementUI）
+```
+oBtn.click = function () {
+  let arr1 = arr.filter(o => isHasEle(o));
+  if (arr1.length === 0) {
+    // 未填写内容
+    this.$message.error('请输入物品名称');
+    return;
+  }
+  // 判断必填字段
+  for(let i = 0; i < arr.length; i++) {
+    if(!arr[i].name) {
+      this.$message.error('请输入物品名称');
+      return;
+    } 
+    else if (!arr[i].number) {
+      this.$message.error('请输入数量');
+      return;
+    }
+    else if (!arr[i].compony) {
+      this.$message.error('请输入公司');
+      return;
+    }
+  }
+  // 进行下一步操作，如提交
+  api.post(arr1).then(res => { ··· })
+}
+```
+
 # Object
 ## Object.assign
 * 简单的说就是通过复制一个或多个对象来创建一个新的对象。  
