@@ -366,3 +366,104 @@ function deepClone(obj){
   return objClone;
 } 
 ```
+
+# 项目中的一些问题
+## 根据数组某个元素循环请求api，按顺序获得相应值
+![项目图片](./toc/images/js/项目01.png)
+![项目图片](./toc/images/js/项目02.png)
+描述：获取详情页，内部含有一个申请表格，根据表格内部项目id按顺序再生成对应的表格。相当于是先请求了一个接口获得一个数组，后需要再根据这个数组内的各个id获取相应的值整合成为新数组，循环展示表格。    
+思路：api请求是异步操作，直接按数组id循环请求，push到新数组中，很可能和原数组顺序不一致，在需要保证先后值的前提下，将请求放入数组中，考虑用promise.all或者async。    
+**1、直接push**     
+顺序随机  
+```
+projectList: [
+  {id: 0, name: 'aaa'},
+  {id: 1, name: 'bbb'}
+]
+_.forEach(projectList, item => {
+  api.getList({ id: item.id }).then(res => {
+    this.list.push(res.data)
+  })
+})
+```
+**2、promise.all**    
+将api请求循环放入数组中，通过promise.all执行     
+```
+let atemp = _.map(projectList, item => 
+  // 使用Promise用于异步计算
+  new Promise((resolve, reject) => {
+    api.getList({ id: item.id }).then(res => {
+      resolve(res)
+    }, err => {
+      reject(err)
+    })
+  })
+)
+Promise.all(atemp).then(res => {
+  // 全部执行结束，保证执行顺序
+  console.log(res);
+  res是两个api返回数据组成得数组
+  //数据处理
+  ···
+}).catch(err => {
+  console.log('error', err)
+})
+```
+**3、单个表格还需要分页**      
+需要一个对应的分页数组，切换分页时需要判断是哪一个表格，再调取接口修改相应的一个表格数据
+```
+// 拼接请求参数
+this.reimburseRecords = _.map(projectList, item => {
+  return {
+    project_id: item.project_id,
+    limit: 10,
+    page: 1
+  }
+})
+// 拼接请求顺序
+let atemp = _.map(projectList, (item, index) => this.getHistoryReim(index));
+// 全部执行结束，保证执行顺序
+Promise.all(atemp).then(res => {
+  this.reimburseRecordsList = res;
+}).catch(err => {
+  console.log('error', err)
+})
+getHistoryReim(index) {
+  // 获取记录
+  return new Promise((resolve, reject) => {
+    ApplyApi.getHistoryReim(this.reimburseRecords[index]).then(res => {
+      if(res.data.data.length !== 0) {
+        // 如果需要在最后一行添加一些内容
+        res.data.data.push({
+          id: 'sum',
+          contract_number: '项目签约金额',
+          party_a: res.data.meta.custom.signed_money + '万元',
+          project_name: '已报销金额总计',
+          project_type: res.data.meta.custom.reimburse_money + '万元',
+          reimburse_fee: -1,
+          reimburse_fee_type_name:  res.data.meta.custom.loan_strike_a_balance_money_not + '万元',
+          created_at: ' '
+        })
+      }
+      resolve(res.data.data);
+    }, err => {
+      this.$message.error(err.data.message)
+      reject(err)
+    })
+  })
+}
+handleSizeChange (val, index) {
+  // 切换每页条数
+  this.reimburseRecords[index].limit = val;
+  this.getHistoryReim(index).then(res => {
+    this.$set(this.reimburseRecordsList, index, res);
+  })
+},
+handleCurrentChange (val, index) {
+  // 切换当前页
+  this.reimburseRecords[index].page = val;
+  this.getHistoryReim(index).then(res => {
+    this.$set(this.reimburseRecordsList, index, res);
+  })
+},
+```

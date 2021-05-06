@@ -369,6 +369,95 @@ copy = JSON.parse(JSON.stringify(obj));
   }
   return objClone;
 } 
+</code></pre><h1 id="-">项目中的一些问题</h1>
+<h2 id="-api-">根据数组某个元素循环请求api，按顺序获得相应值</h2>
+<p><img src="./toc/images/js/项目01.png" alt="项目图片">
+<img src="./toc/images/js/项目02.png" alt="项目图片">
+描述：获取详情页，内部含有一个申请表格，根据表格内部项目id按顺序再生成对应的表格。相当于是先请求了一个接口获得一个数组，后需要再根据这个数组内的各个id获取相应的值整合成为新数组，循环展示表格。<br>思路：api请求是异步操作，直接按数组id循环请求，push到新数组中，很可能和原数组顺序不一致，在需要保证先后值的前提下，将请求放入数组中，考虑用promise.all或者async。<br><strong>1、直接push</strong><br>顺序随机  </p>
+<pre><code>projectList: [
+  {id: 0, name: &#39;aaa&#39;},
+  {id: 1, name: &#39;bbb&#39;}
+]
+_.forEach(projectList, item =&gt; {
+  api.getList({ id: item.id }).then(res =&gt; {
+    this.list.push(res.data)
+  })
+})
+</code></pre><p><strong>2、promise.all</strong><br>将api请求循环放入数组中，通过promise.all执行     </p>
+<pre><code>let atemp = _.map(projectList, item =&gt; 
+  // 使用Promise用于异步计算
+  new Promise((resolve, reject) =&gt; {
+    api.getList({ id: item.id }).then(res =&gt; {
+      resolve(res)
+    }, err =&gt; {
+      reject(err)
+    })
+  })
+)
+Promise.all(atemp).then(res =&gt; {
+  // 全部执行结束，保证执行顺序
+  console.log(res);
+  res是两个api返回数据组成得数组
+  //数据处理
+  ···
+}).catch(err =&gt; {
+  console.log(&#39;error&#39;, err)
+})
+</code></pre><p><strong>3、单个表格还需要分页</strong><br>需要一个对应的分页数组，切换分页时需要判断是哪一个表格，再调取接口修改相应的一个表格数据</p>
+<pre><code>// 拼接请求参数
+this.reimburseRecords = _.map(projectList, item =&gt; {
+  return {
+    project_id: item.project_id,
+    limit: 10,
+    page: 1
+  }
+})
+// 拼接请求顺序
+let atemp = _.map(projectList, (item, index) =&gt; this.getHistoryReim(index));
+// 全部执行结束，保证执行顺序
+Promise.all(atemp).then(res =&gt; {
+  this.reimburseRecordsList = res;
+}).catch(err =&gt; {
+  console.log(&#39;error&#39;, err)
+})
+getHistoryReim(index) {
+  // 获取记录
+  return new Promise((resolve, reject) =&gt; {
+    ApplyApi.getHistoryReim(this.reimburseRecords[index]).then(res =&gt; {
+      if(res.data.data.length !== 0) {
+        // 如果需要在最后一行添加一些内容
+        res.data.data.push({
+          id: &#39;sum&#39;,
+          contract_number: &#39;项目签约金额&#39;,
+          party_a: res.data.meta.custom.signed_money + &#39;万元&#39;,
+          project_name: &#39;已报销金额总计&#39;,
+          project_type: res.data.meta.custom.reimburse_money + &#39;万元&#39;,
+          reimburse_fee: -1,
+          reimburse_fee_type_name:  res.data.meta.custom.loan_strike_a_balance_money_not + &#39;万元&#39;,
+          created_at: &#39; &#39;
+        })
+      }
+      resolve(res.data.data);
+    }, err =&gt; {
+      this.$message.error(err.data.message)
+      reject(err)
+    })
+  })
+}
+handleSizeChange (val, index) {
+  // 切换每页条数
+  this.reimburseRecords[index].limit = val;
+  this.getHistoryReim(index).then(res =&gt; {
+    this.$set(this.reimburseRecordsList, index, res);
+  })
+},
+handleCurrentChange (val, index) {
+  // 切换当前页
+  this.reimburseRecords[index].page = val;
+  this.getHistoryReim(index).then(res =&gt; {
+    this.$set(this.reimburseRecordsList, index, res);
+  })
+},
 </code></pre>
           	</article>
         </div>
