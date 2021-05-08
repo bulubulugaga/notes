@@ -467,3 +467,55 @@ handleCurrentChange (val, index) {
   })
 },
 ```
+
+# 题库编程
+## 基础
+1、以下代码，控制台打印什么
+```
+const obj = {
+  name: 'T',
+  height: 170
+}
+console.log(obj);
+console.log(obj.height);
+obj.height = 180;
+```  
+![项目图片](./toc/images/js/题库编程-基础01.png)   
+* 不展开对象看时，console.log()是按照代码执行顺序，同步地输出了对象当时的快照（只输出一个对象的引用）。所以我们看到的是预期的值。   
+* 展开对象时，它其实是重新去内存中读取对象的属性值，此时对象属性已被更改，所以展开对象后，可能看到的不是预期值了。   
+* console.log()在控制台输出引用值时确实是当时的值，但是你点开箭头的时候它会重新获取这些引用的值。    
+
+当我们在输出对象时我们看到的数据是异步处理最终的值，**但是当我们仅输出对象中的某一key时，输出的值就是当前的值**，从中我们可以看出实际上不同的浏览器实际异步处理的是对象的引用，当我们console.log输出对象时调用的是一个引用，如果我们仅输出其中的值，浏览器就不会进行异步处理输出最终的调用值。同理使用JSON.stringfy一样，浏览器仅仅异步处理对象，并不会处理序列化JSON字符串，所有输出的数据是当前的值，而不是最终值。  
+
+console.log()打印出来的内容并不是一定百分百可信的内容。一般对于基本类型number、string、boolean、null、undefined的输出是可信的，但对于Object等引用类型来说，则就会出现上述异常打印输出。    
+**将对象序列化JSON.stringify为字符串**
+```
+const obj = {
+  name: 'T',
+  height: 170
+}
+console.log(JSON.parse(JSON.stringify(obj)));
+obj.height = 180;
+```
+![项目图片](./toc/images/js/题库编程-基础02.png)   
+## 数组类
+### 递归实现数组长度为5且元素为2-32间不重复的值   
+> 1. 生成一个长度为5的空数组arr。
+> 2. 生成一个（2－32）之间的随机整数rand。
+> 3. 把随机数rand插入到数组arr内，如果数组arr内已存在与rand相同的数字，则重新生成随机数rand并插入到arr内，**需要使用递归实现，不能使用for/while等循环**
+> 4. 最终输出一个长度为5，且内容不重复的数组arr   
+
+代码演示
+```
+let length = 5, i = 0;
+let arr = new Array(length);
+function build() {
+  let rand = Math.floor(Math.random() * 31 + 2);  //31 => 32-2+1
+  if(!arr.includes(rand)) {
+    arr[i] = rand;
+    i++;
+  }
+  return arr[length-1] ? arr : build();
+}
+console.log(build());
+```
