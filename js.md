@@ -1,32 +1,44 @@
 # 数组
+## 数组方法
+### 查找数组是否含有某元素
+> const arrNaN = ['a', 2, 2, NaN, ' '];    
 
-## 判断对象是否有元素不为空    
-全为空返回false, 含有非空元素返回true
+除了使用数组循环自己判断，用原生方法
 ```
-// lodash.js
-isHasEle(obj) {
-  let flag = false;
-  _.forIn(obj, value => {
-    if(value || value === 0) {
-      // 0保证元素可能为0的情况
-      flag = true;
-    }
-  })
-  return flag;
-}
-// 普通使用
-function isHasEle(obj) {
-  let flag = false;
-  for(let key in obj) {
-    if(obj[key] || obj[key] === 0) {
-      flag = true;
-    }
-  }
-  return flag;
-}
-console.log(isHasEle({a: '', b: ''}));  //false
-console.log(isHasEle({a: 1, b: ''}));  //true
-console.log(isHasEle({a: 0, b: ''}));  //true
+// 可以查找NaN（目前唯一）
+console.log(arrNaN.includes(NaN));  //true 
+
+console.log(arrNaN.indexOf(NaN));  //-1  
+console.log(arrNaN.lastIndexOf(2));  //2  从后面查找，返回元素下标  
+
+// 回调函数，找到第一个跳出循环，返回元素
+console.log(arrNaN.find(o => o === 2));  //2   
+console.log(arrNaN.find(o => o === NaN));   //undefined 
+
+// 找到第一个跳出循环，返回元素下标
+console.log(arrNaN.findIndex(o => o === 2));  //1   
+console.log(arrNaN.findIndex(o => o === NaN));  //-1
+
+// 找到第一个跳出循环，返回布尔
+console.log(arrNaN.some(o => o === 2));  //true   
+console.log(arrNaN.some(o => o === NaN));  //false
+
+// 一直查找，返回数组
+console.log(arrNaN.filter(o => o === 2));  //[2, 2]   
+console.log(arrNaN.filter(o => o === NaN));  //[]
+```
+### 连接数组
+> const arr1 = [1, 2, 'a'];    
+> const arr2 = [2, 3, NaN];    
+
+```
+console.log(arr1.concat(arr2));  //[1, 2, 'a', 2, 3, NaN]
+console.log(arr1);  //[1, 2, 'a']
+console.log(arr1.push.apply(arr1, arr2));  //6                           直接改变原数组
+console.log(arr1);  //[1, 2, 'a', 2, 3, NaN]
+console.log([...arr1, ...arr2]);  //[1, 2, "a", 2, 3, NaN, 2, 3, NaN]
+console.log(arr1.splice(arr1.length, 0, ...arr2));   //[]                直接改变原数组
+console.log(arr1);   //[1, 2, "a", 2, 3, NaN, 2, 3, NaN]
 ```
 ## 去除对象数组中的全空对象元素
 ```
@@ -216,6 +228,34 @@ console.log(target.foo3); // undefined，异常之后 assign 方法就退出了�
 console.log(target.baz);  // undefined，第三个源对象更是不会被拷贝到的。
 ```
 
+## 判断对象是否有元素不为空    
+全为空返回false, 含有非空元素返回true
+```
+// lodash.js
+isHasEle(obj) {
+  let flag = false;
+  _.forIn(obj, value => {
+    if(value || value === 0) {
+      // 0保证元素可能为0的情况
+      flag = true;
+    }
+  })
+  return flag;
+}
+// 普通使用
+function isHasEle(obj) {
+  let flag = false;
+  for(let key in obj) {
+    if(obj[key] || obj[key] === 0) {
+      flag = true;
+    }
+  }
+  return flag;
+}
+console.log(isHasEle({a: '', b: ''}));  //false
+console.log(isHasEle({a: 1, b: ''}));  //true
+console.log(isHasEle({a: 0, b: ''}));  //true
+```
 # 深浅拷贝
 ## js数据类型及其存储
 1、 基本数据类型：数值(number)、字符串(string)、布尔(boolean)、null、undefined   

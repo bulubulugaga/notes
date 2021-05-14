@@ -66,32 +66,44 @@
         <div id='readme' style='width:70%;margin-left:20%;'>
           	<article class='markdown-body'>
             	<h1 id="-">数组</h1>
-<h2 id="-">判断对象是否有元素不为空</h2>
-<p>全为空返回false, 含有非空元素返回true</p>
-<pre><code>// lodash.js
-isHasEle(obj) {
-  let flag = false;
-  _.forIn(obj, value =&gt; {
-    if(value || value === 0) {
-      // 0保证元素可能为0的情况
-      flag = true;
-    }
-  })
-  return flag;
-}
-// 普通使用
-function isHasEle(obj) {
-  let flag = false;
-  for(let key in obj) {
-    if(obj[key] || obj[key] === 0) {
-      flag = true;
-    }
-  }
-  return flag;
-}
-console.log(isHasEle({a: &#39;&#39;, b: &#39;&#39;}));  //false
-console.log(isHasEle({a: 1, b: &#39;&#39;}));  //true
-console.log(isHasEle({a: 0, b: &#39;&#39;}));  //true
+<h2 id="-">数组方法</h2>
+<h3 id="-">查找数组是否含有某元素</h3>
+<blockquote>
+<p>const arrNaN = [&#39;a&#39;, 2, 2, NaN, &#39; &#39;];    </p>
+</blockquote>
+<p>除了使用数组循环自己判断，用原生方法</p>
+<pre><code>// 可以查找NaN（目前唯一）
+console.log(arrNaN.includes(NaN));  //true 
+
+console.log(arrNaN.indexOf(NaN));  //-1  
+console.log(arrNaN.lastIndexOf(2));  //2  从后面查找，返回元素下标  
+
+// 回调函数，找到第一个跳出循环，返回元素
+console.log(arrNaN.find(o =&gt; o === 2));  //2   
+console.log(arrNaN.find(o =&gt; o === NaN));   //undefined 
+
+// 找到第一个跳出循环，返回元素下标
+console.log(arrNaN.findIndex(o =&gt; o === 2));  //1   
+console.log(arrNaN.findIndex(o =&gt; o === NaN));  //-1
+
+// 找到第一个跳出循环，返回布尔
+console.log(arrNaN.some(o =&gt; o === 2));  //true   
+console.log(arrNaN.some(o =&gt; o === NaN));  //false
+
+// 一直查找，返回数组
+console.log(arrNaN.filter(o =&gt; o === 2));  //[2, 2]   
+console.log(arrNaN.filter(o =&gt; o === NaN));  //[]
+</code></pre><h3 id="-">连接数组</h3>
+<blockquote>
+<p>const arr1 = [1, 2, &#39;a&#39;];<br>const arr2 = [2, 3, NaN];    </p>
+</blockquote>
+<pre><code>console.log(arr1.concat(arr2));  //[1, 2, &#39;a&#39;, 2, 3, NaN]
+console.log(arr1);  //[1, 2, &#39;a&#39;]
+console.log(arr1.push.apply(arr1, arr2));  //6                           直接改变原数组
+console.log(arr1);  //[1, 2, &#39;a&#39;, 2, 3, NaN]
+console.log([...arr1, ...arr2]);  //[1, 2, &quot;a&quot;, 2, 3, NaN, 2, 3, NaN]
+console.log(arr1.splice(arr1.length, 0, ...arr2));   //[]                直接改变原数组
+console.log(arr1);   //[1, 2, &quot;a&quot;, 2, 3, NaN, 2, 3, NaN]
 </code></pre><h2 id="-">去除对象数组中的全空对象元素</h2>
 <pre><code>let arr = [
   {name: &#39;aaa&#39;, number: &#39;&#39;, compony: &#39;&#39;},
@@ -254,7 +266,33 @@ console.log(target.foo3); // undefined，异常之后 assign 方法就退出了�
 console.log(target.baz);  // undefined，第三个源对象更是不会被拷贝到的。
 </code></pre></li>
 </ol>
-<h1 id="-">深浅拷贝</h1>
+<h2 id="-">判断对象是否有元素不为空</h2>
+<p>全为空返回false, 含有非空元素返回true</p>
+<pre><code>// lodash.js
+isHasEle(obj) {
+  let flag = false;
+  _.forIn(obj, value =&gt; {
+    if(value || value === 0) {
+      // 0保证元素可能为0的情况
+      flag = true;
+    }
+  })
+  return flag;
+}
+// 普通使用
+function isHasEle(obj) {
+  let flag = false;
+  for(let key in obj) {
+    if(obj[key] || obj[key] === 0) {
+      flag = true;
+    }
+  }
+  return flag;
+}
+console.log(isHasEle({a: &#39;&#39;, b: &#39;&#39;}));  //false
+console.log(isHasEle({a: 1, b: &#39;&#39;}));  //true
+console.log(isHasEle({a: 0, b: &#39;&#39;}));  //true
+</code></pre><h1 id="-">深浅拷贝</h1>
 <h2 id="js-">js数据类型及其存储</h2>
 <p>1、 基本数据类型：数值(number)、字符串(string)、布尔(boolean)、null、undefined<br>2、 引用数据类型：对象(数组、正则表达式、日期、函数)   </p>
 <p>基本数据类型保存在栈内存，引用类型保存在堆内存中。根本原因在于保存在栈内存的必须是大小固定的数据，引用类型的大小不固定，只能保存在堆内存中，但是可以把它的地址写在栈内存中以供我们访问。   </p>
