@@ -604,5 +604,18 @@ list: [   // 三级分类实例数据，第一层是申请表格，可填多个�
 </body>
 </html>
 ```
+## 对整个data赋值
+有时候需要对几乎整个页面数据做缓存，创建页面时赋初始值需要对整个data赋值，不能直接用this.$data = ···，考虑循环赋值   
+```
+// 存储
+localStorage.setItem('count', JSON.stringify(this.$data));
 
+//创建赋初始值
+created() {
+  const data = JSON.parse(localStorage.getItem('count));
+  for(let prop in data) {   // 循环赋值
+    this.$set(this, [prop], data[prop]);
+  }
+}
+```
 
