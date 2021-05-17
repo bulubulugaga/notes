@@ -538,6 +538,80 @@ console.log(JSON.parse(JSON.stringify(obj)));
 obj.height = 180;
 ```
 ![项目图片](./toc/images/js/题库编程-基础02.png)   
+
+2、将-0转换成字符串输出
+```
+const a = -0;
+console.log(a);  //-0（Number）
+console.log(a.toString());  // 0
+console.log(a.toLocaleString());   //-0
+```
+## 字符串类
+### 去除字符串中最后一个指定字符   
+注意：不是字符串最末尾的字符   
+初步想法
+```
+function PopStr(str, char) {
+  if(typeof(str) !== 'string') {
+    return '非字符串';
+  }
+  if(str.indexOf(char) === -1) {
+    return `不含${char}字符`;
+  }
+  const index = str.lastIndexOf(char);   
+  // return str.substring(0, index) + str.substring(index + 1, str.length);    // 提取字符串中两个指定的索引号之间的字符。
+  // return str.substr(0, index) + str.substr(index + 1, str.length - index);   // 从起始索引号提取字符串中指定数目的字符。
+                                                                                // ECMAscript 没有对该方法进行标准化，因此反对使用它
+  return str.slice(0, index) + str.slice(index + 1, str.length);   // 提取字符串的片断(两个索引)，并在新的字符串中返回被提取的部分。
+}
+console.log(PopStr('abcsdfdsf', 's'));  //abcsdfdf
+console.log(PopStr(1, 's'));  //非字符串
+console.log(PopStr('abcsdfdsf', 'z'));  //不含z字符
+```
+看到的别人的解法
+```
+function delLast(str, target) {
+  return str.split('').reverse().join('').replace(target, '').split('').reverse().join('');
+}
+console.log(delLast('asdfghhj', 'h'))   // asdfghj
+console.log(delLast('asdfghhj', 'z'))   // asdfghhj
+console.log(delLast(1, 'a'))   // 报错，str.split is not a function
+```
+```
+function delLast(str,target) {
+  let reg =new RegExp(`${target}(?=([^${target}]*)$)`)
+  return str.replace(reg,'')
+}
+console.log(delLast('asdfghhj', 'h'))   // asdfghj
+console.log(delLast('asdfghhj', 'z'))   // asdfghhj
+console.log(delLast(1, 'a'))   // 报错，str.replace is not a function
+```
+后面相关示例不再判断类型   
+### 把下划线命名转成驼峰命名  
+```
+function toUp(name) {
+  return name.split('_').map((o, i) => {
+    if(i === 0) {
+      return o;
+    }
+    else {
+      return o.charAt(0).toUpperCase() + o.substring(1, o.length);
+    }
+  }).join('');
+}
+console.log(toUp('first_name_abc'));   //firstNameAbc 
+``` 
+### 把字符串中的字符切换大小写   
+```
+function strConvert(str) {
+  return str.split('').map(o => {
+    if(o.charCodeAt() < 97) return o.toLowerCase();
+    else return o.toUpperCase();
+  }).join('');
+}
+console.log(strConvert('AbCddzGg'));  //aBcDDZgG
+```
+
 ## 数组类
 ### 递归实现数组长度为5且元素为2-32间不重复的值   
 > 1. 生成一个长度为5的空数组arr。

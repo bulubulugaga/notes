@@ -521,7 +521,66 @@ obj.height = 180;
 console.log(JSON.parse(JSON.stringify(obj)));
 obj.height = 180;
 </code></pre><p><img src="./toc/images/js/题库编程-基础02.png" alt="项目图片">   </p>
-<h2 id="-">数组类</h2>
+<p>2、将-0转换成字符串输出</p>
+<pre><code>const a = -0;
+console.log(a);  //-0（Number）
+console.log(a.toString());  // 0
+console.log(a.toLocaleString());   //-0
+</code></pre><h2 id="-">字符串类</h2>
+<h3 id="-">去除字符串中最后一个指定字符</h3>
+<p>注意：不是字符串最末尾的字符<br>初步想法</p>
+<pre><code>function PopStr(str, char) {
+  if(typeof(str) !== &#39;string&#39;) {
+    return &#39;非字符串&#39;;
+  }
+  if(str.indexOf(char) === -1) {
+    return `不含${char}字符`;
+  }
+  const index = str.lastIndexOf(char);   
+  // return str.substring(0, index) + str.substring(index + 1, str.length);    // 提取字符串中两个指定的索引号之间的字符。
+  // return str.substr(0, index) + str.substr(index + 1, str.length - index);   // 从起始索引号提取字符串中指定数目的字符。
+                                                                                // ECMAscript 没有对该方法进行标准化，因此反对使用它
+  return str.slice(0, index) + str.slice(index + 1, str.length);   // 提取字符串的片断(两个索引)，并在新的字符串中返回被提取的部分。
+}
+console.log(PopStr(&#39;abcsdfdsf&#39;, &#39;s&#39;));  //abcsdfdf
+console.log(PopStr(1, &#39;s&#39;));  //非字符串
+console.log(PopStr(&#39;abcsdfdsf&#39;, &#39;z&#39;));  //不含z字符
+</code></pre><p>看到的别人的解法</p>
+<pre><code>function delLast(str, target) {
+  return str.split(&#39;&#39;).reverse().join(&#39;&#39;).replace(target, &#39;&#39;).split(&#39;&#39;).reverse().join(&#39;&#39;);
+}
+console.log(delLast(&#39;asdfghhj&#39;, &#39;h&#39;))   // asdfghj
+console.log(delLast(&#39;asdfghhj&#39;, &#39;z&#39;))   // asdfghhj
+console.log(delLast(1, &#39;a&#39;))   // 报错，str.split is not a function
+</code></pre><pre><code>function delLast(str,target) {
+  let reg =new RegExp(`${target}(?=([^${target}]*)$)`)
+  return str.replace(reg,&#39;&#39;)
+}
+console.log(delLast(&#39;asdfghhj&#39;, &#39;h&#39;))   // asdfghj
+console.log(delLast(&#39;asdfghhj&#39;, &#39;z&#39;))   // asdfghhj
+console.log(delLast(1, &#39;a&#39;))   // 报错，str.replace is not a function
+</code></pre><p>后面相关示例不再判断类型   </p>
+<h3 id="-">把下划线命名转成驼峰命名</h3>
+<pre><code>function toUp(name) {
+  return name.split(&#39;_&#39;).map((o, i) =&gt; {
+    if(i === 0) {
+      return o;
+    }
+    else {
+      return o.charAt(0).toUpperCase() + o.substring(1, o.length);
+    }
+  }).join(&#39;&#39;);
+}
+console.log(toUp(&#39;first_name_abc&#39;));   //firstNameAbc 
+</code></pre><h3 id="-">把字符串中的字符切换大小写</h3>
+<pre><code>function strConvert(str) {
+  return str.split(&#39;&#39;).map(o =&gt; {
+    if(o.charCodeAt() &lt; 97) return o.toLowerCase();
+    else return o.toUpperCase();
+  }).join(&#39;&#39;);
+}
+console.log(strConvert(&#39;AbCddzGg&#39;));  //aBcDDZgG
+</code></pre><h2 id="-">数组类</h2>
 <h3 id="-5-2-32-">递归实现数组长度为5且元素为2-32间不重复的值</h3>
 <blockquote>
 <ol>
