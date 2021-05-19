@@ -123,6 +123,131 @@ a::after{
 .test:hover::before { /* 这时animation和transition才生效 */ }
 ```
 
+# 不知道什么类的
+## BFC规范及应用  
+BFC即Block Formatting Contexts (块级格式化上下文)，是W3CCSS2.1规范中的一个概念。它是页面中的一块渲染区域，并且有一套渲染规则， 它决定了其子元素将如何定位，以及和其他元素的关系和相互作用。具有BFC特性的元素可以看作是隔离了的独立容器，容器里面的元素不会在布局上影响到外面的元素，并且BFC具有普通容器所没有的一些特性。
+### 特性
+1、内部的Box会在垂直方向，从顶部开始一个接一个地放置。    
+2、Box垂直方向的距离由margin决定。属于同一个BFC的两个相邻Box的margin会发生重叠。  
+3、在BFC中，每一个盒子的左外边缘（margin-left）会触碰到容器的左边缘(border-left)（对于从右到左的格式来说，则触碰到右边缘），即使存在浮动也是如此。  
+4、BFC的区域不会与float box叠加。    
+5、BFC就是页面上的一个隔离的独立容器，容器里面的子元素不会影响到外面的元素，反之亦然。  
+6、计算BFC的高度时，浮动元素也参与计算。
+### 如何触发BFC
+* 浮动元素：float除none以外的值（left,right）  
+* 绝对定位元素：position（absolute，fixed）  
+* display为inline-block、table-cells、flex  
+* overflow除了visible以外的值（hidden，auto，scroll） 
+
+### BFC规范的应用
+**1、margin叠加问题**
+```
+<style>
+    .div1{
+        width: 100px;
+        height: 100px;
+        background: fuchsia;
+        margin-bottom: 20px;
+    }
+    .div2{
+        width: 100px;
+        height: 100px;
+        background: yellowgreen;
+        margin-top: 20px;
+    }
+    .box{
+        /* 触发BFC，解决margin叠加问题 */
+        overflow: hidden;
+    }
+</style>
+<div class="box">
+    <div class="div1"></div>
+</div>
+<div class="box">
+    <div class="div2"></div>
+</div>
+```
+触发BFC后，margin由触发前（margin叠加）的20px变为了40px    
+![运行显示](./toc/images/css/不知类01.png)  
+
+**2、margin传递问题**
+```
+<style>
+    .wrap{
+        width: 100px;
+        height: 100px;
+        background: yellowgreen;
+        /* 触发BFC */
+        /* overflow: hidden; */
+        position: absolute;
+    }
+    .content{
+        width: 50px;
+        height: 50px;
+        background: rebeccapurple;
+        /* margin传递，影响父容器 */
+        margin-top: 30px;
+    }
+</style>
+<div class="wrap">
+    <div class="content"></div>
+</div>
+```
+左图触发前，右图触发后，触发前外盒子跟着内盒子一起增加margin    
+![运行显示](./toc/images/css/不知类02.png)   
+
+**3、浮动问题**
+```
+<style>
+    .div1{
+        width: 200px;
+        border: 10px solid blue;
+        /* 触发BFC */
+        float: left;
+        /* display: inline-block; */
+        /* overflow: hidden; */
+    }
+    .div2{
+        width: 100px;
+        height: 100px;
+        background: red;
+        float: left;
+    }
+</style>
+<div class="div1">
+    <div class="div2"></div>
+</div>
+```
+左图触发前，右图触发后，内部盒子浮动脱离文档，内部盒子宽高跟不上   
+![运行显示](./toc/images/css/不知类03.png)  
+
+**4、覆盖问题**
+```
+<style>
+    .div3{
+        width: 100px;
+        height: 100px;
+        background: rosybrown;
+        /* 浮动影响了div4 */
+        float: left;
+    }
+    .div4{
+        height: 200px;
+        background: sienna;
+        color: #fff;
+        /* 触发BFC */
+        overflow: hidden;
+        /* float: left; */
+    }
+</style>
+<div class="div3"></div>
+<div class="div4">编程（biān chéng）是编定程序的中文简称，就是让计算机代为解决某个问题，对某个计算体系规定一定的运算方式...</div>
+```
+上图触发前，下图触发后，实现了左边固定宽度，右边自适应的布局   
+![运行显示](./toc/images/css/不知类04.png)   
+
+**原文：**[BFC规范及应用](https://blog.csdn.net/fylxy000/article/details/107262200)
+
 # 题库
 ## 问题
 ### 在页面上隐藏元素的方法有哪些    

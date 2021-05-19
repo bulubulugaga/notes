@@ -618,4 +618,65 @@ created() {
   }
 }
 ```
+## el-table根据状态值展示相应状态
+最简单的一种方法：根据状态值用v-if进行渲染数据
+```
+<el-table :data="list>
+  <el-table-column label="项目状态" align="center" prop="status">
+    <template slot-scope="{ row }">
+      <span v-if="row.status === '1'">意向项目</span>
+      <span v-if="row.status === '2'">接触中</span>
+      ······
+    </template>
+  </el-table-column>
+</el-table>
+```
+使用函数进行赋值
+```
+<el-table-column label="项目状态" align="center" prop="status">
+  <template slot-scope="{ row }">
+    {{ getProjectStatus(row.status) }}
+    ······
+  </template>
+</el-table-column>
+
+methods: {
+  getProjectStatus(status) {
+
+    // 1. 用switch返回
+    let st = '';
+    switch(status) {
+      case '1': st = '意向项目'; break;   // 不能直接return '意向项目'
+      ····
+    }
+    return st;
+
+    // 2. 封装对象返回
+    const statusObj = {
+      '1': ': '意向项目',
+      ·····
+    }
+    return statusObj[status];
+
+  }
+}
+```
+使用计算属性，内部也可以使用switch和对象赋值
+```
+<el-table-column label="项目状态" align="center" prop="status">
+  <template slot-scope="{ row }">
+    {{ getProjectStatus(row.status) }}
+    ······
+  </template>
+</el-table-column>
+
+computed: {
+  getProjectStatus() {
+    return (status) => {
+      return this.statusObj[status]
+    }
+  },
+}
+```
+
 
