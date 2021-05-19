@@ -580,6 +580,13 @@ console.log(toUp(&#39;first_name_abc&#39;));   //firstNameAbc
   }).join(&#39;&#39;);
 }
 console.log(strConvert(&#39;AbCddzGg&#39;));  //aBcDDZgG
+</code></pre><h3 id="-">统计一个字符串中另一个字符串出现的次数</h3>
+<pre><code>function sumStr(str, subStr) {
+  return str.split(subStr).length - 1;
+}
+console.log(sumStr(&#39;abcfgfhbcskdfbcbc&#39;, &#39;bc&#39;));  //4
+console.log(sumStr(&#39;abcfgfhbcskdfbcbc&#39;, &#39;qqq&#39;));  //0
+console.log(sumStr(&#39;abcfgfhbcskdfbcbc&#39;, &#39;f&#39;));  //3
 </code></pre><h2 id="-">数组类</h2>
 <h3 id="-5-2-32-">递归实现数组长度为5且元素为2-32间不重复的值</h3>
 <blockquote>

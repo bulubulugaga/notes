@@ -611,6 +611,15 @@ function strConvert(str) {
 }
 console.log(strConvert('AbCddzGg'));  //aBcDDZgG
 ```
+### 统计一个字符串中另一个字符串出现的次数
+```
+function sumStr(str, subStr) {
+  return str.split(subStr).length - 1;
+}
+console.log(sumStr('abcfgfhbcskdfbcbc', 'bc'));  //4
+console.log(sumStr('abcfgfhbcskdfbcbc', 'qqq'));  //0
+console.log(sumStr('abcfgfhbcskdfbcbc', 'f'));  //3
+```
 
 ## 数组类
 ### 递归实现数组长度为5且元素为2-32间不重复的值   
