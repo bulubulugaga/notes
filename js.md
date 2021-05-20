@@ -425,22 +425,147 @@ function deepClone(obj){
 判断数据类型的方法一般可以通过：typeof、instanceof、constructor、toString四种常用方法。
 ### typeof
 typeof操作符返回一个字符串，表示未经计算的操作数的类型。    
-返回结果包括：number、boolean、string、object、undefined、function等6种数据类型。  
+返回结果包括：number、boolean、string、object、undefined、function、symbol等7种数据类型。  
 
 简单理解就是typeof是判断的是原始类型（值类型），但**函数返回的是function，引用类型返回的基本上都是object，null返回的也是object**，因为所有对象的原型链最终都指向了Object，null被认为是一个空的对象引用，当我们需要知道某个对象的具体类型时，typeof 就显得有些力不从心了。   
 ```
-console.log(typeof null);   //object
-console.log(typeof undefined);   //undefined
 console.log(typeof 2);   //number
 console.log(typeof '2');   //string
+console.log(typeof true);   //boolean 
+console.log(typeof Symbol());   //symbol
+console.log(typeof undefined);   //undefined
+console.log(typeof null);   //object
 console.log(typeof (() => 's'));   //function
 console.log(typeof [1, 3, 's']);   //object
+console.log(typeof new Date());   //object
+console.log(typeof new RegExp());   //object
 ```
 ### instanceof
-instanceof 运算符用来测试一个 对象（第一个参数）在其原型链中是否存在一个构造函数（第二个参数）的 prototype 属性。  
+instanceof 运算符用来测试一个对象（第一个参数）在其原型链中是否存在一个构造函数（第二个参数）的 prototype 属性。  
 
-简言之，判断对象和构造函数在原型链上是否有关系，如果有关系，返回真，否则返回假。
+换言之，判断A是否为B的实例，表达式为：A instanceof B，如果A是B的实例，则返回true，否则返回false。 在这里需要特别注意的是：instanceof检测的是原型，我们用一段伪代码来模拟其内部执行过程：
+```
+instanceof (A, B) = {
+  var L = A.__proto__;
+  var R = B.prototype;
+  if(L === R) {
+      // A的内部属性 __proto__ 指向 B 的原型对象
+      return true;
+  }
+  return false;
+}
+```
+从上述过程可以看出，当 A 的 \__proto__ 指向 B 的 prototype 时，就认为 A 就是 B 的实例，我们再来看几个例子：
+```
+console.log([] instanceof Array);// true
+console.log({} instanceof Object);// true
+console.log(new Date() instanceof Date);// true
 
+function Person(){};
+console.log(new Person() instanceof Person);  //true
+
+console.log([] instanceof Object);// true
+console.log(new Date() instanceof Object);// true
+console.log(new Person() instanceof Object);// true
+```
+虽然 instanceof 能够判断出 [ ] 是Array的实例，但它认为 [ ] 也是Object的实例   
+
+从 instanceof 能够判断出 [ ].\_\_proto\_\_  指向 Array.prototype，而 Array.prototype.\__proto__ 又指向了Object.prototype，最终 Object.prototype.\__proto__ 指向了null，标志着原型链的结束。因此，[]、Array、Object 就在内部形成了一条原型链：  
+![原型链分析](./toc/images/js/数据类型01.png)   
+从原型链可以看出，[] 的 \__proto__  直接指向Array.prototype，间接指向 Object.prototype，所以按照 instanceof 的判断规则，[] 就是Object的实例。依次类推，类似的 new Date()、new Person() 也会形成一条对应的原型链 。因此，**instanceof 只能用来判断两个对象是否属于实例关系， 而不能判断一个对象实例具体属于哪种类型**。   
+
+相应判断：
+```
+console.log(2 instanceof Number);   //false
+console.log(new Number(2) instanceof Number);   //true
+console.log('2' instanceof String);   //false
+console.log(new String('2') instanceof String);   //true
+console.log(true instanceof Boolean);   //false
+console.log(new Boolean(true) instanceof Boolean);   //true
+console.log(Symbol() instanceof Symbol);   //false
+console.log(null instanceof Object);   //false
+console.log(undefined instanceof Object);   //false
+console.log({} instanceof Object);   //true
+console.log(/a/ instanceof RegExp);   //true
+console.log(/a/ instanceof Object);   //true
+console.log((() => {}) instanceof Function);   //true
+```
+从上面的运行结果我们可以看到，基本数据类型是没有检测出他们的类型，但是我们使用对象实例化的方式，是可以检测出类型的。  
+### constructor
+当一个函数 F被定义时，JS引擎会为F添加 prototype 原型，然后再在 prototype上添加一个 constructor 属性，并让其指向 F 的引用。如下所示：
+![演示图片](./toc/images/js/数据类型02.png)  
+
+当执行 var f = new F() 时，F 被当成了构造函数，f 是F的实例对象，此时 F 原型上的 constructor 传递到了 f 上，因此 f.constructor == F。
+![演示图片](./toc/images/js/数据类型03.png)  
+
+可以看出，F 利用原型对象上的 constructor 引用了自身，当 F 作为构造函数来创建对象时，原型上的 constructor 就被遗传到了新创建的对象上， 从原型链角度讲，构造函数 F 就是新对象的类型。这样做的意义是，让新对象在诞生以后，就具有可追溯的数据类型。
+```
+console.log('2'.constructor === String);   //true
+console.log(2.constructor === Number);   //浏览器报错
+let num = 2; console.log(num.constructor === Number);   //true
+console.log(new Number(2).constructor === Number);   //true
+console.log(true.constructor === Boolean);   //true
+console.log(Symbol().constructor === Symbol);   //true
+console.log(null.constructor === Object);   //报错
+console.log(undefined.constructor === Object);   //报错
+console.log({}.constructor === Object);   //true
+console.log((new Date()).constructor === Date);   //true
+console.log((new Date()).constructor === Object);   //false
+console.log((() => {}).constructor === Function);   //true
+```
+null 和 undefined 是无效的对象，因此是不会有 constructor 存在的，故报错，这两种类型的数据需要通过其他方式来判断。  
+另外，函数的 constructor 是不稳定的，这个主要体现在自定义对象上，当开发者重写 prototype 后，原有的 constructor 引用会丢失，constructor 会默认为 Object。
+```
+function F() {}
+F.prototype = { a: 1 }
+let f = new F();
+console.log(f.constructor === F)   //false
+console.log(f.constructor);  //ƒ Object() { [native code] }
+console.log(f.constructor === Object);  //true
+```
+因为 prototype 被重新赋值的是一个 { }， { } 是 new Object() 的字面量，因此 new Object() 会将 Object 原型上的 constructor 传递给 { }，也就是 Object 本身。   
+**因此，为了规范开发，在重写对象原型时一般都需要重新给 constructor 赋值，以保证对象实例的类型不被篡改。**  
+### Object.prototype.toString
+可以说不管是什么类型，它都可以立即判断出，推荐使用。   
+
+toString() 是 Object 的原型方法，调用该方法，默认返回当前对象的 [[Class]] (其调用者的具体类型)。这是一个内部属性，其格式为 [object Xxx] ，其中 Xxx 就是对象的类型。   
+
+对于 Object 对象，直接调用 toString() 就能返回 [object Object] 。而对于其他对象，则需要通过 call / apply 来调用才能返回正确的类型信息。   
+```
+console.log(Object.prototype.toString.call(2));   //[object Number]
+console.log(Object.prototype.toString.call('2'));   //[object String]
+console.log(Object.prototype.toString.call(true));   //[object Boolean]
+console.log(Object.prototype.toString.call(Symbol()));   //[object Symbol]
+console.log(Object.prototype.toString.call(null));   //[object Null]
+console.log(Object.prototype.toString.call(undefined));   //[object Undefined]
+console.log(Object.prototype.toString.call(new Date()));   //[object Date]
+console.log(Object.prototype.toString.call({}));   //[object Object]
+console.log(Object.prototype.toString.call([]));   //[object Array]
+console.log(Object.prototype.toString.call(/a/));   //[object RegExp]
+console.log(Object.prototype.toString.call(() => {}));   //[object Function]
+console.log(Object.prototype.toString.call(new Error()));   //[object Error]
+console.log(Object.prototype.toString.call(document));   //[object HTMLDocument]
+console.log(Object.prototype.toString.call(window));   //[object Window]  window 是全局对象 global 的引用
+```  
+### 优缺点
+|    | typeof | instanceof | constructor | Object.prototype.toString.call |
+| :---: | :---: | :---: | :---: | :---: |
+| 优点 | 使用简单 | 能检测出引用类型 | 基本能检测所有的类型（除了null和undefined） | 检测出所有的类型 |
+| 缺点 | 只能检测出基本类型（除null） | 不能检测出基本类型，且不能跨iframe | constructor易被修改，也不能跨iframe | IE6下，undefined和null均为Object |   
+测试：跨页面判断是否是数组   
+```
+var oF = document.createElement('iframe');
+document.body.appendChild( oF );
+var ifArray = window.frames[0].Array;
+var arr = new ifArray();
+console.log( typeof arr );   //object
+console.log( arr.constructor == Array );   //false
+console.log( arr instanceof Array );   //false
+console.log( Object.prototype.toString.call(arr) == '[object Array]' );   //true
+```   
+从结果中可以看出，constructor和instanceof都没有正确的判断出类型。  
+
+参考文章：[一像素](https://www.cnblogs.com/onepixel/p/5126046.html)&emsp;[冰雪为融](https://blog.csdn.net/lhjuejiang/article/details/79623973)
 
 # 项目中的一些问题
 ## 根据数组某个元素循环请求api，按顺序获得相应值
