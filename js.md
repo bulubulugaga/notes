@@ -256,10 +256,24 @@ console.log(isHasEle({a: '', b: ''}));  //false
 console.log(isHasEle({a: 1, b: ''}));  //true
 console.log(isHasEle({a: 0, b: ''}));  //true
 ```
-# 深浅拷贝
+# 数据类型及相关问题
 ## js数据类型及其存储
-1、 基本数据类型：数值(number)、字符串(string)、布尔(boolean)、null、undefined   
-2、 引用数据类型：对象(数组、正则表达式、日期、函数)   
+1、 基本数据类型：数值(number)、字符串(string)、布尔(boolean)、null、undefined、Symbol(ES6新定义)    
+2、 引用数据类型：对象(数组、正则表达式、日期、函数)  
+
+> Object分为本地对象、内置对象和宿主对象。    
+> 本地对象：独立于宿主环境的ECMAScript实现提供的对象，简单的说就是ECMA定义的类。他们包括：Object&emsp;Function&emsp;Array&emsp;String&emsp;Boolean&emsp;Number&emsp;Date&emsp;RegExp&emsp;Error&emsp;EvalError&emsp;RangeError&emsp;ReferenceError&emsp;SyntaxError&emsp;TypeError&emsp;URIError，这里的String等类型是它的定义类型，如new String('str') 
+```
+var str1='hello';
+var str2=new String("hello");
+typeof str1 //string
+typeof str2 //object
+//如果想获取str2的字符串，可以通过str2.toString()
+str1 instanceof String //false
+str2 instanceof String //true
+```
+> 内置对象：定义：“由ECMAScript实现提供的、独立于宿主环境的所有对象，在ECMAScript程序开始执行时出现”。这意味着开发者不必明确实例化内置对象，它已经被实例化了。内置对象只有两个 Global和 Math,他们其实也是本地对象，根据定义每个内置对象都是本地对象。    
+> 宿主对象：所有非本地对象都是宿主对象，即由ECMAScript实现的宿主环境提供的对象。所有 BOM和 DOM对象都是宿主对象。
 
 基本数据类型保存在栈内存，引用类型保存在堆内存中。根本原因在于保存在栈内存的必须是大小固定的数据，引用类型的大小不固定，只能保存在堆内存中，但是可以把它的地址写在栈内存中以供我们访问。   
 
@@ -295,6 +309,7 @@ color1与color2指向堆内存中同一地址的同一对象，复制的只是�
 ![引用类型内存分配](./toc/images/js/深浅拷贝02.png)
 
 ## 深浅拷贝
+### 深浅拷贝
 >浅拷贝只复制指向某个对象的指针，而不复制对象本身，新旧对象还是共享同一块内存。但深拷贝会另外创造一个一模一样的对象，新对象跟原对象不共享内存，修改新对象不会改到原对象。
 
 1、浅拷贝    
@@ -356,7 +371,7 @@ function deepClone(initalObj, finalObj) {
 }
 ```
 
-## 深拷贝实现方式
+### 深拷贝实现方式
 1、以上深拷贝函数    
 
 2、JSON.stringify 和 JSON.parse   
@@ -406,6 +421,26 @@ function deepClone(obj){
   return objClone;
 } 
 ```
+## 判断js数据类型    
+判断数据类型的方法一般可以通过：typeof、instanceof、constructor、toString四种常用方法。
+### typeof
+typeof操作符返回一个字符串，表示未经计算的操作数的类型。    
+返回结果包括：number、boolean、string、object、undefined、function等6种数据类型。  
+
+简单理解就是typeof是判断的是原始类型（值类型），但**函数返回的是function，引用类型返回的基本上都是object，null返回的也是object**，因为所有对象的原型链最终都指向了Object，null被认为是一个空的对象引用，当我们需要知道某个对象的具体类型时，typeof 就显得有些力不从心了。   
+```
+console.log(typeof null);   //object
+console.log(typeof undefined);   //undefined
+console.log(typeof 2);   //number
+console.log(typeof '2');   //string
+console.log(typeof (() => 's'));   //function
+console.log(typeof [1, 3, 's']);   //object
+```
+### instanceof
+instanceof 运算符用来测试一个 对象（第一个参数）在其原型链中是否存在一个构造函数（第二个参数）的 prototype 属性。  
+
+简言之，判断对象和构造函数在原型链上是否有关系，如果有关系，返回真，否则返回假。
+
 
 # 项目中的一些问题
 ## 根据数组某个元素循环请求api，按顺序获得相应值
@@ -619,6 +654,33 @@ function sumStr(str, subStr) {
 console.log(sumStr('abcfgfhbcskdfbcbc', 'bc'));  //4
 console.log(sumStr('abcfgfhbcskdfbcbc', 'qqq'));  //0
 console.log(sumStr('abcfgfhbcskdfbcbc', 'f'));  //3
+```
+### 简单的字符串加密解密
+```
+<script type="text/javascript">
+  var oStr = "中国人";
+  var obj = compileStr(oStr);
+  console.log(obj);
+  var objStr = uncompileStr(obj);
+  console.log(objStr);
+  //对字符串进行加密   
+  function compileStr(code){
+      var c=String.fromCharCode(code.charCodeAt(0)+code.length);  
+      for(var i=1;i<code.length;i++){        
+          c+=String.fromCharCode(code.charCodeAt(i)+code.charCodeAt(i-1));  
+      }     
+      return escape(c);
+  }
+  //字符串进行解密   
+  function uncompileStr(code){
+      code = unescape(code);        
+      var c=String.fromCharCode(code.charCodeAt(0)-code.length);        
+      for(var i=1;i<code.length;i++){        
+          c+=String.fromCharCode(code.charCodeAt(i)-c.charCodeAt(i-1));        
+      }        
+      return c;
+  }  
+</script>
 ```
 
 ## 数组类

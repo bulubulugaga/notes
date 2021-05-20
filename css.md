@@ -246,8 +246,46 @@ BFC即Block Formatting Contexts (块级格式化上下文)，是W3CCSS2.1规范�
 上图触发前，下图触发后，实现了左边固定宽度，右边自适应的布局   
 ![运行显示](./toc/images/css/不知类04.png)   
 
-**原文：**[BFC规范及应用](https://blog.csdn.net/fylxy000/article/details/107262200)
+**参考：**[BFC规范及应用](https://blog.csdn.net/fylxy000/article/details/107262200)
 
+## 优雅降级和渐进增强
+**渐进增强 progressive enhancement：**针对低版本浏览器进行构建页面，保证最基本的功能，然后再针对高级浏览器进行效果、交互等改进和追加功能达到更好的用户体验。   
+**优雅降级 graceful degradation：**一开始就构建完整的功能，然后再针对低版本浏览器进行兼容。   
+
+前缀CSS3（-webkit- / -moz- / -o-*）和正常CSS3在**浏览器中的支持情况**是这样的：   
+1. 很久以前：浏览器前缀CSS3和正常CSS3都不支持；   
+2. 不久之前：浏览器只支持前缀CSS3，不支持正常CSS3；   
+3. 现在：浏览器既支持前缀CSS3，又支持正常CSS3；   
+4. 未来：浏览器不支持前缀CSS3，仅支持正常CSS3。 
+
+**示例**
+```
+<div class="not-a-square"></div>
+```
+```
+/* 渐进增强 */
+.not-a-square {
+    width: 300px;
+    height: 80px;
+    background: lightblue;
+    -webkit-border-radius: 30px 10px;
+    border-radius: 30px 10px;
+}
+```
+![运行显示](./toc/images/css/不知类05.png)    
+```
+/* 优雅降级 */
+.not-a-square {
+    ····
+    border-radius: 30px 10px;
+    -webkit-border-radius: 30px 10px;
+}
+```
+![运行显示](./toc/images/css/不知类06.png)   
+  
+按理说这两种写法效果应该是一样的，但是我们现在浏览器停留第三阶段，既支持前缀写法，又支持正常写法，这样就要出问题了。当属性超过一个参数值的时候，不同属性产生的作用是不一样的！可以看到，采用优雅降级的写法，如果一个浏览器同时支持前缀写法和正常写法，后面的旧版浏览器样式（带兼容前缀）就覆盖了新版样式，出现一些奇怪的问题 ，但是用渐进增强的写法就不存在这个问题。所以为了避免这个不必要的错误，建议大家都采用**渐进增强**的写法。 
+
+参考：[CSS选择 “渐进增强” 还是 “优雅降级”](https://www.zhihu.com/question/29634882/answer/657239947)
 # 题库
 ## 问题
 ### 在页面上隐藏元素的方法有哪些    
@@ -263,7 +301,46 @@ BFC即Block Formatting Contexts (块级格式化上下文)，是W3CCSS2.1规范�
     width: 0; height: 0; overflow: hidden;  
 * **仅对块内文本元素:**  
     text-indent: -9999px;  
-    font-size: 0;  
+    font-size: 0; 
+
+### 清除浮动的方法
+```
+<div class="div1">
+    <div class="div2" style="float: left></div>
+</div>
+```   
+1、 父级高度固定时直接设置height。
+```
+.div1 {height: 100px;}
+```
+2、 结尾处加空div标签 clear: both;&emsp;&emsp;浮动布局多，则需要增加很多空的div。
+```
+<div style="clear: both;"></div>
+```
+3、 触发BFC，父级定义 overflow: hidden;或者display: inline-block; 详见2.1.3。    
+4、给父级元素增加伪类after 
+```
+.div1:after {
+    content: '';
+    height: 0;
+    line-height: 0;
+    display: block;
+    visibility: hidden;
+    clear: both;
+}
+```
+5、 使用双伪类
+```
+.div1:after, .div1:before {
+    content: "";
+    display: block;
+    clear: both;
+}
+```
+6、 父级定义display: table;&emsp;&emsp;容易引起其他布局问题，不推荐
+```
+.div1 {display: table;}
+```
 
 ## 编程
 ### 圣杯布局和双飞翼布局   
