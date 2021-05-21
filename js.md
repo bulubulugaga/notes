@@ -829,3 +829,34 @@ function build() {
 }
 console.log(build());
 ```
+## 其他
+### 获取URL地址栏参数
+> url: baidu.com/s?ie=utf-8&f=8&rsv_bp=1&tn=baidu&wd=js获取url参数   
+
+```
+function getQueryVariable(variable) {
+  var query = window.location.search.substring(1);
+  var vars = query.split("&");
+  for (var i=0;i<vars.length;i++) {
+          var pair = vars[i].split("=");
+          if(pair[0] == variable){return pair[1];}
+  }
+  return(false);
+}
+console.log(getQueryVariable('ie'));    // utf-8
+console.log(getQueryVariable('name'));  // false
+```
+```
+function getQueryString(name) {
+  var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+  var r = window.location.search.substr(1).match(reg);
+  if (r != null) return unescape(r[2]); return null;
+}
+console.log(getQueryVariable('ie'));    // utf-8
+console.log(getQueryVariable('name'));  // null
+```
+```
+let params = new URLSearchParams(location.search);
+console.log(params.get('ie'))    // utf-8
+console.log(params.get('name'))  // null
+```

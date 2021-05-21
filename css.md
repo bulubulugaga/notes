@@ -123,6 +123,13 @@ a::after{
 .test:hover::before { /* 这时animation和transition才生效 */ }
 ```
 
+# 相关样式
+## 布局
+常见五大布局   
+![常见布局](./toc/images/css/样式布局01.jfif)   
+详细代码解析：[css常见的五大布局](https://www.cnblogs.com/wangsongbai/p/10215141.html)
+
+
 # 不知道什么类的
 ## BFC规范及应用  
 BFC即Block Formatting Contexts (块级格式化上下文)，是W3CCSS2.1规范中的一个概念。它是页面中的一块渲染区域，并且有一套渲染规则， 它决定了其子元素将如何定位，以及和其他元素的关系和相互作用。具有BFC特性的元素可以看作是隔离了的独立容器，容器里面的元素不会在布局上影响到外面的元素，并且BFC具有普通容器所没有的一些特性。
