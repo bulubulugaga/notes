@@ -17,6 +17,17 @@
 ```
 FOR属性：表示Label标签要绑定的HTML元素，你点击这个标签的时候，所绑定的元素将获取焦点。    
 ACCESSKEY属性：表示访问Label标签所绑定的元素的热键，当您按下热键，所绑定的元素将获取焦点。在这里必须指定for才能起作用。所设置的快捷键不能与浏览器的快捷键冲突，否则将优先激活浏览器的快捷键。  
+### 关闭表单自动完成  
+> autocomplete="off" 可放在表单，也可放在输入框   
+
+```
+<form action="demo_form.asp" method="get" autocomplete="on">
+  First name:<input type="text" name="fname" /><br />  <!-- 需要设置name值 -->
+  Last name: <input type="text" name="lname" /><br />
+  E-mail: <input type="email" name="email" autocomplete="off" /><br />
+  <input type="submit" />
+</form>
+```
 ## meta
 ### viewport
 viewport 就是视区窗口，也就是浏览器中显示网页的部分。PC 端上基本等于设备显示区域，但在移动端上 viewport 会超出设备的显示区域（即会有横向滚动条出现），设备默认的 viewport 在 980 – 1024 之间。  

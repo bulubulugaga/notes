@@ -565,7 +565,11 @@ console.log( Object.prototype.toString.call(arr) == '[object Array]' );   //true
 ```   
 从结果中可以看出，constructor和instanceof都没有正确的判断出类型。  
 
-参考文章：[一像素](https://www.cnblogs.com/onepixel/p/5126046.html)&emsp;[冰雪为融](https://blog.csdn.net/lhjuejiang/article/details/79623973)
+参考文章：[一像素](https://www.cnblogs.com/onepixel/p/5126046.html)&emsp;[冰雪为融](https://blog.csdn.net/lhjuejiang/article/details/79623973)  
+
+# 变量
+## 作用域
+## 变量提升
 
 # 项目中的一些问题
 ## 根据数组某个元素循环请求api，按顺序获得相应值
@@ -668,45 +672,16 @@ handleCurrentChange (val, index) {
 },
 ```
 
-# 题库编程
-## 基础
-1、以下代码，控制台打印什么
-```
-const obj = {
-  name: 'T',
-  height: 170
-}
-console.log(obj);
-console.log(obj.height);
-obj.height = 180;
-```  
-![项目图片](./toc/images/js/题库编程-基础01.png)   
-* 不展开对象看时，console.log()是按照代码执行顺序，同步地输出了对象当时的快照（只输出一个对象的引用）。所以我们看到的是预期的值。   
-* 展开对象时，它其实是重新去内存中读取对象的属性值，此时对象属性已被更改，所以展开对象后，可能看到的不是预期值了。   
-* console.log()在控制台输出引用值时确实是当时的值，但是你点开箭头的时候它会重新获取这些引用的值。    
-
-当我们在输出对象时我们看到的数据是异步处理最终的值，**但是当我们仅输出对象中的某一key时，输出的值就是当前的值**，从中我们可以看出实际上不同的浏览器实际异步处理的是对象的引用，当我们console.log输出对象时调用的是一个引用，如果我们仅输出其中的值，浏览器就不会进行异步处理输出最终的调用值。同理使用JSON.stringfy一样，浏览器仅仅异步处理对象，并不会处理序列化JSON字符串，所有输出的数据是当前的值，而不是最终值。  
-
-console.log()打印出来的内容并不是一定百分百可信的内容。一般对于基本类型number、string、boolean、null、undefined的输出是可信的，但对于Object等引用类型来说，则就会出现上述异常打印输出。    
-**将对象序列化JSON.stringify为字符串**
-```
-const obj = {
-  name: 'T',
-  height: 170
-}
-console.log(JSON.parse(JSON.stringify(obj)));
-obj.height = 180;
-```
-![项目图片](./toc/images/js/题库编程-基础02.png)   
-
-2、将-0转换成字符串输出
+# 题库
+## 数字
+### 将-0转换成字符串输出
 ```
 const a = -0;
 console.log(a);  //-0（Number）
 console.log(a.toString());  // 0
 console.log(a.toLocaleString());   //-0
 ```
-## 字符串类
+## 字符串
 ### 去除字符串中最后一个指定字符   
 注意：不是字符串最末尾的字符   
 初步想法
@@ -808,7 +783,7 @@ console.log(sumStr('abcfgfhbcskdfbcbc', 'f'));  //3
 </script>
 ```
 
-## 数组类
+## 数组
 ### 递归实现数组长度为5且元素为2-32间不重复的值   
 > 1. 生成一个长度为5的空数组arr。
 > 2. 生成一个（2－32）之间的随机整数rand。
@@ -829,6 +804,37 @@ function build() {
 }
 console.log(build());
 ```
+
+## 对象
+### 修改对象属性
+```
+const obj = {
+  name: 'T',
+  height: 170
+}
+console.log(obj);
+console.log(obj.height);
+obj.height = 180;
+```  
+![项目图片](./toc/images/js/题库编程-基础01.png)   
+* 不展开对象看时，console.log()是按照代码执行顺序，同步地输出了对象当时的快照（只输出一个对象的引用）。所以我们看到的是预期的值。   
+* 展开对象时，它其实是重新去内存中读取对象的属性值，此时对象属性已被更改，所以展开对象后，可能看到的不是预期值了。   
+* console.log()在控制台输出引用值时确实是当时的值，但是你点开箭头的时候它会重新获取这些引用的值。    
+
+当我们在输出对象时我们看到的数据是异步处理最终的值，**但是当我们仅输出对象中的某一key时，输出的值就是当前的值**，从中我们可以看出实际上不同的浏览器实际异步处理的是对象的引用，当我们console.log输出对象时调用的是一个引用，如果我们仅输出其中的值，浏览器就不会进行异步处理输出最终的调用值。同理使用JSON.stringfy一样，浏览器仅仅异步处理对象，并不会处理序列化JSON字符串，所有输出的数据是当前的值，而不是最终值。  
+
+console.log()打印出来的内容并不是一定百分百可信的内容。一般对于基本类型number、string、boolean、null、undefined的输出是可信的，但对于Object等引用类型来说，则就会出现上述异常打印输出。    
+**将对象序列化JSON.stringify为字符串**
+```
+const obj = {
+  name: 'T',
+  height: 170
+}
+console.log(JSON.parse(JSON.stringify(obj)));
+obj.height = 180;
+```
+![项目图片](./toc/images/js/题库编程-基础02.png)   
+
 ## 其他
 ### 获取URL地址栏参数
 > url: baidu.com/s?ie=utf-8&f=8&rsv_bp=1&tn=baidu&wd=js获取url参数   
@@ -860,3 +866,31 @@ let params = new URLSearchParams(location.search);
 console.log(params.get('ie'))    // utf-8
 console.log(params.get('name'))  // null
 ```
+### 网页应用从服务器主动推送数据到客户端
+例如订单方面，实时推送消息给商家或者用户    
+
+**1、comet：基于HTTP长连接的服务器推送技术**  
+comet是一种用于Web的推送技术，能使服务器实时地将更新的信息传送到客户端，而无须客户端发出请求。  
+ 
+**（1）、ajax轮询**   
+用定时器每隔一段时间就轮询一次（重新调取接口），更新信息，相当于客户端不断的向服务器发起请求。   
+
+实现简单，但这是通过模拟服务器发起的通信，不是实时通信，无论应用状态是否改变，都会更新，导致服务器资源的浪费，且会加重网络负载，拖累服务器。  
+
+**（2）、长轮询**  
+长轮询 (long polling)：在打开一条连接以后保持，等待服务器推送来数据再关闭，可以采用HTTP长轮询和XHR长轮询两种方式。
+
+HTTP 和JSONP方式的长轮询: 把 script 标签附加到页面上以让脚本执行。服务器会挂起连接直到有事件发生，接着把脚本内容发送回浏览器，然后重新打开另一个 script 标签来获取下一个事件，从而实现长轮询的模型。  
+XHR长轮询：客户端打开一个到服务器端的 AJAX 请求然后等待响应；服务器端需要一些特定的功能来允许请求被挂起，只要一有事件发生，服务器端就会在挂起的请求中送回响应并关闭该请求。客户端 JavaScript 响应处理函数会在处理完服务器返回的信息后，再次发出请求，重新建立连接；如此循环。   
+
+现在浏览器已经支持CROS的跨域方式请求，因此HTTP和JSONP的长轮询方式是慢慢被淘汰的一种技术，建议采用XHR长轮询。  
+
+客户端很容易实现良好的错误处理系统和超时管理，实现成本与Ajax轮询的方式类似。但需要服务器端有特殊的功能来临时挂起连接。当客户端发起的连接较多时，服务器端会长期保持多个连接，具有一定的风险。HTTP 1.1 规范中规定，客户端不应该与服务器端建立超过两个的 HTTP 连接， 新的连接会被阻塞，在IE浏览器中严格遵守了这种规定。  
+
+**（3）、iframe**  
+通过在 HTML 页面里嵌入一个隐蔵帧，然后将这个隐蔵帧的 SRC 属性设为对一个长连接的请求，服务器端就能源源不断地往客户端输入数据。  
+
+这种方式每次数据传送不会关闭连接，连接只会在通信出现错误时，或是连接重建时关闭（一些防火墙常被设置为丢弃过长的连接， 服务器端可以设置一个超时时间， 超时后通知客户端重新建立连接，并关闭原来的连接）。   
+
+**2、websocket**  
+WebSocket是HTML5开始提供的一种在单个 TCP 连接上进行全双工通讯的协议。WebSocket通讯协议于2011年被IETF定为标准RFC 6455，WebSocketAPI被W3C定为标准。在WebSocket API中，浏览器和服务器只需要做一个握手的动作，然后，浏览器和服务器之间就形成了一条快速通道。两者之间就直接可以数据互相传送。但是兼容性不高，很多浏览器不支持。

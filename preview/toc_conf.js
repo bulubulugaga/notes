@@ -18,11 +18,11 @@ var jquery_ztree_toc_opts = {
             }
         },
         top: '100px',
-        // 'overflow-x': 'hidden',
-        'height': $(window).height() + 'px'
+        'overflow-x': 'hidden',
+        'height': $(window).height() - 120 + 'px',
     }
 }
-console.log(document.querySelector('.header-container'));
+// console.log(document.querySelector('.header-container'));
 var markdown_panel_style = {
     'width': '1066px',
     'margin-top': '100px',
@@ -63,6 +63,7 @@ function init() {
             .header-container-middle li {display:inline; margin-left: 20px;}
             .header-container-middle a {font-size: 14px;text-decoration: none;color: rgba(0, 0, 0, .54);}
             .header-container-middle a:hover {color: #0088f5;font-weight:bold;}
+            .header-nav-active a {color: #0088f5;font-weight:bold;}
             .header-container-right {width: 168px;}
             .header-container-right .icon-m-play, .header-container-right .icon-m-vo {margin-top: 1px;}
             .header-container-right .iconfont, .header-container-right .music-name {opacity: .1;transition: opacity .1s, visibility .1s;}
@@ -93,12 +94,12 @@ function init() {
                 <p class="blue f20 flex-middle FB"><i class="iconfont f30">&#xe693;</i>XIAOHUI</p>
                 <p class="blue f14" style="margin-left: 20px;">入目无别人，四下皆是你</p>
                 <ul class="header-container-middle">
-                    <li><a href="./html.html">html</a><li>
-                    <li><a href="./css.html">css</a><li>
-                    <li><a href="./js.html">js</a><li>
-                    <li><a href="./vue.html">vue</a><li>
-                    <li><a href="./other.html">other</a><li>
-                    <li><a href="./markdown.html">markdown</a><li>
+                    <li class="html"><a href="./html.html">html</a><li>
+                    <li class="css"><a href="./css.html">css</a><li>
+                    <li class="js"><a href="./js.html">js</a><li>
+                    <li class="vue"><a href="./vue.html">vue</a><li>
+                    <li class="other"><a href="./other.html">other</a><li>
+                    <li class="markdown"><a href="./markdown.html">markdown</a><li>
                 </ul>
                 <div class="header-container-right ml-auto">
                     <p class="flex-middle">
@@ -113,5 +114,20 @@ function init() {
         </div>
     `
     body.appendChild(oDiv);
+    if(location.href.indexOf('html.') !== -1) {
+        $('.header-container-middle .html').addClass('header-nav-active');
+    };
+    isActiveNav('css');
+    isActiveNav('js');
+    isActiveNav('vue');
+    isActiveNav('other');
+    isActiveNav('markdown');
 }
+
+function isActiveNav(type) {
+    if(location.href.indexOf(type) !== -1) {
+        $('.header-container-middle .' + type).addClass('header-nav-active');
+    };
+}
+
 init();
