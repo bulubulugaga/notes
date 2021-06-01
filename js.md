@@ -568,7 +568,64 @@ console.log( Object.prototype.toString.call(arr) == '[object Array]' );   //true
 参考文章：[一像素](https://www.cnblogs.com/onepixel/p/5126046.html)&emsp;[冰雪为融](https://blog.csdn.net/lhjuejiang/article/details/79623973)  
 
 # 变量
-## 作用域
+## 作用域  
+作用域说明：指一个变量的作用范围   
+
+**1、全局作用域**   
+(1) 全局作用域在页面打开时被创建，页面关闭时被销毁   
+(2) 编写在script标签中的变量和函数，作用域为全局，在页面的任意位置都可以访问到   
+(3) 在全局作用域中有全局对象window，代表一个浏览器窗口，由浏览器创建，可以直接调用   
+(4) 全局作用域中声明的变量和函数会作为window对象的属性和方法保存   
+```
+var a = 10;
+b = 20;
+function an(){
+    console.log('an')
+}
+var bn = function(){
+    console.log('bn')
+}
+console.log(window)
+```  
+如图，变量a，b和函数an，bn都保存在window对象上   
+![项目图片](./toc/images/js/变量01.png)    
+
+**2、函数作用域**  
+(1) 调用函数时，函数作用域被创建，函数执行完毕，函数作用域被销毁   
+(2) 每调用一次函数就会创建一个新的函数作用域，他们之间是相互独立的   
+(3) 在函数作用域中可以访问到全局作用域的变量，在函数外无法访问到函数作用域内的变量   
+(4) 在函数作用域中访问变量、函数时，会先在自身作用域中寻找，若没有找到，则会到函数的上一级作用域中寻找，一直到全局作用域    
+(5) 在函数作用域中也有声明提前的特性，对于变量和函数都起作用，此时函数作用域相当于一个小的全局作用域，详细声明提前请看声明提前部分    
+(6) 在函数作用域中，不使用变量关键字声明的变量，在赋值时会往上一级作用域寻找已经声明的同名变量，直到全局作用域时还没找到，则会成为window的属性   
+```  
+an(); // 输出结果 bn
+function an(){
+  var b = 'bn';
+  function bn(){
+    console.log(b); 
+    b = 'bn2';   // b会往上一级寻找已经声明的同名变量，并赋值，直到全局作用域时还没找到，则会成为window的属性
+  }
+  bn();
+  console.log(b); // 输出 bn2
+}
+```
+(7) 在函数中定义形参,等同于声明变量  
+```
+function an(name){
+  console.log(name); // 输出 undefined
+}
+an();
+```
+等同于
+```
+function an(){
+  var name
+  console.log(name); // 输出 undefined
+}
+an();
+```  
+
+原文链接：[JS中的变量作用域](https://blog.csdn.net/zjy_android_blog/article/details/80863425)
 ## 变量提升
 
 # 项目中的一些问题
