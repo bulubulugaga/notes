@@ -666,6 +666,118 @@ function foo(a) {
 var c = foo(2);  // 这里首先对 foo 进行 RHS 查询，找到它是一个函数，然后对 c 进行 LHS 查询把 foo 赋值给 c 
 ```
 ## 变量提升  
+### 变量提升
+提升简单来说就是把我们所写的类似于var a = 123;这样的代码，声明提升到它所在作用域的顶端去执行，到我们代码所在的位置来赋值。   
+```
+function test () {
+    console.log(a);  //undefined
+    var a = 123; 
+}
+test ();
+```   
+实际执行顺序
+```
+function test () {
+    var a;
+    console.log(a);
+    a = 123;
+}
+test();
+```
+### 函数提升
+**1、函数声明式**   
+```
+console.log(bar);
+function bar () {
+  console.log(1);
+}
+```
+执行顺序相当于   
+```
+function bar () {
+  console.log(1);
+}
+console.log(bar);
+```
+**2、函数字面量式**
+```
+foo();   //1
+function foo () {
+  console.log(1);
+}
+var foo = function () {
+  console.log(2);
+}
+```
+执行顺序相当于
+```
+function foo () {
+  console.log(1);
+}
+var foo;
+foo();
+foo = function () {
+  console.log(2);
+}
+```
+
+### 题目
+```
+console.log(v1); 
+var v1 = 100;
+function foo() {
+  console.log(v1); 
+  var v1 = 200;
+  console.log(v1);   
+}
+foo();
+console.log(v1);   
+
+// undefined
+// undefined
+// 200
+// 100
+```
+```
+foo(); 
+var a = true;
+if(a){
+  function foo () { console.log(1); }
+}else{
+  function foo () { console.log(2); }
+}
+
+//低版本：2  //高版本： Uncaught TypeError: foo is not a function
+```
+```
+console.log(typeof a);
+a();
+var a = 3;
+function a() {
+ console.log(typeof a);
+}
+console.log(typeof a);
+a = 6;
+a();
+
+// "function"
+// "function"
+// "number"
+// "a is not a function"
+```
+```
+f();
+fn(); 
+var fn = function(){
+  console.log(1)
+}
+function f(){
+  console.log(0)
+}
+
+// 0
+// fn is not a function
+```
 
 # 项目中的一些问题
 ## 根据数组某个元素循环请求api，按顺序获得相应值
