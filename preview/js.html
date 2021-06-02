@@ -558,6 +558,9 @@ console.log( Object.prototype.toString.call(arr) == &#39;[object Array]&#39; ); 
 </code></pre><p>从结果中可以看出，constructor和instanceof都没有正确的判断出类型。  </p>
 <p>参考文章：<a href="https://www.cnblogs.com/onepixel/p/5126046.html">一像素</a>&emsp;<a href="https://blog.csdn.net/lhjuejiang/article/details/79623973">冰雪为融</a>  </p>
 <h1 id="-">变量</h1>
+<h2 id="-">编译原理</h2>
+<p>JavaScript的源代码在运行的时候，会经过两个阶段：编译和执行。而且，编译阶段往往就在执行阶段的前几微秒甚至更短的时间内。<br>大家通常把 javascript 归类为一种“动态”或“解释执行”的语言，但事实上，它是一门编译语言，但和传统的编译语言不同，它不是提前编译的，编译结果也不能进行移植。  </p>
+<p>在传统编译语言中，程序在执行之前会经历三个步骤，统称为“编译”：<br><strong>1、词法解析</strong><br>这个过程会把字符串分解成有意义的代码块，这些代码块被称为词法单元。<br>例如 <strong>var a = 5;</strong> 这段程序通常会被分解成下面这些词法单元： var、a、=、5、; 。空格是否会被当成词法单元取决于空格在这门语言中是否有意义。<br><strong>2、语法解析</strong><br>这个过程是将词法单元流（数组）转换成一个由元素逐级嵌套所组成的代表了程序语法结构的树。这个树被称为“抽象语法树”（Abstract Syntax Tree，AST）。var a = 5; 的抽象语法树中可能如下图所示：<br><img src="./toc/images/js/变量02.png" alt="抽象语法树"><br><strong>3、代码生成</strong><br>将 AST 转换为可执行代码的过程被称为代码生成。这个过程与语言、目标平台等息息相关。简单来说，就是通过某种方法可以将 var a = 5; 的 AST 转化为一组机器指令，用来创建一个叫做 a 的变量（包括分配内存等），并将一个值 5 存储在 a 中。<br>任何 javascript 代码片段在执行前都要进行编译（预编译）。因此，javascript 编译器首先会对 var a = 5; 这段程序进行编译，然后做好执行它的准备，并且通常马上就会执行它。</p>
 <h2 id="-">作用域</h2>
 <p>作用域说明：指一个变量的作用范围   </p>
 <p><strong>1、全局作用域</strong><br>(1) 全局作用域在页面打开时被创建，页面关闭时被销毁<br>(2) 编写在script标签中的变量和函数，作用域为全局，在页面的任意位置都可以访问到<br>(3) 在全局作用域中有全局对象window，代表一个浏览器窗口，由浏览器创建，可以直接调用<br>(4) 全局作用域中声明的变量和函数会作为window对象的属性和方法保存   </p>
@@ -593,8 +596,25 @@ an();
   console.log(name); // 输出 undefined
 }
 an();
-</code></pre><p>原文链接：<a href="https://blog.csdn.net/zjy_android_blog/article/details/80863425">JS中的变量作用域</a></p>
-<h2 id="-">变量提升</h2>
+</code></pre><p>原文链接：<a href="https://blog.csdn.net/zjy_android_blog/article/details/80863425">JS中的变量作用域</a>   </p>
+<h2 id="-">作用域嵌套</h2>
+<p>当一个块或函数嵌套在另一个块或函数中时，就发生了作用域嵌套。因此，在当前作用域中无法找到某个变量时，引擎就会在外层嵌套的作用域中继续查找，直到找到该变量，或抵达最外层的作用域（也就是全局作用域）为止。   </p>
+<pre><code>function foo(a) {
+  console.log(a + b);
+}
+var b = 2;
+foo(2);    // 4
+</code></pre><p>这里对 b 进行的 RHS 查询在 foo 作用域中无法找到，但可以在上一级作用域（这个例子中就是全局作用域）中找到。   </p>
+<h2 id="lhs-rhs">LHS 和 RHS</h2>
+<p><strong>LHS查询</strong><br>LHS ： 指的是赋值操作的左端。在编译的过程中，先将标识符和函数声明给提升到其对应的作用域的顶端。标识符解析的时候，会进行LHS查询，在LHS查询的时候，如果标识符一直找不到声明的位置，那么最终就会在全局环境生成一个全局变量。   </p>
+<p><strong>RHS查询</strong><br>说到LHS查询，就不得不提对应的RHS查询，它指的是赋值操作的源头。RHS查询的时候，如果找不到对应的标识符，就会抛出一个异常：ReferenceError。  </p>
+<pre><code>function foo(a) {
+  // 这里隐式包含了 a = 2 这个赋值，所以对 a 进行了 LHS 查询
+  var b = a;   // 这里对 a 进行了 RHS 查询，找到 a 的值，然后对 b 进行 LHS 查询，把 2 赋值给 b
+  return a + b;   // 这里包含了对 a 和 b 进行的 RHS 查询
+}
+var c = foo(2);  // 这里首先对 foo 进行 RHS 查询，找到它是一个函数，然后对 c 进行 LHS 查询把 foo 赋值给 c 
+</code></pre><h2 id="-">变量提升</h2>
 <h1 id="-">项目中的一些问题</h1>
 <h2 id="-api-">根据数组某个元素循环请求api，按顺序获得相应值</h2>
 <p><img src="./toc/images/js/项目01.png" alt="项目图片">
