@@ -668,6 +668,7 @@ var c = foo(2);  // 这里首先对 foo 进行 RHS 查询，找到它是一个�
 ## 变量提升  
 ### 变量提升
 提升简单来说就是把我们所写的类似于var a = 123;这样的代码，声明提升到它所在作用域的顶端去执行，到我们代码所在的位置来赋值。   
+其在JS引擎的执行的优先级是 变量声明、函数声明、变量赋值。   
 ```
 function test () {
     console.log(a);  //undefined
@@ -777,6 +778,45 @@ function f(){
 
 // 0
 // fn is not a function
+```
+```
+var s = function(){
+  console.log(0);
+}
+function s(){
+  console.log(1);
+}
+s(); // 0
+
+// 执行顺序
+var s; // 变量声明
+function s(){ //函数声明
+  console.log(1);
+}
+s = function(){ // 变量赋值
+  console.log(0);
+}
+s(); // 0
+
+```
+```
+console.log(fn);
+function fn() {
+  console.log('a');
+}
+var fn = 3;
+
+// ƒ fn() {
+  console.log('a');
+}
+
+// 执行顺序
+var fn;
+function fn() {
+  console.log('a');
+}
+console.log(fn);
+fn = 3;
 ```
 
 # 项目中的一些问题

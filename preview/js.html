@@ -616,7 +616,7 @@ foo(2);    // 4
 var c = foo(2);  // 这里首先对 foo 进行 RHS 查询，找到它是一个函数，然后对 c 进行 LHS 查询把 foo 赋值给 c 
 </code></pre><h2 id="-">变量提升</h2>
 <h3 id="-">变量提升</h3>
-<p>提升简单来说就是把我们所写的类似于var a = 123;这样的代码，声明提升到它所在作用域的顶端去执行，到我们代码所在的位置来赋值。   </p>
+<p>提升简单来说就是把我们所写的类似于var a = 123;这样的代码，声明提升到它所在作用域的顶端去执行，到我们代码所在的位置来赋值。<br>其在JS引擎的执行的优先级是 变量声明、函数声明、变量赋值。   </p>
 <pre><code>function test () {
     console.log(a);  //undefined
     var a = 123; 
@@ -706,6 +706,41 @@ function f(){
 
 // 0
 // fn is not a function
+</code></pre><pre><code>var s = function(){
+  console.log(0);
+}
+function s(){
+  console.log(1);
+}
+s(); // 0
+
+// 执行顺序
+var s; // 变量声明
+function s(){ //函数声明
+  console.log(1);
+}
+s = function(){ // 变量赋值
+  console.log(0);
+}
+s(); // 0
+
+</code></pre><pre><code>console.log(fn);
+function fn() {
+  console.log(&#39;a&#39;);
+}
+var fn = 3;
+
+// ƒ fn() {
+  console.log(&#39;a&#39;);
+}
+
+// 执行顺序
+var fn;
+function fn() {
+  console.log(&#39;a&#39;);
+}
+console.log(fn);
+fn = 3;
 </code></pre><h1 id="-">项目中的一些问题</h1>
 <h2 id="-api-">根据数组某个元素循环请求api，按顺序获得相应值</h2>
 <p><img src="./toc/images/js/项目01.png" alt="项目图片">
