@@ -94,10 +94,12 @@ function init() {
                 <p class="blue f20 flex-middle FB"><i class="iconfont f30">&#xe693;</i>XIAOHUI</p>
                 <p class="blue f14" style="margin-left: 20px;">入目无别人，四下皆是你</p>
                 <ul class="header-container-middle">
+                    <!-- 添加新链接时，文件名和类名需要保持一致 -->
                     <li class="html"><a href="./html.html">html</a><li>
                     <li class="css"><a href="./css.html">css</a><li>
                     <li class="js"><a href="./js.html">js</a><li>
                     <li class="vue"><a href="./vue.html">vue</a><li>
+                    <li class="algorithm"><a href="./algorithm.html">算法</a><li>
                     <li class="other"><a href="./other.html">other</a><li>
                     <li class="markdown"><a href="./markdown.html">markdown</a><li>
                 </ul>
@@ -117,17 +119,14 @@ function init() {
     if(location.href.indexOf('html.') !== -1) {
         $('.header-container-middle .html').addClass('header-nav-active');
     };
-    isActiveNav('css');
-    isActiveNav('js');
-    isActiveNav('vue');
-    isActiveNav('other');
-    isActiveNav('markdown');
+    let aLi = document.querySelectorAll('.header-container-middle li');
+    for(let item of aLi) {
+        if(item.className && item.className !== 'html') {
+            if(location.href.indexOf(item.className) !== -1) {
+                $('.header-container-middle .' + item.className).addClass('header-nav-active');
+                return;
+            };
+        }
+    }
 }
-
-function isActiveNav(type) {
-    if(location.href.indexOf(type) !== -1) {
-        $('.header-container-middle .' + type).addClass('header-nav-active');
-    };
-}
-
 init();

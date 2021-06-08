@@ -1,0 +1,180 @@
+<html>
+  <head>
+	  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>i5ting_ztree_toc:algorithm</title>
+		<link href="toc/style/github-bf51422f4bb36427d391e4b75a1daa083c2d840e.css" media="all" rel="stylesheet" type="text/css"/>
+		<link href="toc/style/github2-d731afd4f624c99a4b19ad69f3083cd6d02b81d5.css" media="all" rel="stylesheet" type="text/css"/>
+		<link href="toc/css/zTreeStyle/zTreeStyle.css" media="all" rel="stylesheet" type="text/css"/>
+	  <style>
+		pre {
+		    counter-reset: line-numbering;
+		    border: solid 1px #d9d9d9;
+		    border-radius: 0;
+		    background: #fff;
+		    padding: 0;
+		    line-height: 23px;
+		    margin-bottom: 30px;
+		    white-space: pre;
+		    overflow-x: auto;
+		    word-break: inherit;
+		    word-wrap: inherit;
+		}
+
+		pre a::before {
+		  content: counter(line-numbering);
+		  counter-increment: line-numbering;
+		  padding-right: 1em; /* space after numbers */
+		  width: 25px;
+		  text-align: right;
+		  opacity: 0.7;
+		  display: inline-block;
+		  color: #aaa;
+		  background: #eee;
+		  margin-right: 16px;
+		  padding: 2px 10px;
+		  font-size: 13px;
+		  -webkit-touch-callout: none;
+		  -webkit-user-select: none;
+		  -khtml-user-select: none;
+		  -moz-user-select: none;
+		  -ms-user-select: none;
+		  user-select: none;
+		}
+
+		pre a:first-of-type::before {
+		  padding-top: 10px;
+		}
+
+		pre a:last-of-type::before {
+		  padding-bottom: 10px;
+		}
+
+		pre a:only-of-type::before {
+		  padding: 10px;
+		}
+
+		.highlight { background-color: #ffffcc } /* RIGHT */
+		</style>
+  </head>
+  <body>
+	  <div>
+				<div style='width:25%;'>
+						<ul id="tree" class="ztree" style='width:100%'>
+
+						</ul>
+				</div>
+        <div id='readme' style='width:70%;margin-left:20%;'>
+          	<article class='markdown-body'>
+            	<h1 id="-">题库</h1>
+<p>目前是来自<a href="https://leetcode-cn.com/">力扣（LeeCode）</a>的一些题目</p>
+<h2 id="-">两数之和</h2>
+<p>给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出 和为目标值 target  的那 两个 整数，并返回它们的数组下标。<br>你可以假设每种输入只会对应一个答案。但是，数组中同一个元素在答案里不能重复出现。<br>你可以按任意顺序返回答案。   </p>
+<pre><code>// 1、初步解法
+var twoSum = function(nums, target) {
+  for(let i = 0; i &lt; nums.length - 1; i++) {
+    for(let j = i + 1; j &lt; nums.length; j++) {
+      if(nums[i] + nums[j] === target) {
+        return [i, j];
+      }
+    }
+  }
+};
+console.log(twoSum([2, 7, 2, 11, 15], 18));   // [1, 3]
+console.log(twoSum([2, 7, 2, 11, 15], 9));   // [0, 1]
+console.log(twoSum([2, 7, 2, 11, 15], 1));   // undefined
+</code></pre><p>看到来自可乐君JY的另外两种解法</p>
+<pre><code>// 2、静态哈希表
+var twoSum = function(nums, target) {
+  const map = new Map();
+  for(let i = 0;i &lt; nums.length;i++){
+    map.set(nums[i],i);
+  }
+  for(let i = 0;i &lt; nums.length;i++){
+    const diff = target - nums[i];
+    if(map.has(diff) &amp;&amp; map.get(diff) !== i){
+      return [i,map.get(diff)];
+    }
+  }
+};
+</code></pre><pre><code>// 3、动态哈希表
+var twoSum = function (nums, target) {
+  const map = new Map();
+  for (let i = 0; i &lt; nums.length; i++) {
+    const num1 = nums[i];
+    const num2 = target - nums[i];
+    if(map.has(num2)){
+      return [map.get(num2),i];
+    }else{
+      map.set(num1,i);
+    }
+  }
+};
+</code></pre><h2 id="-">判断回文</h2>
+<p>回文数是指正序（从左向右）和倒序（从右向左）读都是一样的整数。  </p>
+<pre><code>function isReverse(num) {
+  let str = num.toString();
+  let flag = false;
+  let arr = str.split(&#39;&#39;);
+  let i = 0;
+  for( ;i &lt; Math.floor(arr.length / 2); i++ ) {
+    if(arr[i] !== arr[arr.length - i - 1]) {
+      // 只要不等，就推出循环
+      break;
+    }
+  }
+  if(i === Math.floor(arr.length / 2)) {
+    flag = true;
+  }
+  return flag;
+}
+console.log(isReverse(123321));    // true
+console.log(isReverse(1234321));    // true
+console.log(isReverse(123412));    // false
+console.log(isReverse(12344221));    // false
+
+// 可直接用于字符串
+console.log(isReverse(&#39;asdfdsa));    // true
+console.log(isReverse(&#39;asds&#39;));    // false
+</code></pre><p>其他解法</p>
+<pre><code>function isReverse(x) {
+  if(x&lt;0){
+    // 负数不能是回文
+    return false;
+  }else{
+    var x2 = parseInt(x.toString().split(&quot;&quot;).reverse().join(&quot;&quot;));
+    return x2===x?true:false;
+  }
+}
+</code></pre><pre><code>function isReverse(x) {
+  if (x &lt; 0) return false;
+  if (x &lt; 10) return true;    // 一位为回文
+  let n = 10 ** Math.floor(Math.log10(x));
+  while (n &gt; 1 &amp;&amp; x &gt; 0) {
+    if (Math.floor(x / n) !== x % 10) return false;
+    x = Math.floor((x % n) / 10);
+    n /= 100;
+  }
+  return true;
+}
+</code></pre>
+          	</article>
+        </div>
+		</div>
+  </body>
+</html>
+<script type="text/javascript" src="toc/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="toc/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="toc/js/ztree_toc.js"></script>
+<script type="text/javascript" src="toc_conf.js"></script>
+
+<SCRIPT type="text/javascript" >
+<!--
+$(document).ready(function(){
+    var css_conf = eval(markdown_panel_style);
+    $('#readme').css(css_conf)
+    
+    var conf = eval(jquery_ztree_toc_opts);
+		$('#tree').ztree_toc(conf);
+});
+//-->
+</SCRIPT>
