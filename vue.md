@@ -108,8 +108,23 @@ getList() {
 }
 ```
 **如果有子组件调用父组件方法（子组件点击事件，父组件需要执行一些相关操作），与平时无异**
+## 对整个data赋值
+有时候需要对几乎整个页面数据做缓存，创建页面时赋初始值需要对整个data赋值，不能直接用this.$data = ···，考虑循环赋值   
+```
+// 存储
+localStorage.setItem('count', JSON.stringify(this.$data));
 
-## vue+elementUI拆分单元格     
+//创建赋初始值
+created() {
+  const data = JSON.parse(localStorage.getItem('count));
+  for(let prop in data) {   // 循环赋值
+    this.$set(this, [prop], data[prop]);
+  }
+}
+```
+## elementUI组件
+### el-table
+#### 拆分单元格     
 数组中嵌套数组（多级分类），需要拆分单元格来展示表格数据的情况    
 具体表现为一行对应多行的格式  
 ```
@@ -604,21 +619,7 @@ list: [   // 三级分类实例数据，第一层是申请表格，可填多个�
 </body>
 </html>
 ```
-## 对整个data赋值
-有时候需要对几乎整个页面数据做缓存，创建页面时赋初始值需要对整个data赋值，不能直接用this.$data = ···，考虑循环赋值   
-```
-// 存储
-localStorage.setItem('count', JSON.stringify(this.$data));
-
-//创建赋初始值
-created() {
-  const data = JSON.parse(localStorage.getItem('count));
-  for(let prop in data) {   // 循环赋值
-    this.$set(this, [prop], data[prop]);
-  }
-}
-```
-## el-table根据状态值展示相应状态
+#### 根据状态值展示相应状态
 最简单的一种方法：根据状态值用v-if进行渲染数据
 ```
 <el-table :data="list>
@@ -678,5 +679,432 @@ computed: {
   },
 }
 ```
+#### 有排序时重置搜索
+表格列表有选项，有排序，重置清空所有选项和排序，主要是针对1.4版本，后续版本有重置方法可以调用。    
+![示例图片](./toc/images/vue/项目08.png)
+```
+handelReset(){
+  // 重置
+  // 清空搜索选项
+  this.searchParams.star = '';
+  this.searchParams.keyword = '';
+  // 清空排序，具体根据排序方法判断
+  this.sort({ column: null, order: null, p: null})
+  // 清除排序样式
+  let asceTh = document.querySelector('th.ascending');
+  if(asceTh) {
+    let asceThClass = asceTh && asceTh.className;
+    asceTh.className = asceThClass && asceThClass.replace(/ascending /, '');
+  } 
+  let dsceTh = document.querySelector('th.descending');
+  if(dsceTh) {
+    let dsceThClass = dsceTh && dsceTh.className;
+    dsceTh.className = dsceThClass && dsceThClass.replace(/descending /, '');
+  } 
+}
+```   
 
+### el-form
+#### rules判断select value为数值检测失效
+通过rules验证表单规则，el-select => options绑定的是数值类型时，会监测不到。   
+```
+<template>
+  <el-form :model="formData" :rules="rules" ref="ruleForm">
+    <el-form-item prop="progress_status" label="项目进度状态">
+      <el-select v-model="dataForm.progress_status" placeholder="请选择">
+        <el-option v-for="item in progress" :value="item.id" :label="item.name" :key="item.id"></el-option>
+      </el-select>
+    </el-form-item>
+  </el-form>
+  <el-button @click="handleSave('ruleForm')>提交</el-button>
+</template>
+<script>
+  data() {
+    return {
+      dataForm: {
+        progress_status
+      },
+      progress: [
+        { id: 1, name: '按计划进行' },
+        { id: 2, name: '比计划提前' },
+        { id: 3, name: '落后计划' }
+      ],
+      rules: {
+        progress_status: [
+          { required: true, message: "请选择项目进度状态", trigger: "blur" }
+        ],
+      }
+    }
+  },
+  methods: {
+    handleSave(formName) {
+      // 提交
+      this.$refs[formName].validate((valid) => {
+        if(!valid) {
+          return;
+        }
+      })
+    }
+  }
+</script>
+```
+提交之后   
+![展示](./toc/images/vue/项目04.png)   
+```
+// 将progress的id替换为字符串形式，即可
+progress: [
+  { id: '1', name: '按计划进行' },
+  { id: '2', name: '比计划提前' },
+  { id: '3', name: '落后计划' }
+],
+```
+提交之后   
+![展示](./toc/images/vue/项目05.png)
 
+#### el-select远程搜索赋初始值
+使用远程搜索时可能会有编辑页面，需要先赋初始值，可能会造成初始值显示的不是值，而是id。
+```
+<el-form-item prop="project_owner" label="目前负责人">
+  <el-select
+    v-model="dataForm.project_owner"
+    placeholder="请输入姓名"
+    clearable
+    :multiple="false"
+    filterable
+    remote
+    :remote-method="remoteMethod"
+    :loading="userLoading"
+    style="width: 100%">
+    <el-option
+      v-for="user in userList"
+      :key="user.user.data.id"
+      :label="user.user.data.name"
+      :value="user.user.data.id">
+      <span style="float: left">{{ user.user.data.name }}</span>
+      <span style="float: right; color: #8492a6; font-size: 13px">{{ user.user.data.mobile }}</span>
+    </el-option>
+  </el-select>
+</el-form-item>
+
+<script>
+  data() {
+    dataForm: {},
+    userLoading: false,
+    userList: []
+  },
+  methods: {
+    getDetail() {
+      api.getDetail().then(res => {
+        this.dataForm = res.data;   //里面含有负责人id--project_owner
+      })
+    },
+    remoteMethod (query) {
+      // 搜索负责人
+      let that = this;
+      if(!query) {
+        this.userList = [];
+        return;
+      }
+      setTimeout(() => {
+        that.userLoading = true;
+        userApi.getUserList({
+          limit: 0, 
+          search: query
+        }).then(response => {
+          that.userList = response.body.data;
+          that.userLoading = false;
+        }, err => {
+          that.$message.error(err.body.message);
+          that.userLoading = false;
+        })
+      }, 200);
+    },
+  }
+</script>
+```
+直接这样写的话，由于v-model绑定值变化就会搜索一次，导致第一次是id值，并且会搜索一次。     
+![展示](./toc/images/vue/项目06.png)   
+
+**解决办法：获取详情后，拼接一个userList，第一次不进行搜索**    
+1、如果是多选情况，绑定的值会是一个数组，可以通过这个在搜索时进行判断   
+```
+:multiple="true"
+
+getDetail() {
+  api.getDetail().then(res => {
+    this.dataForm = res.data;
+    this.userList = res.data.data.owner.data;   // 如果结构不一致，需要拼接
+  })
+},
+remoteMethod (query) {
+  if(typeof(query) !== 'string') {  //新输入搜索的是字符串，初次获取会是数组
+    return;
+  }
+  if(!query) {
+    this.userList = [];
+    ······
+  }, 200);
+},
+```
+2、单选时，可以在获取详情时放一个变量，表示是否为需要搜索的情况，第一次赋值不进行搜索。
+```
+data() {
+  isSearchUser: true,   //是否需要搜索
+},
+methods: {
+  getDetail() {
+    this.isSearchUser = false;   // 赋值只能放在调用接口外（内部好像因为异步性会导致没有效果）
+    api.getDetail().then(res => {
+      this.dataForm = res.data; 
+      this.userList.push({   // 拼接userList
+        user: {
+          data: {
+            'id': this.dataForm.project_owner,
+            'name': this.dataForm.project_owner_name,
+            'mobile': this.dataForm.project_owner_mobile,
+          }
+        }
+      })
+    })
+  },
+  remoteMethod (query) {
+    let that = this;
+    if(!this.isSearchUser) {
+      this.isSearchUser = true;
+      return;
+    }
+    if(!query) {
+      this.userList = [];
+      ······
+    }, 200);
+  },
+}
+```
+#### 封装一个简易版的el远程搜索
+需求：输入的时候进行搜索，可以选择搜索到的值，如果没有搜索到，就用输入的值。   
+如果直接使用el远程搜索，没有搜索到时或者说没有选择搜索到的值时，失去焦点输入内容会是输入前的，不能满足没有搜索到使用输入的值。   
+思路：搜索部分直接使用el-input，下面用远程搜索的DOM元素，引入el之后，class可以公用，可以不考虑css部分。
+```
+<template>
+  <div class="SearchUser">
+    <el-input
+      v-model="dataForm.party_a"
+      :placeholder="placeholder"
+      style="width: 100%"
+      @change="changePartAInput"
+      @click.native="handleInput"
+      @blur="blur"
+    ></el-input>
+    <!-- 搜索后的列表展示 -->
+    <div class="el-select-dropdown" v-show="isShowDropdown">
+      <div v-if="customerList.length" class="el-scrollbar" style="">
+        <div class="el-select-dropdown__wrap el-scrollbar__wrap" style="margin-bottom: -16px; margin-right: -16px">
+          <ul class="el-scrollbar__view el-select-dropdown__list" style="position: relative">
+            <div class="resize-triggers">
+              <div class="expand-trigger">
+                <div style="width: 324px; height: 1165px"></div>
+              </div>
+              <div class="contract-trigger"></div>
+            </div>
+            <li 
+              class="el-select-dropdown__item" 
+              :class="{selected: activeIndex === index}"
+              v-for="(item, index) in customerList" 
+              :key="item.id"
+              @click="handlePartyA(index)"
+            >
+              <span>{{ item.company}}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <p v-else class="el-select-dropdown__empty" style="line-height: 22px;">{{searchInfo}}</p>
+    </div>
+  </div>
+</template>
+<script>
+import customerApi from "@/api/customer";
+export default {
+  props: {
+    dataForm: {
+      type: Object,
+      default() {
+        return {};
+      },
+    },
+    placeholder: {
+      type: String,
+      default: "请输入单位名称",
+    },
+  },
+  data() {
+    return {
+      customerList: [],   // 搜索列表
+      activeIndex: -1,   // 选择列表的下标
+      isShowDropdown: false,   // 是否展示列表
+      searchInfo: '无数据',   // 加载中/无数据
+      timer: ''   //定时器
+    };
+  },
+  methods: {
+    handleInput() {
+      // 点击时
+      this.isShowDropdown = !this.isShowDropdown;
+    },
+    changePartAInput(e) {
+      // 甲方内容改变时处理
+      this.isShowDropdown = true;
+      this.customerList = [];
+      this.activeIndex = -1;
+      if(e === '') {
+        this.$emit("updatePartyA", e);
+        this.searchInfo = '无数据';
+        return;
+      }
+      this.searchInfo = '加载中';
+      clearTimeout(this.timer);
+      // 添加定时器延时搜索，防止可能搜索两次
+      this.timer = setTimeout(() => {
+        customerApi.getVipCustomerList({
+          keyword: e,
+          include: 'contacts,industry',
+          limit: 0
+        }).then(res => {
+          this.customerList = res.data.data;
+          if(!this.customerList.length) {
+            this.searchInfo = '无数据';
+          }
+        }, err => {
+          this.$message.error(err.data.message);
+        })
+      }, 200);
+      // this.$emit("updatePartyA", e);   //这里可以传给父组件一个方法，进行一些其它操作，如判断输入值是否合法
+    },
+    handlePartyA(index) {
+      // 选择列表内容
+      this.isShowDropdown = false;
+      this.activeIndex = index;
+      this.dataForm.party_a = this.customerList[index].company;
+      this.$emit("handlePartyA", this.customerList[index]);   // 选择之后可能会返回信息处理其他输入
+    },
+    blur() {
+      // 延时隐藏，否则选择列表无效
+      setTimeout(() => {
+        this.isShowDropdown = false;
+      }, 300)
+    }
+  },
+};
+</script>
+<style scoped lang="scss">
+.SearchUser {
+  display: inline-block;
+  position: relative;
+  .el-select-dropdown {
+    width: 100%;
+  }
+}
+</style>
+```
+#### select value绑定对象
+有时候可能需要联动处理，select选择时返回的是绑定的value值，但是想要点击时的对象值，如下  
+![展示联动](./toc/images/vue/项目07.png)   
+
+有一个用户对象，选择某个用户时，联系电话更新为相应用户的电话
+```
+<el-form-item prop="part_a_contacts" label="甲方联系人"> 
+  <!-- value为对象时，必须绑定value-key值 -->
+  <el-select v-model="partAContacts" @change="changeContactA" value-key="contact_name">
+    <el-option v-for="item in contactAList" :key="item.id" :label="item.contact_name" :value="item"></el-option>
+  </el-select>
+</el-form-item>
+<el-form-item prop="part_a_tel" label="甲方联系电话">
+  <el-input v-model="dataForm.part_a_tel" name="part_a_tel"></el-input>
+</el-form-item>
+
+data() {
+  return {
+    dataForm: {
+      part_a_contacts: '',  //联系人
+      part_a_tel: '',  //电话
+    }
+    partAContacts: {},   // 不直接绑定dataform里的数据
+    contactAList: []  // 联系人列表
+  }
+},
+methods: {
+  getList() {
+    // 一般需要调接口获取初始值
+    this.contactAList = [
+      { contact_mobile: "15512341234", contact_name: "张一旦", id: "7mpykzrqm5lq48v3" },
+      { contact_mobile: "17712341234", contact_name: "张二旦", id: "7mpykzrqm5lq48v4" }
+    ]
+    // 如果需要默认选中第一个
+    this.dataForm.part_a_contacts = this.contactAList[0].contact_name;
+    this.dataForm.part_a_tel = this.contactAList[0].contact_mobile;
+  },
+  changeContactA(e) {
+    this.$set(this.dataForm, 'part_a_contacts', e.contact_name);
+    this.$set(this.dataForm, 'part_a_tel', e.contact_mobile);
+  },
+},
+created() {
+  this.getList();
+}
+```
+这种方法可能编辑这种需要赋初始值的需要另作修改。
+### others
+#### el-dialog封装为子组件时，弹窗关闭
+例如列表有编辑功能，将dialog封装为子组件时，由于显隐值通过props传参，关闭dialog相当于直接修改props值，会报错。
+![示例展示](./toc/images/vue/项目09.png)   
+点击编辑展示弹窗   
+![示例展示](./toc/images/vue/项目10.png)    
+```
+// parent.vue
+<template>
+  <el-button @click="handleEdit(scope.row)>编辑</el-button>
+  <edit-dialog :isShow.sync="isShowEdit" :editData="editData"></edit-dialog>
+</template>
+
+data() {
+  return {
+    isShowEdit: false,
+    editData: {}
+  }
+},
+methods: {
+  handleEdit(row) {
+    this.editData = row;
+    this.isShow = true;
+  }
+}
+```
+```
+// edit.vue
+<template>
+  <el-dialog 
+    :visible.sync="isShow" 
+    :show-close="false"
+    :close-on-click-modal="false"
+    :before-close="handleClose" 
+  >
+    <el-button @click="handleClose">取消</el-button>
+  </el-dialog>
+</template>
+
+props: {
+  isShow: Boolean,
+  editData: {
+    type: Object,
+    default() {
+      return {}
+    }
+  }
+},
+methods: {
+  handleClose() {
+    // 关闭
+    this.$emit("update:isShow",!this.isShow);
+  }
+}
+```
