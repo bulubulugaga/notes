@@ -32,3 +32,5 @@
 | win + Alt | 切换打开的窗口 |
 | Ctrl + Shift + Esc | 打开任务管理器 |
 | win + v | 多重剪切板 |
+# http
+[菜鸟联盟手册](https://www.runoob.com/http/http-tutorial.html)

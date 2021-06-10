@@ -141,7 +141,36 @@ Android4.4 系统浏览器切换到了Chromium，内核是 Webkit 的分支 Blin
 Windows Phone 8 系统浏览器内核是 Trident。  
 
 [更多浏览器内核详细信息](https://www.cnblogs.com/chengzp/p/7757844.html)
+### HTML5为什么只需要写<!DOCTYPE>
+在 HTML 4.01 中有三种 <!DOCTYPE> 声明，在 HTML5 中只有一种。    
+**HTML 5**  
+```
+<!DOCTYPE html>
+```
+**HTML 4.01 Strict**   
+该 DTD 包含所有 HTML 元素和属性，但不包括展示性的和弃用的元素（比如 font）。不允许框架集（Framesets）。   
+```
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+```
+**HTML 4.01 Transitional**   
+该 DTD 包含所有 HTML 元素和属性，包括展示性的和弃用的元素（比如 font）。不允许框架集（Framesets）。  
+```
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+```
+**HTML 4.01 Frameset**   
+该 DTD 等同于 HTML 4.01 Transitional，但允许框架集内容。   
+```
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/frameset.dtd">
+```    
+HTML5 不基于 SGML, 因此不要要对 DTD 进行引用，但是需要 DOCTYPE 来规范浏览器的行为（让浏览器按照它们应该的方式来运行）。   
+HTML4.0.1 基于 SGML ，所以需要对 DTD 进行引用，才能让浏览器知道该文档所使用的的文档类型，正确呈现内容。   
 
+**SGML**: SGML 是国际上定义电子文档和内容描述的标准。它源于1969年IBM公司开发的文档描述语言 GML ，GML主要用来解决不同系统中文档格式不同的问题。后经过多年发展，1986 年经 ISO 批准为国际标 准ISO8897，并被称为 SGML。   
+制定 SGML 的基本思想是把文档的内容与样式分开。在 SGML 中，标记分两种：一种用来描述文档显示的样式，称为程序标记；另一种用来描述文档中语句的用途，称为描述标记。一个 SGML 文件通常分三个层次：结构、内容和样式。结构为组织文档的元素提供框架，内容是信息本身，样式控制内容的显示。   
+SGML 的平台无关性、结构化、可扩展等特性，使得它使用范围很广，被许多大型公司用来创建和发布信息。   
 
+**DTD**: 文档类型定义（Document Type Definition，DTD）   
 
+<!DOCTYPE> 声明必须是 HTML 文档的第一行，位于 < html > 标签之前。   
+<!DOCTYPE> 声明不是 HTML 标签；它是指示 web 浏览器关于页面使用哪个 HTML 版本进行编写的指令。
 ## 编程
