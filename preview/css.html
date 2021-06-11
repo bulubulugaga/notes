@@ -340,7 +340,9 @@ a::after{
 }
 </code></pre><p>6、 父级定义display: table;&emsp;&emsp;容易引起其他布局问题，不推荐</p>
 <pre><code>.div1 {display: table;}
-</code></pre><h2 id="-">编程</h2>
+</code></pre><h3 id="style-body-body-">style标签写在body前与写body后有什么区别</h3>
+<p>1、写在body标签前利于浏览器逐步渲染<br>&emsp;resources downloading-&gt;CSSOM+DOM-&gt;RenderTree(composite)-&gt;Layout-&gt;paint<br>2、写在body标签后<br>&emsp;由于浏览器以逐行方式对html文档进行解析，当解析到写在尾部的样式表（外联或写在style标签）会导致浏览器停止之前的渲染，等待加载且解析样式表完成之后重新渲染，在windows的IE下可能会出现FOUC现象（即样式失效导致的页面闪烁问题）；</p>
+<h2 id="-">编程</h2>
 <h3 id="-">圣杯布局和双飞翼布局</h3>
 <blockquote>
 <p><strong>作用：</strong><br>圣杯布局和双飞翼布局解决的问题是相同的，就是两边顶宽，中间自适应的三栏布局，中间栏要在放在文档流前面以优先渲染。   </p>
@@ -434,6 +436,38 @@ a::after{
         &lt;div id=&quot;right&quot;&gt;right&lt;/div&gt;
     &lt;/body&gt;
 &lt;/html&gt;
+</code></pre><h3 id="position-fixed-ios-">position:fixed在ios下失效</h3>
+<p>在ios下，头部或底部采用固定定位时，滑动中心部分时整个页面都跟着滚动也就是说固定定位失效了。</p>
+<pre><code>&lt;div class=&quot;header&gt;&lt;/div&gt;
+&lt;div class=&quot;contain&gt;&lt;/div&gt;
+&lt;div class=&quot;footer&gt;&lt;/div&gt;
+
+.header {
+    position: fixed;
+    top:0;
+    left: 0;
+    right:0;
+    height:100px;
+}
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right:0;
+    height: 30px;
+}
+.main{
+    /*main绝对定位，进行内部滚动，似乎用fixed也可以*/
+    position: absolute;
+    /*top是头部的高度*/
+    top: 100px;  
+    /*bottom是底部的高度*/
+    bottom: 30px;
+    /*使之可以滚动*/
+    overflow-y: scroll;
+    /*增加弹性滚动,解决滚动不流畅的问题*/
+    -webkit-overflow-scrolling: touch;
+}
 </code></pre>
           	</article>
         </div>

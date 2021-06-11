@@ -348,7 +348,11 @@ BFC即Block Formatting Contexts (块级格式化上下文)，是W3CCSS2.1规范�
 ```
 .div1 {display: table;}
 ```
-
+### style标签写在body前与写body后有什么区别
+1、写在body标签前利于浏览器逐步渲染    
+&emsp;resources downloading->CSSOM+DOM->RenderTree(composite)->Layout->paint   
+2、写在body标签后   
+&emsp;由于浏览器以逐行方式对html文档进行解析，当解析到写在尾部的样式表（外联或写在style标签）会导致浏览器停止之前的渲染，等待加载且解析样式表完成之后重新渲染，在windows的IE下可能会出现FOUC现象（即样式失效导致的页面闪烁问题）；
 ## 编程
 ### 圣杯布局和双飞翼布局   
 > **作用：**    
@@ -451,4 +455,38 @@ BFC即Block Formatting Contexts (块级格式化上下文)，是W3CCSS2.1规范�
         <div id="right">right</div>
     </body>
 </html>
+```
+### position:fixed在ios下失效
+在ios下，头部或底部采用固定定位时，滑动中心部分时整个页面都跟着滚动也就是说固定定位失效了。
+```
+<div class="header></div>
+<div class="contain></div>
+<div class="footer></div>
+
+.header {
+    position: fixed;
+    top:0;
+    left: 0;
+    right:0;
+    height:100px;
+}
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right:0;
+    height: 30px;
+}
+.main{
+    /*main绝对定位，进行内部滚动，似乎用fixed也可以*/
+    position: absolute;
+    /*top是头部的高度*/
+    top: 100px;  
+    /*bottom是底部的高度*/
+    bottom: 30px;
+    /*使之可以滚动*/
+    overflow-y: scroll;
+    /*增加弹性滚动,解决滚动不流畅的问题*/
+    -webkit-overflow-scrolling: touch;
+}
 ```

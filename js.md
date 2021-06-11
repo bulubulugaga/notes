@@ -256,6 +256,30 @@ console.log(isHasEle({a: '', b: ''}));  //false
 console.log(isHasEle({a: 1, b: ''}));  //true
 console.log(isHasEle({a: 0, b: ''}));  //true
 ```
+# 函数
+## 闭包
+闭包是指有权访问另一个函数作用域中变量的函数。   
+创建闭包的最常见的方式就是在一个函数A内创建另一个函数B，通过函数B访问函数A的局部变量。
+
+**1、优缺点**    
+&emsp;优点：   
+&emsp;1）读取另一个函数作用域中的变量；  
+&emsp;2）让这些变量始终保持在内存中，即闭包可以使得它诞生环境一直存在。(似乎是子函数调用了父函数变量，该变量不会被销毁，会一直存在)  
+&emsp;3）封装对象的私有属性和私有方法。（然后在全局作用域中通过调用闭包就能访问函数中的变量）  
+&emsp;缺点：   
+&emsp;由于闭包会携带包含它的函数的作用域，因此会比其他函数占用更多的内存，过度使用闭包可能会导致内存占用过多的问题。所以不能滥用闭包，否则会造成网页的性能问题，在IE中可能导致内存泄露。解决方法是，在退出函数之前，将不使用的局部变量全部删除。
+
+**2、简单应用**
+```
+// 函数内部变量自增
+var add = (function () {
+  var counter = 0;
+  return function () {return counter += 1;}
+})(); 
+console.log(add());   //1
+console.log(add());   //2
+console.log(add());   //3
+```
 # 数据类型及相关问题
 ## js数据类型及其存储
 1、 基本数据类型：数值(number)、字符串(string)、布尔(boolean)、null、undefined、Symbol(ES6新定义)    
@@ -566,7 +590,6 @@ console.log( Object.prototype.toString.call(arr) == '[object Array]' );   //true
 从结果中可以看出，constructor和instanceof都没有正确的判断出类型。  
 
 参考文章：[一像素](https://www.cnblogs.com/onepixel/p/5126046.html)&emsp;[冰雪为融](https://blog.csdn.net/lhjuejiang/article/details/79623973)  
-
 # 变量
 ## 编译原理
 JavaScript的源代码在运行的时候，会经过两个阶段：编译和执行。而且，编译阶段往往就在执行阶段的前几微秒甚至更短的时间内。   
