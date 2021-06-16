@@ -87,6 +87,130 @@ oBtn.click = function () {
   api.post(arr1).then(res => { ··· })
 }
 ```
+## 数组去重
+### 一维数组
+主要针对一些普通元素，以下大部分不能去除空对象，嵌套对象和数组未测试。
+> let arr = [1,1,'true','true',true,true,15,15,false,false, undefined,undefined, null,null, NaN, NaN,'NaN', 0, 0, 'a', 'a',{},{}];     
+
+**1、Set**  
+```
+function unique(arr) {
+  return Array.from(new Set(arr))
+}
+console.log(unique(arr));
+// [1, "true", true, 15, false, undefined, null, NaN, "NaN", 0, "a", {}, {}]
+// 无法去掉“{}”空对象
+```
+
+**2、Set + ...**  
+```
+console.log([...new Set(arr)]);
+// [1, "true", true, 15, false, undefined, null, NaN, "NaN", 0, "a", {}, {}]
+```
+
+**3、利用for嵌套for，然后splice去重**   
+```
+function unique(arr){            
+  for(var i=0; i<arr.length; i++){
+      for(var j=i+1; j<arr.length; j++){
+          if(arr[i]===arr[j]){         //第一个等同于第二个，splice方法删除第二个
+              arr.splice(j,1);
+              j--;
+          }
+      }
+  }
+  return arr;
+}
+// [1, "true", true, 15, false, undefined, null, NaN, NaN, "NaN", 0, "a", {…}, {…}]     
+// NaN和{}没有去重
+```
+
+**4、用indexOf**
+```
+function unique(arr) {
+  let array = [];
+  for (let i = 0; i < arr.length; i++) {
+      if (array.indexOf(arr[i]) === -1) {
+          array.push(arr[i])
+      }
+  }
+  return array;
+}
+// [1, "true", true, 15, false, undefined, null, NaN, NaN, "NaN", 0, "a", {…}, {…}]     
+// NaN和{}没有去重
+```
+
+**4、利用sort**
+```
+function unique(arr) {
+  arr = arr.sort();
+  let arrry= [arr[0]];
+  for (let i = 1; i < arr.length; i++) {
+      if (arr[i] !== arr[i-1]) {
+          arrry.push(arr[i]);
+      }
+  }
+  return arrry;
+}
+// [0, 1, 15, NaN, NaN, "NaN", {…}, {…}, "a", false, null, "true", true, undefined]
+// NaN和{}没有去重
+```
+
+**5、利用includes**
+```
+function unique(arr) {
+  var array =[];
+  for(var i = 0; i < arr.length; i++) {
+    if( !array.includes(arr[i])) {
+      array.push(arr[i]);
+    }
+  }
+  return array
+}
+// [1, "true", true, 15, false, undefined, null, NaN, "NaN", 0, "a", {…}, {…}] 
+// {}没有去重
+```
+
+**6、利用filter**
+```
+function unique(arr) {
+  return arr.filter((item, index) => {
+    return arr.indexOf(item) === index;
+  });
+}
+// [1, "true", true, 15, false, undefined, null, "NaN", 0, "a", {…}, {…}]
+// 去掉了NaN，{}没有去重
+```
+
+### 多维数组
+> let list = [   
+> &emsp;1, 1, 5,   
+> &emsp;[1, 1, 6],   
+> &emsp;[1, 1, 7, [1, 1, 78]]   
+> ];    
+
+> 去重后：    
+> [   
+> &emsp;1, 5,   
+> &emsp;[1, 6],   
+> &emsp;[1, 7, [1, 78]]   
+> ]; 
+
+```
+getList(arr) {
+  for (let i=0; i<arr.length; i++) {
+    if (Array.isArray(arr[i])) {
+
+      arr[i] = Array.from(new Set(arr[i]))
+      getList(arr[i]);
+    }
+  };
+  arr = Array.from(new Set(arr));
+  return arr
+}
+console.log(getList(list));
+```
+
 
 # Object
 ## Object.assign
@@ -1165,3 +1289,6 @@ XHR长轮询：客户端打开一个到服务器端的 AJAX 请求然后等待�
 
 **2、websocket**  
 WebSocket是HTML5开始提供的一种在单个 TCP 连接上进行全双工通讯的协议。WebSocket通讯协议于2011年被IETF定为标准RFC 6455，WebSocketAPI被W3C定为标准。在WebSocket API中，浏览器和服务器只需要做一个握手的动作，然后，浏览器和服务器之间就形成了一条快速通道。两者之间就直接可以数据互相传送。但是兼容性不高，很多浏览器不支持。
+
+### 返回页面顶部
+[Js实现返回页面顶部（从实现到增强）](https://www.cnblogs.com/art-poet/p/13755083.html)
