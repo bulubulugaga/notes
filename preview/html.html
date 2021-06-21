@@ -268,7 +268,47 @@ oDiv.className = &#39;active&#39;;
 </table>
 <p>代码演示：</p>
 <pre><code>&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0&quot;&gt;
-</code></pre><h1 id="-">题库</h1>
+</code></pre><h2 id="map-area">map+area</h2>
+<p>map：用于定义一个客户端图像映射。图像映射（image-map）指带有可点击区域的一幅图像。<br>area：定义 map 的可点击区域。<br>当 map 设置 name 或者 id 属性时， img 标签的 usemap 属性会根据 map 的 id 和 name 属性来关联 map（由于浏览器的不同，usemap属性接收二者之一的值，所以通常name和id属性二者都写，值相同）。  </p>
+<p>map标签的用途：是与img标签绑定使用的，常被用来赋予给客户端图像某处区域特殊的含义，点击该区域可跳转到新的文档。</p>
+<p>area属性:    </p>
+<ul>
+<li>alt: 当图片无法加载的时候显示的提示文字    </li>
+<li>shape: 定义可点击区域的形状，有如下值    <ul>
+<li>circ或circle:圆形    </li>
+<li>poly或polygon:多边型    </li>
+<li>rect或rectangle:矩形    </li>
+</ul>
+</li>
+<li>coords: 定义坐标值    <ul>
+<li>当shape为circ或circle(圆形)时,coords的值应该为 (x,y,r) x,y是圆心的坐标,r是半径    </li>
+<li>当shape为rect或rectangle(矩形)时,coords的值应该为 (x1,y1,x2,y2)  x1,y1是矩形的左上角坐标  x2.y2是矩形的右下角坐标</li>
+<li>当shape为poly或polygon(多边形)时,coords的值应该为 (x1,y1,x2,y2,x3,y3......) 当可点击区域为多边形时,coords的值应该为多边形各个顶点的坐标。注意:最后一个坐标应与第一个坐标一致,用于关闭多边形,就像走路,不管你怎么走,最后回到出发地点,你走过的路线才会形成一个封闭图形。</li>
+</ul>
+</li>
+<li>href: 定义一个URL,当点击设定的区域时访问该URL</li>
+<li>target: 规定href在何处打开<ul>
+<li>_blank: 在新窗口打开URL。</li>
+<li>_self: 在同级框架中打开URL。</li>
+<li>_parent: 在父框架中打开URL。</li>
+<li>_top: 这整个窗口中打开URL。</li>
+<li>frameName: 在指定的框架中打开URL。    </li>
+</ul>
+</li>
+</ul>
+<p>应用：</p>
+<pre><code>&lt;img src=&quot;1.jpg&quot; width=&quot;600px&quot; height=&quot;350px&quot; usemap=&quot;img-map-test&quot; border=&quot;0&quot;&gt;
+&lt;map name=&quot;img-map-test&quot; id=&quot;img-map-test&quot;&gt;
+  &lt;area alt=&quot;1-1.jpg&quot; shape=&quot;rect&quot; coords=&quot;0,0,300,350&quot; href=&quot;1-1.jpg&quot;&gt;
+  &lt;area alt=&quot;1-2.jpg&quot; shape=&quot;rect&quot; coords=&quot;300,0,600,350&quot; href=&quot;1-2.jpg&quot;&gt;
+&lt;/map&gt;
+</code></pre><p>拓展：地图点击不通省份跳转不同页面或链接。</p>
+<h2 id="-">置换元素</h2>
+<p>浏览器根据元素的标签和属性，来决定元素的具体显示内容。如 img、input、select、textarea、button、label 等。    </p>
+<p>例如：浏览器根据 img 标签的 src 属性显示图片，而如果查看 (x)html 代码，则看不到图片的实际内容；input 标签，根据type 属性决定是显示输入框还是按钮。  </p>
+<p>置换元素在其显示中生成了框，这也就是有的内联元素能够设置宽高的原因。<br>置换元素区别于一般的 inline 元素，他们本身拥有内在尺寸（宽度，高度，宽高比），也可以设置 width / height 属性，他们的性质同行内元素设置了 inline-block 一样。    </p>
+<p>非置换元素：官网并未对非置换元素做出具体定义，可以认为除去置换元素都是非置换元素。<br>HTML中的大多数元素都是不可置换元素，例如 label 标签，p 标签里的内容会被浏览器直接显示给用户。</p>
+<h1 id="-">题库</h1>
 <h2 id="-">问题</h2>
 <h3 id="-link-import-">页面导入样式时，使用link和@import有什么区别</h3>
 <ol>
@@ -357,7 +397,79 @@ offline.html
 <p>建议：对于搜索引擎来说 strong 和 em 比 b 和 i 要重视的多。为了符合现在W3C的标准，还是推荐使用strong和em标签。   </p>
 <p>其它：<br>&emsp;物理元素所强调的是一种物理行为，比如说我把一段文字用b标记加粗了，我的意思是告诉浏览器应该给我加粗了显示这段文字，从单词的语义也可以分析得出，b是Bold(加粗)的简写，所以这个B标记所传达的意思只是加粗，没有任何其它的作用。<br>&emsp;而Strong我们从字面理解就可以知道他是强调的意思，所以我们用这个标记向浏览器传达了一个强调某段文字的消息，而这个Strong就是我们所说的逻辑元素，他是强调文档逻辑的，并非是通知浏览器应该如何显示。</p>
 <h2 id="-">编程</h2>
+<h3 id="-">怎样在页面上实现一个圆形可点击区域</h3>
+<p><strong>1、圆角属性(border-radius)</strong></p>
+<pre><code>&lt;style&gt;
+  #box {
+    width: 100px; 
+    height: 100px; 
+    border-radius: 50%; 
+    background: lightblue;
+  }
+  #box:hover {
+    cursor: pointer;
+  }
+&lt;/style&gt;
 
+&lt;div id=&quot;box&quot;&gt;&lt;/div&gt;
+
+&lt;script&gt;
+  document.querySelector(&#39;#box&#39;).onclick = function () {
+    console.log(&#39;点击圆形区域&#39;);
+  }
+&lt;/script&gt;
+</code></pre><p><strong>2、map+area</strong><br>这个似乎只能和图片结合使用</p>
+<pre><code>&lt;style&gt;
+  area:hover {
+    cursor: pointer;
+  }
+&lt;/style&gt;
+
+&lt;img src=&quot;https://avatar.csdnimg.cn/6/5/6/3_dsdsds111_1557377821.jpg&quot; alt=&quot;map&quot; usemap=&quot;#circleArea&quot; width=&quot;200&quot;&gt;
+&lt;map name=&quot;circleArea&quot; id=&quot;circleArea&quot;&gt;
+  &lt;area id=&quot;box&quot; shape=&quot;circle&quot; coords=&quot;100,100,100&quot; href =&quot;javascript:0;&quot; alt=&quot;圆形点击区域&quot; /&gt;
+&lt;/map&gt;
+
+&lt;script&gt;
+  document.querySelector(&#39;#box&#39;).onclick = function () {
+    console.log(&#39;点击圆形区域&#39;);
+  }
+&lt;/script&gt;
+</code></pre><p>最后会有一个中间圆形的点击区域<br><img src="./toc/images/html/编程01.png" alt="圆形点击区域">  </p>
+<p><strong>3、svg</strong></p>
+<pre><code>&lt;svg width=&quot;100%&quot; height=&quot;100%&quot; version=&quot;1.1&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;&gt;
+  &lt;circle cx=&quot;100&quot; cy=&quot;50&quot; r=&quot;40&quot; stroke=&quot;black&quot; stroke-width=&quot;2&quot; fill=&quot;red&quot; onclick=&quot;handleClick()&quot;/&gt;
+&lt;/svg&gt;
+
+&lt;script&gt;
+  function handleClick() {
+    console.log(&#39;点击圆形区域&#39;);
+  }
+&lt;/script&gt;
+</code></pre><p><strong>4、canvas</strong><br>有多种实现和监听方式，这里简单介绍。</p>
+<pre><code>&lt;style&gt;
+  canvas {
+    border: 1px solid #d3d3d3;
+  }
+&lt;/style&gt;
+
+&lt;canvas id=&quot;myCanvas&quot; width=&quot;200&quot; height=&quot;200&quot;&gt;&lt;/canvas&gt;
+
+&lt;script&gt;
+  let myCanvas = document.querySelector(&#39;#myCanvas&#39;);
+  let ctx = myCanvas.getContext(&quot;2d&quot;);
+  ctx.beginPath();
+  ctx.arc(100, 100, 50, 0, 2*Math.PI);
+  ctx.stroke();
+  myCanvas.addEventListener(&quot;click&quot; , function(e){
+    let x = 100 - e.layerX;
+    let y = 100 - e.layerY;
+    let isMove = Math.sqrt(x * x + y * y);
+    if(isMove &lt; 50)
+        console.log(&#39;点击圆形区域&#39;);
+  });
+&lt;/script&gt;
+</code></pre>
           	</article>
         </div>
 		</div>

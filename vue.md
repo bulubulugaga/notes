@@ -880,6 +880,32 @@ methods: {
   },
 }
 ```
+3、单选时，拼接失效   
+与第二种方法相似，但是搜索时进行判断，首次赋值。
+```
+data() {
+  isSearchUser: true,   //是否需要搜索
+},
+methods: {
+  getDetail() {
+    this.isSearchUser = false;   // 赋值只能放在调用接口外（内部好像因为异步性会导致没有效果）
+    api.getDetail().then(res => {
+      this.dataForm = res.data; 
+    })
+  },
+  remoteMethod (query) {
+    let that = this;
+    if(!this.isSearchUser) {
+      this.isSearchUser = true;
+      query = this.dataForm.project_owner_name;  //用名字进行一次赋值搜索
+    }
+    if(!query) {
+      this.userList = [];
+      ······
+    }, 200);
+  },
+}
+```
 #### 封装一个简易版的el远程搜索
 需求：输入的时候进行搜索，可以选择搜索到的值，如果没有搜索到，就用输入的值。   
 如果直接使用el远程搜索，没有搜索到时或者说没有选择搜索到的值时，失去焦点输入内容会是输入前的，不能满足没有搜索到使用输入的值。   

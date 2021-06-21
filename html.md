@@ -198,7 +198,53 @@ viewport 就是视区窗口，也就是浏览器中显示网页的部分。PC �
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 ```
 
+## map+area 
+map：用于定义一个客户端图像映射。图像映射（image-map）指带有可点击区域的一幅图像。   
+area：定义 map 的可点击区域。    
+当 map 设置 name 或者 id 属性时， img 标签的 usemap 属性会根据 map 的 id 和 name 属性来关联 map（由于浏览器的不同，usemap属性接收二者之一的值，所以通常name和id属性二者都写，值相同）。  
 
+map标签的用途：是与img标签绑定使用的，常被用来赋予给客户端图像某处区域特殊的含义，点击该区域可跳转到新的文档。
+
+area属性:    
+* alt: 当图片无法加载的时候显示的提示文字    
+* shape: 定义可点击区域的形状，有如下值    
+  * circ或circle:圆形    
+  * poly或polygon:多边型    
+  * rect或rectangle:矩形    
+* coords: 定义坐标值    
+  * 当shape为circ或circle(圆形)时,coords的值应该为 (x,y,r) x,y是圆心的坐标,r是半径    
+  * 当shape为rect或rectangle(矩形)时,coords的值应该为 (x1,y1,x2,y2)  x1,y1是矩形的左上角坐标  x2.y2是矩形的右下角坐标
+  * 当shape为poly或polygon(多边形)时,coords的值应该为 (x1,y1,x2,y2,x3,y3......) 当可点击区域为多边形时,coords的值应该为多边形各个顶点的坐标。注意:最后一个坐标应与第一个坐标一致,用于关闭多边形,就像走路,不管你怎么走,最后回到出发地点,你走过的路线才会形成一个封闭图形。
+* href: 定义一个URL,当点击设定的区域时访问该URL
+* target: 规定href在何处打开
+  * _blank: 在新窗口打开URL。
+  * _self: 在同级框架中打开URL。
+  * _parent: 在父框架中打开URL。
+  * _top: 这整个窗口中打开URL。
+  * frameName: 在指定的框架中打开URL。    
+
+
+应用：
+```
+<img src="1.jpg" width="600px" height="350px" usemap="img-map-test" border="0">
+<map name="img-map-test" id="img-map-test">
+  <area alt="1-1.jpg" shape="rect" coords="0,0,300,350" href="1-1.jpg">
+  <area alt="1-2.jpg" shape="rect" coords="300,0,600,350" href="1-2.jpg">
+</map>
+```
+拓展：地图点击不通省份跳转不同页面或链接。
+
+
+## 置换元素
+浏览器根据元素的标签和属性，来决定元素的具体显示内容。如 img、input、select、textarea、button、label 等。    
+
+例如：浏览器根据 img 标签的 src 属性显示图片，而如果查看 (x)html 代码，则看不到图片的实际内容；input 标签，根据type 属性决定是显示输入框还是按钮。  
+
+置换元素在其显示中生成了框，这也就是有的内联元素能够设置宽高的原因。   
+置换元素区别于一般的 inline 元素，他们本身拥有内在尺寸（宽度，高度，宽高比），也可以设置 width / height 属性，他们的性质同行内元素设置了 inline-block 一样。    
+
+非置换元素：官网并未对非置换元素做出具体定义，可以认为除去置换元素都是非置换元素。   
+HTML中的大多数元素都是不可置换元素，例如 label 标签，p 标签里的内容会被浏览器直接显示给用户。
 # 题库
 ## 问题
 ### 页面导入样式时，使用link和@import有什么区别   
@@ -355,4 +401,92 @@ SGML 的平台无关性、结构化、可扩展等特性，使得它使用范围
 其它：   
 &emsp;物理元素所强调的是一种物理行为，比如说我把一段文字用b标记加粗了，我的意思是告诉浏览器应该给我加粗了显示这段文字，从单词的语义也可以分析得出，b是Bold(加粗)的简写，所以这个B标记所传达的意思只是加粗，没有任何其它的作用。   
 &emsp;而Strong我们从字面理解就可以知道他是强调的意思，所以我们用这个标记向浏览器传达了一个强调某段文字的消息，而这个Strong就是我们所说的逻辑元素，他是强调文档逻辑的，并非是通知浏览器应该如何显示。
-## 编程
+
+## 编程 
+### 怎样在页面上实现一个圆形可点击区域
+**1、圆角属性(border-radius)**
+```
+<style>
+  #box {
+    width: 100px; 
+    height: 100px; 
+    border-radius: 50%; 
+    background: lightblue;
+  }
+  #box:hover {
+    cursor: pointer;
+  }
+</style>
+
+<div id="box"></div>
+
+<script>
+  document.querySelector('#box').onclick = function () {
+    console.log('点击圆形区域');
+  }
+</script>
+```
+
+**2、map+area**   
+这个似乎只能和图片结合使用
+```
+<style>
+  area:hover {
+    cursor: pointer;
+  }
+</style>
+
+<img src="https://avatar.csdnimg.cn/6/5/6/3_dsdsds111_1557377821.jpg" alt="map" usemap="#circleArea" width="200">
+<map name="circleArea" id="circleArea">
+  <area id="box" shape="circle" coords="100,100,100" href ="javascript:0;" alt="圆形点击区域" />
+</map>
+
+<script>
+  document.querySelector('#box').onclick = function () {
+    console.log('点击圆形区域');
+  }
+</script>
+```
+最后会有一个中间圆形的点击区域    
+![圆形点击区域](./toc/images/html/编程01.png)  
+
+**3、svg**
+```
+<svg width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="100" cy="50" r="40" stroke="black" stroke-width="2" fill="red" onclick="handleClick()"/>
+</svg>
+
+<script>
+  function handleClick() {
+    console.log('点击圆形区域');
+  }
+</script>
+```
+
+**4、canvas**    
+有多种实现和监听方式，这里简单介绍。
+```
+<style>
+  canvas {
+    border: 1px solid #d3d3d3;
+  }
+</style>
+
+<canvas id="myCanvas" width="200" height="200"></canvas>
+
+<script>
+  let myCanvas = document.querySelector('#myCanvas');
+  let ctx = myCanvas.getContext("2d");
+  ctx.beginPath();
+  ctx.arc(100, 100, 50, 0, 2*Math.PI);
+  ctx.stroke();
+  myCanvas.addEventListener("click" , function(e){
+    let x = 100 - e.layerX;
+    let y = 100 - e.layerY;
+    let isMove = Math.sqrt(x * x + y * y);
+    if(isMove < 50)
+        console.log('点击圆形区域');
+  });
+</script>
+```
+

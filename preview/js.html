@@ -386,7 +386,56 @@ function isHasEle(obj) {
 console.log(isHasEle({a: &#39;&#39;, b: &#39;&#39;}));  //false
 console.log(isHasEle({a: 1, b: &#39;&#39;}));  //true
 console.log(isHasEle({a: 0, b: &#39;&#39;}));  //true
-</code></pre><h1 id="-">函数</h1>
+</code></pre><h2 id="-">判断对象是否为空对象</h2>
+<p>对象比较特殊，怎么判断{}。</p>
+<pre><code>console.log(!{});   //false，则直接判断{}会是true
+console.log({} == {});   //false，指向的对象地址不一致
+</code></pre><p>解决方法</p>
+<pre><code>let obj = {}
+let obj1 = {
+  name: &quot;jack&quot;
+}
+let obj2 = {
+  [Symbol(&quot;name&quot;)]: &quot;jack&quot;,
+}
+let obj3 = Object.defineProperty({}, &quot;name&quot;, {
+  value: &quot;john&quot;,
+  enumerable: false // 不可枚举
+})
+</code></pre><p>1、将对象转化为字符串，再判断该字符串是否为&quot;{}&quot;</p>
+<pre><code>let isEmpty = (obj) =&gt; (JSON.stringify(obj) === &#39;{}&#39;) ? true : false;
+console.log(isEmpty(obj)) // true
+console.log(isEmpty(obj1)) // false
+console.log(isEmpty(obj2)) // true
+console.log(isEmpty(obj3)) // true
+</code></pre><p>2、for in 循环判断</p>
+<pre><code>function isEmpty(obj) {
+  for (let i in Object.keys(obj)) {
+    return false;
+  }
+  return true;
+}
+console.log(isEmpty(obj)) // true
+console.log(isEmpty(obj1)) // false
+console.log(isEmpty(obj2)) // true
+console.log(isEmpty(obj3)) // true
+</code></pre><p>3、ES6的Object.keys()方法</p>
+<pre><code>let isEmpty = (obj) =&gt; (Object.keys(obj).length === 0) ? true : false
+console.log(isEmpty(obj)) // true
+console.log(isEmpty(obj1)) // false
+console.log(isEmpty(obj2)) // true
+console.log(isEmpty(obj3)) // true
+</code></pre><p>由此可见，以上三种方法不能判断对象中的不可枚举属性。    </p>
+<p>4、不可枚举<br>如果对象中含有不可枚举属性，且需要找出这些属性，就可以使用 Object.getOwnPropertyNames() 和 Object.getOwnPropertySymbols()  这两个API。<br>Object.getOwnPropertyNames()  返回对象中的所有属性（不包括symbol）<br>Object.getOwnPropertySymbols()  只返回对象中的symbol属性   </p>
+<pre><code>function isEmpty(obj) {
+  return  !Object.getOwnPropertyNames(obj).length &amp;&amp;  !Object.getOwnPropertySymbols(obj).length
+}
+console.log(isEmpty(obj)) // true
+console.log(isEmpty(obj1)) // false
+console.log(isEmpty(obj2)) // false
+console.log(isEmpty(obj3)) // false
+</code></pre><p>文章：<a href="https://www.cnblogs.com/feng-fengfeng/p/12409546.html">判断对象是否为空对象</a></p>
+<h1 id="-">函数</h1>
 <h2 id="-">闭包</h2>
 <p>闭包是指有权访问另一个函数作用域中变量的函数。<br>创建闭包的最常见的方式就是在一个函数A内创建另一个函数B，通过函数B访问函数A的局部变量。</p>
 <p><strong>1、优缺点</strong><br>&emsp;优点：<br>&emsp;1）读取另一个函数作用域中的变量；<br>&emsp;2）让这些变量始终保持在内存中，即闭包可以使得它诞生环境一直存在。(似乎是子函数调用了父函数变量，该变量不会被销毁，会一直存在)<br>&emsp;3）封装对象的私有属性和私有方法。（然后在全局作用域中通过调用闭包就能访问函数中的变量）<br>&emsp;缺点：<br>&emsp;由于闭包会携带包含它的函数的作用域，因此会比其他函数占用更多的内存，过度使用闭包可能会导致内存占用过多的问题。所以不能滥用闭包，否则会造成网页的性能问题，在IE中可能导致内存泄露。解决方法是，在退出函数之前，将不使用的局部变量全部删除。</p>
@@ -848,6 +897,81 @@ function fn() {
 }
 console.log(fn);
 fn = 3;
+</code></pre><h1 id="-">其它</h1>
+<h2 id="-">严格模式</h2>
+<p>&quot;use strict&quot; 指令在 JavaScript 1.8.5 (ECMAScript5) 中新增。<br>它不是一条语句，但是是一个<strong>字面量表达式</strong>，在 JavaScript 旧版本中会被忽略。<br>&quot;use strict&quot; 的目的是指定代码在严格条件下执行。<br>支持严格模式的浏览器:Internet Explorer 10 +、 Firefox 4+ Chrome 13+、 Safari 5.1+、 Opera 12+。  </p>
+<p><strong>声明</strong><br>在脚本或函数的头部添加 use strict; 表达式来声明。</p>
+<pre><code>&lt;script&gt;
+  &quot;use strict&quot;;
+  console.log(1);
+&lt;/script&gt;
+</code></pre><pre><code>&lt;script&gt;
+  function test() {
+    &quot;use strict&quot;;
+    console.log(1);
+  }
+  test();
+&lt;/script&gt;
+</code></pre><p><strong>优点</strong><br>1、消除Javascript语法的一些不合理、不严谨之处，减少一些怪异行为；<br>2、消除代码运行的一些不安全之处，保证代码运行的安全；<br>3、提高编译器效率，增加运行速度；<br>4、为未来新版本的Javascript做好铺垫。   </p>
+<p><strong>限制</strong><br>1、不允许使用未声明的变量</p>
+<pre><code>&quot;use strict&quot;;
+x = 3.14;   // 报错 (x 未定义)
+</code></pre><p>2、不允许删除变量或对象(包括函数)</p>
+<pre><code>&quot;use strict&quot;;
+var x = 3.14;
+delete x;   // 报错
+</code></pre><p>3、不允许变量重名</p>
+<pre><code>&quot;use strict&quot;;
+function x(p1, p1) {};   // 报错
+</code></pre><p>4、不允许使用八进制</p>
+<pre><code>&quot;use strict&quot;;
+var x = 010;   // 报错
+</code></pre><p>5、不允许使用转义字符</p>
+<pre><code>&quot;use strict&quot;;
+var x = \010;   // 报错
+</code></pre><p>6、不允许对只读属性赋值</p>
+<pre><code>&quot;use strict&quot;;
+var obj = {};
+Object.defineProperty(obj, &quot;x&quot;, {value:0, writable:false});
+obj.x = 3.14;   // 报错
+</code></pre><p>7、不允许对一个使用getter方法读取的属性进行赋值</p>
+<pre><code>&quot;use strict&quot;;
+var obj = {get x() {return 0} };
+obj.x = 3.14;   // 报错
+</code></pre><p>8、不允许删除一个不允许删除的属性</p>
+<pre><code>&quot;use strict&quot;;
+delete Object.prototype;   // 报错
+</code></pre><p>9、变量名不能使用 &quot;eval、arguments&quot; 字符串</p>
+<pre><code>&quot;use strict&quot;;
+var eval = 3.14;         // 报错
+var arguments = 3.14;    // 报错
+</code></pre><p>10、不允许使用以下这种语句</p>
+<pre><code>&quot;use strict&quot;;
+with (Math){x = cos(2)}; // 报错
+</code></pre><p>11、由于一些安全原因，在作用域 eval() 创建的变量不能被调：</p>
+<pre><code>&quot;use strict&quot;;
+eval (&quot;var x = 2&quot;);
+alert (x);               // 报错
+</code></pre><p>12、禁止this关键字指向全局对象。</p>
+<pre><code>function test() {
+  console.log(this);   // window对象
+}
+function test1() {
+  &quot;use strict&quot;;
+  console.log(this);   // undefined
+}
+</code></pre><p>13、为了向将来Javascript的新版本过渡，严格模式新增了一些保留关键字</p>
+<pre><code>implements  
+interface  
+let
+package
+private
+protected
+public
+static
+yield
+</code></pre><pre><code>&quot;use strict&quot;;
+var public = 1500;      // 报错
 </code></pre><h1 id="-">项目中的一些问题</h1>
 <h2 id="-api-">根据数组某个元素循环请求api，按顺序获得相应值</h2>
 <p><img src="./toc/images/js/项目01.png" alt="项目图片">
@@ -1116,6 +1240,24 @@ console.log(params.get(&#39;name&#39;))  // null
 <p><strong>2、websocket</strong><br>WebSocket是HTML5开始提供的一种在单个 TCP 连接上进行全双工通讯的协议。WebSocket通讯协议于2011年被IETF定为标准RFC 6455，WebSocketAPI被W3C定为标准。在WebSocket API中，浏览器和服务器只需要做一个握手的动作，然后，浏览器和服务器之间就形成了一条快速通道。两者之间就直接可以数据互相传送。但是兼容性不高，很多浏览器不支持。</p>
 <h3 id="-">返回页面顶部</h3>
 <p><a href="https://www.cnblogs.com/art-poet/p/13755083.html">Js实现返回页面顶部（从实现到增强）</a></p>
+<h3 id="attribute-property-">&quot;attribute&quot;和&quot;property&quot;有什么不同</h3>
+<p><strong>property</strong>   </p>
+<ul>
+<li>是DOM中的属性，是JavaScript里的对象   </li>
+<li>可以读取标签自带属性，包括没有写出来的   </li>
+<li>不能读取attribute设置的属性   </li>
+<li>获取方式：读：element.property;&emsp;&emsp;如：p.className;  </li>
+<li>设置方式：element.property = &#39;xxx&#39;;&emsp;&emsp;如：p.className = &#39;xiao&#39;;   </li>
+<li>是元素（对象）的属性   </li>
+</ul>
+<p><strong>attribute</strong>  </p>
+<ul>
+<li>是HTML标签的属性,即直接在html标签添加的都是attribute属性  </li>
+<li>不能读取property设置的属性  </li>
+<li>读取方式：element.getAttribute(&#39;属性名&#39;,&#39;属性值&#39;);  如：a.getAttribute(&#39;href&#39;);  </li>
+<li>设置方式：element.setAttribute(&#39;属性名&#39;,&#39;属性值&#39;);  如：a.getAttribute(&#39;href&#39;,&#39;xiaowan.jpg&#39;);  </li>
+<li>直接在html标签上添加的和使用setAttribute添加的情况一致  </li>
+</ul>
 
           	</article>
         </div>

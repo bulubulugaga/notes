@@ -380,6 +380,74 @@ console.log(isHasEle({a: '', b: ''}));  //false
 console.log(isHasEle({a: 1, b: ''}));  //true
 console.log(isHasEle({a: 0, b: ''}));  //true
 ```
+
+## 判断对象是否为空对象
+对象比较特殊，怎么判断{}。
+```
+console.log(!{});   //false，则直接判断{}会是true
+console.log({} == {});   //false，指向的对象地址不一致
+```
+解决方法
+```
+let obj = {}
+let obj1 = {
+  name: "jack"
+}
+let obj2 = {
+  [Symbol("name")]: "jack",
+}
+let obj3 = Object.defineProperty({}, "name", {
+  value: "john",
+  enumerable: false // 不可枚举
+})
+```
+
+1、将对象转化为字符串，再判断该字符串是否为"{}"
+```
+let isEmpty = (obj) => (JSON.stringify(obj) === '{}') ? true : false;
+console.log(isEmpty(obj)) // true
+console.log(isEmpty(obj1)) // false
+console.log(isEmpty(obj2)) // true
+console.log(isEmpty(obj3)) // true
+```
+2、for in 循环判断
+```
+function isEmpty(obj) {
+  for (let i in Object.keys(obj)) {
+    return false;
+  }
+  return true;
+}
+console.log(isEmpty(obj)) // true
+console.log(isEmpty(obj1)) // false
+console.log(isEmpty(obj2)) // true
+console.log(isEmpty(obj3)) // true
+```
+3、ES6的Object.keys()方法
+```
+let isEmpty = (obj) => (Object.keys(obj).length === 0) ? true : false
+console.log(isEmpty(obj)) // true
+console.log(isEmpty(obj1)) // false
+console.log(isEmpty(obj2)) // true
+console.log(isEmpty(obj3)) // true
+```
+由此可见，以上三种方法不能判断对象中的不可枚举属性。    
+
+4、不可枚举    
+如果对象中含有不可枚举属性，且需要找出这些属性，就可以使用 Object.getOwnPropertyNames() 和 Object.getOwnPropertySymbols()  这两个API。   
+Object.getOwnPropertyNames()  返回对象中的所有属性（不包括symbol）   
+Object.getOwnPropertySymbols()  只返回对象中的symbol属性   
+```
+function isEmpty(obj) {
+  return  !Object.getOwnPropertyNames(obj).length &&  !Object.getOwnPropertySymbols(obj).length
+}
+console.log(isEmpty(obj)) // true
+console.log(isEmpty(obj1)) // false
+console.log(isEmpty(obj2)) // false
+console.log(isEmpty(obj3)) // false
+```
+文章：[判断对象是否为空对象](https://www.cnblogs.com/feng-fengfeng/p/12409546.html)
+
 # 函数
 ## 闭包
 闭包是指有权访问另一个函数作用域中变量的函数。   
@@ -966,6 +1034,126 @@ console.log(fn);
 fn = 3;
 ```
 
+# 其它
+## 严格模式
+"use strict" 指令在 JavaScript 1.8.5 (ECMAScript5) 中新增。  
+它不是一条语句，但是是一个**字面量表达式**，在 JavaScript 旧版本中会被忽略。  
+"use strict" 的目的是指定代码在严格条件下执行。   
+支持严格模式的浏览器:Internet Explorer 10 +、 Firefox 4+ Chrome 13+、 Safari 5.1+、 Opera 12+。  
+
+**声明**   
+在脚本或函数的头部添加 use strict; 表达式来声明。
+```
+<script>
+  "use strict";
+  console.log(1);
+</script>
+```
+```
+<script>
+  function test() {
+    "use strict";
+    console.log(1);
+  }
+  test();
+</script>
+```
+
+**优点**   
+1、消除Javascript语法的一些不合理、不严谨之处，减少一些怪异行为；   
+2、消除代码运行的一些不安全之处，保证代码运行的安全；   
+3、提高编译器效率，增加运行速度；   
+4、为未来新版本的Javascript做好铺垫。   
+
+**限制**   
+1、不允许使用未声明的变量
+```
+"use strict";
+x = 3.14;   // 报错 (x 未定义)
+```
+2、不允许删除变量或对象(包括函数)
+```
+"use strict";
+var x = 3.14;
+delete x;   // 报错
+```
+3、不允许变量重名
+```
+"use strict";
+function x(p1, p1) {};   // 报错
+```
+4、不允许使用八进制
+```
+"use strict";
+var x = 010;   // 报错
+```
+5、不允许使用转义字符
+```
+"use strict";
+var x = \010;   // 报错
+```
+6、不允许对只读属性赋值
+```
+"use strict";
+var obj = {};
+Object.defineProperty(obj, "x", {value:0, writable:false});
+obj.x = 3.14;   // 报错
+```
+7、不允许对一个使用getter方法读取的属性进行赋值
+```
+"use strict";
+var obj = {get x() {return 0} };
+obj.x = 3.14;   // 报错
+```
+8、不允许删除一个不允许删除的属性
+```
+"use strict";
+delete Object.prototype;   // 报错
+```
+9、变量名不能使用 "eval、arguments" 字符串
+```
+"use strict";
+var eval = 3.14;         // 报错
+var arguments = 3.14;    // 报错
+```
+10、不允许使用以下这种语句
+```
+"use strict";
+with (Math){x = cos(2)}; // 报错
+```
+11、由于一些安全原因，在作用域 eval() 创建的变量不能被调：
+```
+"use strict";
+eval ("var x = 2");
+alert (x);               // 报错
+```
+12、禁止this关键字指向全局对象。
+```
+function test() {
+  console.log(this);   // window对象
+}
+function test1() {
+  "use strict";
+  console.log(this);   // undefined
+}
+```
+13、为了向将来Javascript的新版本过渡，严格模式新增了一些保留关键字
+```
+implements  
+interface  
+let
+package
+private
+protected
+public
+static
+yield
+```
+```
+"use strict";
+var public = 1500;      // 报错
+```
+
 # 项目中的一些问题
 ## 根据数组某个元素循环请求api，按顺序获得相应值
 ![项目图片](./toc/images/js/项目01.png)
@@ -1292,3 +1480,20 @@ WebSocket是HTML5开始提供的一种在单个 TCP 连接上进行全双工通�
 
 ### 返回页面顶部
 [Js实现返回页面顶部（从实现到增强）](https://www.cnblogs.com/art-poet/p/13755083.html)
+
+### "attribute"和"property"有什么不同
+**property**   
+* 是DOM中的属性，是JavaScript里的对象   
+* 可以读取标签自带属性，包括没有写出来的   
+* 不能读取attribute设置的属性   
+* 获取方式：读：element.property;&emsp;&emsp;如：p.className;  
+* 设置方式：element.property = 'xxx';&emsp;&emsp;如：p.className = 'xiao';   
+* 是元素（对象）的属性   
+ 
+**attribute**  
+* 是HTML标签的属性,即直接在html标签添加的都是attribute属性，只能是字符串  
+* attributes是属于property的一个子集
+* 不能读取property设置的属性  
+* 读取方式：element.getAttribute('属性名','属性值');  如：a.getAttribute('href');  
+* 设置方式：element.setAttribute('属性名','属性值');  如：a.getAttribute('href','xiaowan.jpg');  
+* 直接在html标签上添加的和使用setAttribute添加的情况一致  

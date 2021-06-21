@@ -270,6 +270,20 @@ BFC即Block Formatting Contexts (块级格式化上下文)，是W3CCSS2.1规范�
 
 **参考：**[BFC规范及应用](https://blog.csdn.net/fylxy000/article/details/107262200)
 
+## FOUC浏览器样式闪烁
+文档样式短暂失效(Flash of Unstyled Content),简称为FOUC。   
+
+**原理**   
+当样式表晚于结构性html 加载，当加载到此样式表时，页面将停止之前的渲染。 此样式表被下载和解析后，将重新渲染页面，也就出现了短暂的闪烁现象。  
+
+**原因**   
+1、使用import方法导入样式表；   
+2、将样式表放在页面底部 ；   
+3、有几个样式表，放在html结构的不同位置。  
+
+**解决方法**   
+使用link标签将样式表放在文档head中。
+
 ## 优雅降级和渐进增强
 **渐进增强 progressive enhancement：**针对低版本浏览器进行构建页面，保证最基本的功能，然后再针对高级浏览器进行效果、交互等改进和追加功能达到更好的用户体验。   
 **优雅降级 graceful degradation：**一开始就构建完整的功能，然后再针对低版本浏览器进行兼容。   

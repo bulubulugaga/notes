@@ -287,6 +287,11 @@ a::after{
 &lt;div class=&quot;div4&quot;&gt;编程（biān chéng）是编定程序的中文简称，就是让计算机代为解决某个问题，对某个计算体系规定一定的运算方式...&lt;/div&gt;
 </code></pre><p>上图触发前，下图触发后，实现了左边固定宽度，右边自适应的布局<br><img src="./toc/images/css/不知类04.png" alt="运行显示">   </p>
 <p><strong>参考：</strong><a href="https://blog.csdn.net/fylxy000/article/details/107262200">BFC规范及应用</a></p>
+<h2 id="fouc-">FOUC浏览器样式闪烁</h2>
+<p>文档样式短暂失效(Flash of Unstyled Content),简称为FOUC。   </p>
+<p><strong>原理</strong><br>当样式表晚于结构性html 加载，当加载到此样式表时，页面将停止之前的渲染。 此样式表被下载和解析后，将重新渲染页面，也就出现了短暂的闪烁现象。  </p>
+<p><strong>原因</strong><br>1、使用import方法导入样式表；<br>2、将样式表放在页面底部 ；<br>3、有几个样式表，放在html结构的不同位置。  </p>
+<p><strong>解决方法</strong><br>使用link标签将样式表放在文档head中。</p>
 <h2 id="-">优雅降级和渐进增强</h2>
 <p><strong>渐进增强 progressive enhancement：</strong>针对低版本浏览器进行构建页面，保证最基本的功能，然后再针对高级浏览器进行效果、交互等改进和追加功能达到更好的用户体验。<br><strong>优雅降级 graceful degradation：</strong>一开始就构建完整的功能，然后再针对低版本浏览器进行兼容。   </p>
 <p>前缀CSS3（-webkit- / -moz- / -o-*）和正常CSS3在<strong>浏览器中的支持情况</strong>是这样的：   </p>
