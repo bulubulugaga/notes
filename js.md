@@ -1033,6 +1033,153 @@ function fn() {
 console.log(fn);
 fn = 3;
 ```
+## 暂时性死区
+红宝书第四版92页说let在JavaScript运行时也会被提升，但由于“暂时性死区”（temporal dead zone）的缘故，实际上不能在声明之前使用let变量。   
+只要块级作用域内存在let命令，它所声明的变量就“绑定”（binding）这个区域，不再受外部的影响。  
+```
+tmp = 'abc';    // ReferenceError
+let tmp;
+```
+上述用let看着没有提升，其实是被限制了。   
+
+```
+var tmp = 123;
+if (true) {
+  tmp = 'abc'; // ReferenceError
+  let tmp;
+}
+```
+上面代码中，存在全局变量tmp，但是块级作用域内let又声明了一个局部变量tmp，导致后者绑定这个块级作用域，所以在let声明变量前，对tmp赋值会报错。   
+ES6明确规定，如果区块中存在let和const命令，这个区块对这些命令声明的变量，从一开始就形成了封闭作用域。凡是在声明之前就使用这些变量，就会报错。  
+
+总之，在代码块内，使用let命令声明变量之前，该变量都是不可用的。这在语法上，称为“暂时性死区”（temporal dead zone，简称 TDZ）。   
+```
+if (true) {
+  // TDZ开始
+  tmp = 'abc'; // ReferenceError
+  console.log(tmp); // ReferenceError
+  let tmp; // TDZ结束
+  console.log(tmp); // undefined
+  tmp = 123;
+  console.log(tmp); // 123
+}
+```
+上面代码中，在let命令声明变量tmp之前，都属于变量tmp的“死区”。    
+
+“暂时性死区”也意味着**typeof**不再是一个百分之百安全的操作。(如果一个变量根本没有被声明，使用typeof反而不会报错)   
+```
+typeof undeclared_variable;    // "undefined"
+typeof x;    // ReferenceError
+let x;
+```
+变量x使用let命令声明，所以在声明之前，都属于x的“死区”，只要用到该变量就会报错。因此，typeof运行时就会抛出一个ReferenceError。  
+但是如果一个变量根本没有被声明，使用typeof反而不会报错。   
+
+有些“死区”比较隐蔽，不太容易发现。  
+```
+function bar(x = y, y = 2) {
+  return [x, y];
+}
+bar(); // 报错
+```
+上面代码中，调用bar函数之所以报错（某些实现可能不报错），是因为参数x默认值等于另一个参数y，而此时y还没有声明，属于”死区“。如果y的默认值是x，就不会报错，因为此时x已经声明了。   
+```
+function bar(x = 2, y = x) {
+  return [x, y];
+}
+bar(); // [2, 2]
+```
+参考文章：[详细介绍JS中“暂时性死区”的概念](https://www.gxlcms.com/JavaScript-253414.html)
+
+# DOM
+## attribute和property
+### 区别
+**property**   
+* 是DOM中的属性，是JavaScript里的对象   
+* 可以读取标签自带属性，包括没有写出来的   
+* 不能读取attribute设置的属性   
+* 获取方式：读：element.property;&emsp;&emsp;如：p.className;  
+* 设置方式：element.property = 'xxx';&emsp;&emsp;如：p.className = 'xiao';   
+* 是元素（对象）的属性   
+ 
+**attribute**  
+* 是HTML标签的属性,即直接在html标签添加的都是attribute属性，只能是字符串  
+* attributes是属于property的一个子集
+* 不能读取property设置的属性  
+* 读取方式：element.getAttribute('属性名','属性值');  如：a.getAttribute('href');  
+* 设置方式：element.setAttribute('属性名','属性值');  如：a.getAttribute('href','xiaowan.jpg');  
+* 直接在html标签上添加的和使用setAttribute添加的情况一致   
+
+### 详细说明   
+简单理解，Attribute就是dom节点自带的属性，例如html中常用的id、class、title、align等。   
+而Property是这个DOM元素作为对象，其附加的内容，例如childNodes、firstChild等。    
+```
+<div id="div1" class="divClass" title="divTitle" title1="divTitle1"></div>
+let oDiv = document.getElementById("div1");
+```
+html自带的dom属性会自动转换成property，property不能输出自定义属性（title1），查看选择该DOM元素，查看Properties。       
+对于id为div1的div，它的property内容如下：（部分）     
+
+![property](./toc/images/js/题库-其它01.png)   
+![property](./toc/images/js/题库-其它02.png)   
+
+可以发现有一个名为“attributes”的属性，类型是NamedNodeMap，同时有“id”和“className”、”title“等基本的属性，但没有“title1”这个自定义的属性。    
+这是由于，每一个DOM对象都会有它默认的基本属性，在创建的时候，只会创建这些基本属性，在标签中自定义的属性是不会直接放到DOM中。    
+从这里就可以看出，attributes是属于property的一个子集，它保存了HTML标签上定义属性。    
+
+![property](./toc/images/js/题库-其它03.png)   
+
+attitudes中的每一个属性，会发现它们并不是简单的对象，它是一个Attr类型的对象，拥有NodeType、NodeName等属性。    
+注意，打印attribute属性不会直接得到对象的值，而是获取一个包含属性名和值的字符串。
+```
+console.log(oDiv.attributes.title1);    // title1="divTitle1"
+console.log(oDiv.attributes.title1.name);    // title1
+console.log(oDiv.attributes.title1.value);    // divTitle1
+```
+最后注意：**“class”变成Property之后叫做“className”，因为“class”是ECMA的关键字**。
+### 赋值和取值
+**1、attribute赋值**   
+```
+oDiv.setAttribute('title', 'b');
+oDiv.setAttribute('title1', 'c');   //自定义特性
+```
+setAttribute()的两个参数，都必须是字符串。   
+
+**2、attribute取值**   
+```
+let class = oDiv.getAttribute("class");
+let title1 = oDiv.getAttribute("title1");
+```
+
+**3、Property赋值**   
+```
+oDiv.className = 'a';
+oDiv.AAAAA = true;
+```
+对属性Property可以赋任何类型的值。   
+对于属性Property的赋值在IE中可能会引起循环引用，内存泄漏。    
+
+**4、property取值**   
+```
+let className = oDiv.className;
+let childNodes = oDiv.childNodes;
+```
+### 更改property和attribute其中一个值
+```
+oDiv.value = 'new value of prop';
+console.log(oDiv.value);               // 'new value of prop'
+console.log(oDiv.attributes.value);         // 'value="1"'
+
+oDiv.setAttribute('value1', 'ni')
+console.log(oDiv.value1);              //ni
+console.log(oDiv.attributes.value1);        //value='ni'
+```
+* property能够从attribute中得到同步；  
+* attribute不会同步property上的值；   
+* attribute和property之间的数据绑定是单向的，attribute->property；   
+* 更改property和attribute上的任意值，都会将更新反映到HTML页面中；   
+
+参考文章：[JS中attribute和property的区别](https://www.cnblogs.com/lmjZone/p/8760232.html)
 
 # 其它
 ## 严格模式
@@ -1480,20 +1627,3 @@ WebSocket是HTML5开始提供的一种在单个 TCP 连接上进行全双工通�
 
 ### 返回页面顶部
 [Js实现返回页面顶部（从实现到增强）](https://www.cnblogs.com/art-poet/p/13755083.html)
-
-### "attribute"和"property"有什么不同
-**property**   
-* 是DOM中的属性，是JavaScript里的对象   
-* 可以读取标签自带属性，包括没有写出来的   
-* 不能读取attribute设置的属性   
-* 获取方式：读：element.property;&emsp;&emsp;如：p.className;  
-* 设置方式：element.property = 'xxx';&emsp;&emsp;如：p.className = 'xiao';   
-* 是元素（对象）的属性   
- 
-**attribute**  
-* 是HTML标签的属性,即直接在html标签添加的都是attribute属性，只能是字符串  
-* attributes是属于property的一个子集
-* 不能读取property设置的属性  
-* 读取方式：element.getAttribute('属性名','属性值');  如：a.getAttribute('href');  
-* 设置方式：element.setAttribute('属性名','属性值');  如：a.getAttribute('href','xiaowan.jpg');  
-* 直接在html标签上添加的和使用setAttribute添加的情况一致  

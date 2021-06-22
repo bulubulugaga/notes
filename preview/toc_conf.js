@@ -116,7 +116,7 @@ function init() {
         </div>
     `
     body.appendChild(oDiv);
-    if(location.href.indexOf('html.') !== -1) {
+    if(location.href.indexOf('html.') !== -1 || location.href === 'http://notes.seeyou.ink/') {
         $('.header-container-middle .html').addClass('header-nav-active');
     };
     let aLi = document.querySelectorAll('.header-container-middle li');
