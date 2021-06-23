@@ -356,6 +356,26 @@ a::after{
 <pre><code>.div1 {display: table;}
 </code></pre><h3 id="style-body-body-">style标签写在body前与写body后有什么区别</h3>
 <p>1、写在body标签前利于浏览器逐步渲染<br>&emsp;resources downloading-&gt;CSSOM+DOM-&gt;RenderTree(composite)-&gt;Layout-&gt;paint<br>2、写在body标签后<br>&emsp;由于浏览器以逐行方式对html文档进行解析，当解析到写在尾部的样式表（外联或写在style标签）会导致浏览器停止之前的渲染，等待加载且解析样式表完成之后重新渲染，在windows的IE下可能会出现FOUC现象（即样式失效导致的页面闪烁问题）；</p>
+<h3 id="-chrome-12px-">如何让Chrome支持小于12px的文字</h3>
+<p><strong>1、-webkit-text-size-adjust:none;</strong><br>这个属性虽然能取消Chrome的字体限制，但是ctrl+滚动放大缩小网页也会被限制<br>chrome更新到27版本之后就删除了这个属性<br>只对英文才有效，对中文无效     </p>
+<p><strong>2、transform</strong>   </p>
+<pre><code>&lt;style&gt;
+    .re {
+        font-size: 10px;
+    }
+    .tr {
+        font-size: 20px;
+        transform: scale(0.5);
+    }
+&lt;/style&gt;
+&lt;body&gt;
+    &lt;div class=&quot;re&quot;&gt;你好啊啦啦啦啦&lt;/div&gt;
+    &lt;div class=&quot;tr&quot;&gt;你好啊啦啦啦啦&lt;/div&gt;
+&lt;/body&gt;
+</code></pre><p><img src="./toc/images/css/题库-问题01.png" alt="结果演示"><br>文字能缩小，但是div的高宽也会相应缩小，所以一般会将宽高设大，甚至移动位置。</p>
+<pre><code>transform: scale(0.5) translate(-50%, 0);
+</code></pre><p><img src="./toc/images/css/题库-问题02.png" alt="结果演示"><br>transform 对行内元素无效，因此要么使用 display: block; 要么使用 display: inline-block;<br>transform 即使进行了缩放，原来元素还是会占据对应的位置。因此需要做调整，最好是在外面再包一层元素，以免影响其他元素。   </p>
+<p><strong>3、用图片切图</strong></p>
 <h2 id="-">编程</h2>
 <h3 id="-">圣杯布局和双飞翼布局</h3>
 <blockquote>

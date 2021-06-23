@@ -383,6 +383,39 @@ BFC即Block Formatting Contexts (块级格式化上下文)，是W3CCSS2.1规范�
 &emsp;resources downloading->CSSOM+DOM->RenderTree(composite)->Layout->paint   
 2、写在body标签后   
 &emsp;由于浏览器以逐行方式对html文档进行解析，当解析到写在尾部的样式表（外联或写在style标签）会导致浏览器停止之前的渲染，等待加载且解析样式表完成之后重新渲染，在windows的IE下可能会出现FOUC现象（即样式失效导致的页面闪烁问题）；
+### 如何让Chrome支持小于12px的文字
+**1、-webkit-text-size-adjust:none;**     
+这个属性虽然能取消Chrome的字体限制，但是ctrl+滚动放大缩小网页也会被限制     
+chrome更新到27版本之后就删除了这个属性          
+只对英文才有效，对中文无效     
+
+**2、transform**   
+```
+<style>
+    .re {
+        font-size: 10px;
+    }
+    .tr {
+        font-size: 20px;
+        transform: scale(0.5);
+    }
+</style>
+<body>
+    <div class="re">你好啊啦啦啦啦</div>
+    <div class="tr">你好啊啦啦啦啦</div>
+</body>
+```
+![结果演示](./toc/images/css/题库-问题01.png)   
+文字能缩小，但是div的高宽也会相应缩小，所以一般会将宽高设大，甚至移动位置。
+```
+transform: scale(0.5) translate(-50%, 0);
+```
+![结果演示](./toc/images/css/题库-问题02.png)    
+transform 对行内元素无效，因此要么使用 display: block; 要么使用 display: inline-block;    
+transform 即使进行了缩放，原来元素还是会占据对应的位置。因此需要做调整，最好是在外面再包一层元素，以免影响其他元素。   
+
+**3、用图片切图**
+
 ## 编程
 ### 圣杯布局和双飞翼布局   
 > **作用：**    
