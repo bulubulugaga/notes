@@ -159,7 +159,12 @@ oDiv.className = 'active';
 | _top | 在浏览器的整个窗口显示内容，忽略掉所有的框架结构 |
 | framename | 在指定的框架中打开被链接文档。 |
 | 任意字符 | 若该链接不是已打开的页面，则在新窗口中打开，与_blank一致；若该链接已经打开，则跳转到该标签页并刷新页面。 |  
-## 表单 
+## 表单   
+### form--enctype属性
+* application/x-www-form-urlencoded：默认的编码方式。基于uri的percent-encoding编码的，表单里的数据被编码为名称/值对，但是在用文本的传输和MP3等大型文件的时候，使用这种编码就显得 效率低下。空格转换为 "+" 加号，特殊符号转换为 ASCII HEX 值。   
+* multipart/form-data：不对字符编码，在使用包含文件上传（上传文件必须是post方法，type="file"）控件的表单时，必须使用该值。   
+* text/plain：空格转换为 "+" 加号，但不对特殊字符编码。   
+
 ### label的属性和作用
 ```
 <label for="name" accesskey="N">姓名：</label><input type="text" id="name" />

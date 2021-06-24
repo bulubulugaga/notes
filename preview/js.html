@@ -435,6 +435,56 @@ console.log(isEmpty(obj1)) // false
 console.log(isEmpty(obj2)) // false
 console.log(isEmpty(obj3)) // false
 </code></pre><p>文章：<a href="https://www.cnblogs.com/feng-fengfeng/p/12409546.html">判断对象是否为空对象</a></p>
+<h2 id="-">原型和原型链</h2>
+<p>推荐文章：<a href="https://blog.csdn.net/weixin_42614080/article/details/93413476">文章一</a> <a href="https://segmentfault.com/a/1190000014717972">文章二</a></p>
+<h2 id="new-">new操作符</h2>
+<p><strong>1、new操作符用于创建一个给定的构造函数的对象实例</strong></p>
+<pre><code>let obj = new Base();
+</code></pre><p><strong>2、new关键字进行的操作</strong>   </p>
+<ul>
+<li>创建一个空对象   </li>
+<li>将空对象的 __proto__ 属性指向Base函数对象的prototype成员对象   </li>
+<li>将Base函数对象的this指针替换成obj，然后调用Base函数   </li>
+<li>考察第三步的返回值，如果无返回值或者返回一个非对象值，则将obj返回作为新对象；否则将返回值作为新对象返回。   </li>
+</ul>
+<p>即为：</p>
+<pre><code>let obj = {};
+obj.__proto__ = Base.prototype;
+Base.call(obj);
+</code></pre><p><strong>3、简单示例</strong></p>
+<pre><code>let Person = function(name, age) {
+  this.name = name;
+  this.age = age;
+};
+Person.prototype.show = function() {
+  console.log(this.name, this.age);
+};
+
+// let p = new Person(&quot;bella&quot;, 10);
+
+let p = {};
+p.__proto__ = Person.prototype;
+Person.call(p, &quot;balle&quot;, 10);
+
+console.log(p);
+</code></pre><p>运行结果<br><img src="./toc/images/js/Object01.png" alt="运行结果">   </p>
+<p><strong>4、实现一个new操作符</strong></p>
+<pre><code>function create(){
+  let obj = {};   //创建一个空的对象；
+  let con = [].shift.call(arguments);   //获得构造函数；
+  obj.__proto__ = con.prototype;   //链接到原型，但是此时的this还没有绑定
+  let result = con.apply(obj, arguments);   //绑定this，执行构造函数
+  return typeof result === &#39;object&#39; ? con : obj;   //确保new出来的是个对象
+}
+function Person(name){
+  this.name = name;
+}
+Person.prototype.getName = function(){
+  return this.name;
+}
+create(Person,&#39;seven&#39;)
+</code></pre><p><img src="./toc/images/js/Object02.png" alt="运行结果"><br>[].shift.call(arguments)：首先shift函数获得参数数组的第一项，并且通过call函数，改变原来shift函数的指向，使其指向arguments，并对数组的第一项进行复制。而后返回一个数组。至此完成了arguments类数组转化为数组的目的。   </p>
+<p>参考文章：<a href="https://blog.csdn.net/weixin_44015821/article/details/105783172">对JS中new操作符的一些理解</a></p>
 <h1 id="-">函数</h1>
 <h2 id="-">闭包</h2>
 <p>闭包是指有权访问另一个函数作用域中变量的函数。<br>创建闭包的最常见的方式就是在一个函数A内创建另一个函数B，通过函数B访问函数A的局部变量。</p>

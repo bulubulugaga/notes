@@ -448,6 +448,68 @@ console.log(isEmpty(obj3)) // false
 ```
 文章：[判断对象是否为空对象](https://www.cnblogs.com/feng-fengfeng/p/12409546.html)
 
+## 原型和原型链
+推荐文章：[文章一](https://blog.csdn.net/weixin_42614080/article/details/93413476) [文章二](https://segmentfault.com/a/1190000014717972)
+
+## new操作符 
+**1、new操作符用于创建一个给定的构造函数的对象实例**
+```
+let obj = new Base();
+```
+**2、new关键字进行的操作**   
+* 创建一个空对象   
+* 将空对象的 \__proto\__ 属性指向Base函数对象的prototype成员对象   
+* 将Base函数对象的this指针替换成obj，然后调用Base函数   
+* 考察第三步的返回值，如果无返回值或者返回一个非对象值，则将obj返回作为新对象；否则将返回值作为新对象返回。   
+
+即为：
+```
+let obj = {};
+obj.__proto__ = Base.prototype;
+Base.call(obj);
+```
+**3、简单示例**
+```
+let Person = function(name, age) {
+  this.name = name;
+  this.age = age;
+};
+Person.prototype.show = function() {
+  console.log(this.name, this.age);
+};
+
+// let p = new Person("bella", 10);
+
+let p = {};
+p.__proto__ = Person.prototype;
+Person.call(p, "balle", 10);
+
+console.log(p);
+```
+运行结果    
+![运行结果](./toc/images/js/Object01.png)   
+
+**4、实现一个new操作符**
+```
+function create(){
+  let obj = {};   //创建一个空的对象；
+  let con = [].shift.call(arguments);   //获得构造函数；
+  obj.__proto__ = con.prototype;   //链接到原型，但是此时的this还没有绑定
+  let result = con.apply(obj, arguments);   //绑定this，执行构造函数
+  return typeof result === 'object' ? con : obj;   //确保new出来的是个对象
+}
+function Person(name){
+  this.name = name;
+}
+Person.prototype.getName = function(){
+  return this.name;
+}
+create(Person,'seven')
+```
+![运行结果](./toc/images/js/Object02.png)    
+[].shift.call(arguments)：首先shift函数获得参数数组的第一项，并且通过call函数，改变原来shift函数的指向，使其指向arguments，并对数组的第一项进行复制。而后返回一个数组。至此完成了arguments类数组转化为数组的目的。   
+
+参考文章：[对JS中new操作符的一些理解](https://blog.csdn.net/weixin_44015821/article/details/105783172)
 # 函数
 ## 闭包
 闭包是指有权访问另一个函数作用域中变量的函数。   
