@@ -65,7 +65,44 @@
 				</div>
         <div id='readme' style='width:70%;margin-left:20%;'>
           	<article class='markdown-body'>
-            	<h1 id="-">项目中遇到的一些问题</h1>
+            	<h1 id="-">代码规范</h1>
+<h2 id="v-for-v-if-">v-for和v-if一起使用</h2>
+<p>当 v-if 与 v-for 一起使用时，v-for 具有比 v-if 更高的优先级，这意味着 v-if 将分别重复运行于每个 v-for 循环中。所以，不推荐v-if和v-for同时使用。   </p>
+<pre><code>plans: [
+  { id: 0, stage: &#39;预付款&#39;, due_money: 0 },
+  { id: 1, stage: &#39;待付款&#39;, due_money: 2 },
+  { id: 2, stage: &#39;已付款&#39;, due_money: -1 },
+  { id: 3, stage: &#39;啦啦啦&#39;, due_money: 30 },
+  { id: 4, stage: &#39;其它&#39;, due_money: 10 },
+]
+</code></pre><pre><code>&lt;div v-for=&quot;item in plans&quot; :key=&quot;item.id&quot; v-if=&quot;item.due_money &gt; 0&quot;&gt;
+  &lt;span&gt;{{type.stage + &#39; &#39; + type.due_money}}&lt;/span&gt;
+&lt;/div&gt;
+</code></pre><p>如果是按照条件渲染相应div，其实这样写对页面没问题，但在vue3中调整了优先级，对维护有麻烦，还是不太建议这么做。<br>可以用计算属性过滤不符合的元素。</p>
+<pre><code>&lt;div v-for=&quot;item in plansData&quot; :key=&quot;item.id&quot;&gt;
+  &lt;span&gt;{{type.stage + &#39; &#39; + type.due_money}}&lt;/span&gt;
+&lt;/div&gt;
+
+computed: {
+  plansData() {
+    return plans.filter(o =&gt; o.due_money &gt; 0);
+  }
+}
+</code></pre><p>如果是在表格中，每行元素不确定的情况下，可用计算属性传参。</p>
+<pre><code>&lt;el-table-column&gt;
+  &lt;template slot-scope=&quot;scope&quot;&gt;
+    &lt;div v-for=&quot;item in Plans(scope.row.plans)&quot; :key=&quot;item.id&quot;&gt;
+      &lt;span&gt;{{type.stage + &#39; &#39; + type.due_money}}&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/template&gt;
+&lt;/el-table-column&gt;
+
+computed: {
+  plansData() {
+    return data =&gt; data.filter(o =&gt; o.due_money &gt; 0);
+  }
+}
+</code></pre><h1 id="-">项目中遇到的一些问题</h1>
 <h2 id="props-">props传参时，父组件数据改变，子组件未更新</h2>
 <p>在父组件创建的时候，已经创建了相关的子组件，该子组件已经缓存在内存中，在通过其他事件改变父组件传给子组件的值时就会不生效
 parent.vue</p>

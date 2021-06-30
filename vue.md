@@ -1,5 +1,49 @@
+# 代码规范
+## v-for和v-if一起使用
+当 v-if 与 v-for 一起使用时，v-for 具有比 v-if 更高的优先级，这意味着 v-if 将分别重复运行于每个 v-for 循环中。所以，不推荐v-if和v-for同时使用。   
+```
+plans: [
+  { id: 0, stage: '预付款', due_money: 0 },
+  { id: 1, stage: '待付款', due_money: 2 },
+  { id: 2, stage: '已付款', due_money: -1 },
+  { id: 3, stage: '啦啦啦', due_money: 30 },
+  { id: 4, stage: '其它', due_money: 10 },
+]
+```
+```
+<div v-for="item in plans" :key="item.id" v-if="item.due_money > 0">
+  <span>{{type.stage + ' ' + type.due_money}}</span>
+</div>
+```
+如果是按照条件渲染相应div，其实这样写对页面没问题，但在vue3中调整了优先级，对维护有麻烦，还是不太建议这么做。   
+可以用计算属性过滤不符合的元素。
+```
+<div v-for="item in plansData" :key="item.id">
+  <span>{{type.stage + ' ' + type.due_money}}</span>
+</div>
 
+computed: {
+  plansData() {
+    return plans.filter(o => o.due_money > 0);
+  }
+}
+```
+如果是在表格中，每行元素不确定的情况下，可用计算属性传参。
+```
+<el-table-column>
+  <template slot-scope="scope">
+    <div v-for="item in Plans(scope.row.plans)" :key="item.id">
+      <span>{{type.stage + ' ' + type.due_money}}</span>
+    </div>
+  </template>
+</el-table-column>
 
+computed: {
+  plansData() {
+    return data => data.filter(o => o.due_money > 0);
+  }
+}
+```
 
 # 项目中遇到的一些问题
 ## props传参时，父组件数据改变，子组件未更新
