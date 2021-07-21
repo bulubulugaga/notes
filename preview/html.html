@@ -311,6 +311,51 @@ oDiv.className = &#39;active&#39;;
   &lt;area alt=&quot;1-2.jpg&quot; shape=&quot;rect&quot; coords=&quot;300,0,600,350&quot; href=&quot;1-2.jpg&quot;&gt;
 &lt;/map&gt;
 </code></pre><p>拓展：地图点击不通省份跳转不同页面或链接。</p>
+<h2 id="-">全局属性</h2>
+<h3 id="data-">data-</h3>
+<p>data-* 属性是 HTML5 新增的，允许用户在 DOM 中存储自定义信息。在HTML5出现之前我们处理一些被引入的数据是通过用的 class Attribute 或者元素自带的 attribute，或者开发人员自定义一些数据属性，这样操作数据很不方便。     </p>
+<p><strong>1、定义和用法</strong><br>data-* 属性用于存储私有页面后应用的自定义数据。<br>data-* 属性可以在所有的 HTML 元素中嵌入数据。<br>自定义的数据可以让页面拥有更好的交互体验（不需要使用 Ajax 或去服务端查询数据）。<br>data-* 属性由以下两部分组成：<br>&emsp;属性名不要包含大写字母，在 data- 后必须至少有一个字符。<br>&emsp;该属性可以是任何字符串。    </p>
+<p>注意： 自定义属性前缀 &quot;data-&quot; 会被客户端忽略。</p>
+<p><strong>2、存取值</strong></p>
+<pre><code>&lt;div class=&quot;div&quot; data-id=&quot;111&quot;&gt;自定义属性&lt;/div&gt;
+</code></pre><p>1)、getAttribute和setAttribute</p>
+<pre><code>console.log(oDiv.getAttribute(&#39;data-id&#39;));   // 111
+oDiv.setAttribute(&#39;data-id&#39;, 333);
+</code></pre><p>设置之后查看元素<br><img src="./toc/images/html/标签01.png" alt="查看元素，div上的data-id已是333"><br>2)、dataset</p>
+<pre><code>console.log(oDiv.dataset.id);   // 111
+oDiv.dataset.id = 333;
+</code></pre><p><strong>3、设置样式</strong>  </p>
+<pre><code>&lt;style&gt;
+  .button {
+    display: inline-block;
+    padding: 4px 10px;
+    color: white;
+    letter-spacing: 2px;
+    background: green;
+  }
+  .button[data-bg] {
+    background: blue;
+  }
+  .button[data-bg=warning] {
+    background: red;
+  }
+  .button[data-bg=gray] {
+    background: gray;
+  }
+&lt;/style&gt;
+&lt;body&gt;
+  &lt;div class=&quot;button&quot;&gt;确认&lt;/div&gt;
+  &lt;div class=&quot;button&quot; data-bg&gt;确认&lt;/div&gt;
+  &lt;div class=&quot;button&quot; data-bg=&quot;warning&quot;&gt;删除&lt;/div&gt;
+  &lt;div class=&quot;button&quot; data-bg=&quot;gray&quot;&gt;删除&lt;/div&gt;
+  &lt;script&gt;
+  &lt;/script&gt;
+&lt;/body&gt;
+</code></pre><p><img src="./toc/images/html/标签02.png" alt="演示结果"></p>
+<h3 id="accesskey">accesskey</h3>
+<p>设置访问元素的键盘快捷键。</p>
+<pre><code>&lt;a href=&quot;//www.runoob.com/html/html-tutorial.html&quot; accesskey=&quot;h&quot;&gt;菜鸟联盟HTML 教程&lt;/a&gt;&lt;br&gt;
+</code></pre><p>注意：不同浏览器使用的快捷键方法不同<br>IE, Chrome, Safari, Opera 15+: [ALT] + accesskey<br>Opera prior version 15: [SHIFT] [ESC] + accesskey<br>Firefox: [ALT] [SHIFT] + accesskey   </p>
 <h2 id="-">置换元素</h2>
 <p>浏览器根据元素的标签和属性，来决定元素的具体显示内容。如 img、input、select、textarea、button、label 等。    </p>
 <p>例如：浏览器根据 img 标签的 src 属性显示图片，而如果查看 (x)html 代码，则看不到图片的实际内容；input 标签，根据type 属性决定是显示输入框还是按钮。  </p>

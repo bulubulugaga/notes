@@ -1465,6 +1465,34 @@ handleCurrentChange (val, index) {
 ```
 
 # 题库
+## 小测试
+```
+true + false      // 1
+[,,,].length      // 3
+[1, 2, 3] + [4, 5, 6]      // "1,2,34,5,6"
+0.2 + 0.1 === 0.3       // false
+10,2      // 2
+!!""      // false
++!![]      // 1
+!!!true      // false
+true == "true"       // false
+010 - 03      // 5
+```
+```
+"" - - ""      // 0
+null + 0       // 0
+0/0            // NaN
+1/0 > Math.pow(10, 1000)       // false
+true++       // SyntaxError
+"" - 1        // -1
+(null - 0) + "0"      // "00"
+true + ("true" - 0)      // NaN
+!5 + !5       // 0
+[] + []       // ""
+```
+```
++0 === -0      // true
+```
 ## 数字
 ### 将-0转换成字符串输出
 ```

@@ -1214,7 +1214,29 @@ handleCurrentChange (val, index) {
   })
 },
 </code></pre><h1 id="-">题库</h1>
-<h2 id="-">数字</h2>
+<h2 id="-">小测试</h2>
+<pre><code>true + false      // 1
+[,,,].length      // 3
+[1, 2, 3] + [4, 5, 6]      // &quot;1,2,34,5,6&quot;
+0.2 + 0.1 === 0.3       // false
+10,2      // 2
+!!&quot;&quot;      // false
++!![]      // 1
+!!!true      // false
+true == &quot;true&quot;       // false
+010 - 03      // 5
+</code></pre><pre><code>&quot;&quot; - - &quot;&quot;      // 0
+null + 0       // 0
+0/0            // NaN
+1/0 &gt; Math.pow(10, 1000)       // false
+true++       // SyntaxError
+&quot;&quot; - 1        // -1
+(null - 0) + &quot;0&quot;      // &quot;00&quot;
+true + (&quot;true&quot; - 0)      // NaN
+!5 + !5       // 0
+[] + []       // &quot;&quot;
+</code></pre><pre><code>+0 === -0      // true
+</code></pre><h2 id="-">数字</h2>
 <h3 id="-0-">将-0转换成字符串输出</h3>
 <pre><code>const a = -0;
 console.log(a);  //-0（Number）

@@ -244,6 +244,77 @@ area属性:
 拓展：地图点击不通省份跳转不同页面或链接。
 
 
+
+
+## 全局属性
+### data-
+data-* 属性是 HTML5 新增的，允许用户在 DOM 中存储自定义信息。在HTML5出现之前我们处理一些被引入的数据是通过用的 class Attribute 或者元素自带的 attribute，或者开发人员自定义一些数据属性，这样操作数据很不方便。     
+
+**1、定义和用法**   
+data-\* 属性用于存储私有页面后应用的自定义数据。       
+data-\* 属性可以在所有的 HTML 元素中嵌入数据。      
+自定义的数据可以让页面拥有更好的交互体验（不需要使用 Ajax 或去服务端查询数据）。   
+data-\* 属性由以下两部分组成：   
+&emsp;属性名不要包含大写字母，在 data- 后必须至少有一个字符。    
+&emsp;该属性可以是任何字符串。    
+
+注意： 自定义属性前缀 "data-" 会被客户端忽略。
+
+**2、存取值**
+```
+<div class="div" data-id="111">自定义属性</div>
+```  
+1)、getAttribute和setAttribute
+```
+console.log(oDiv.getAttribute('data-id'));   // 111
+oDiv.setAttribute('data-id', 333);
+```
+设置之后查看元素     
+![查看元素，div上的data-id已是333](./toc/images/html/标签01.png)   
+2)、dataset
+```
+console.log(oDiv.dataset.id);   // 111
+oDiv.dataset.id = 333;
+```
+**3、设置样式**  
+```
+<style>
+  .button {
+    display: inline-block;
+    padding: 4px 10px;
+    color: white;
+    letter-spacing: 2px;
+    background: green;
+  }
+  .button[data-bg] {
+    background: blue;
+  }
+  .button[data-bg=warning] {
+    background: red;
+  }
+  .button[data-bg=gray] {
+    background: gray;
+  }
+</style>
+<body>
+  <div class="button">确认</div>
+  <div class="button" data-bg>确认</div>
+  <div class="button" data-bg="warning">删除</div>
+  <div class="button" data-bg="gray">删除</div>
+  <script>
+  </script>
+</body>
+```
+![演示结果](./toc/images/html/标签02.png)
+### accesskey
+设置访问元素的键盘快捷键。
+```
+<a href="//www.runoob.com/html/html-tutorial.html" accesskey="h">菜鸟联盟HTML 教程</a><br>
+```
+注意：不同浏览器使用的快捷键方法不同   
+IE, Chrome, Safari, Opera 15+: \[ALT\] + accesskey   
+Opera prior version 15: \[SHIFT\] \[ESC\] + accesskey   
+Firefox: \[ALT\] \[SHIFT\] + accesskey   
 ## 置换元素
 浏览器根据元素的标签和属性，来决定元素的具体显示内容。如 img、input、select、textarea、button、label 等。    
 
