@@ -311,6 +311,10 @@ oDiv.className = &#39;active&#39;;
   &lt;area alt=&quot;1-2.jpg&quot; shape=&quot;rect&quot; coords=&quot;300,0,600,350&quot; href=&quot;1-2.jpg&quot;&gt;
 &lt;/map&gt;
 </code></pre><p>拓展：地图点击不通省份跳转不同页面或链接。</p>
+<h2 id="script">script</h2>
+<p>&lt; script &gt; 标签用于定义客户端脚本，比如 JavaScript。<br>&lt; script &gt; 元素既可包含脚本语句，也可以通过 &quot;src&quot; 属性指向外部脚本文件，<strong>如果使用 &quot;src&quot; 属性，则 &lt; script &gt; 元素必须是空的</strong>。</p>
+<p>有多种执行外部脚本的方法：<br>&lt; script &gt;：加载的时候是同步的会阻塞后面代码的执行，加载立即执行。<br>&lt; script async &gt;：异步加载，加载和执行是并行的。<br>&lt; script defer &gt;：异步加载，需等到所有文档加载完才执行。   </p>
+<p>&lt; noscript &gt;标签可以包含在能够出现在&lt; body &gt;中的任何元素，&lt; script &gt;标签除外。<br>&lt; noscript &gt;标签中的元素在下列情况会显示出来<br>&emsp;1、浏览器不支持脚本<br>&emsp;2、脚本被禁用   </p>
 <h2 id="-">全局属性</h2>
 <h3 id="data-">data-</h3>
 <p>data-* 属性是 HTML5 新增的，允许用户在 DOM 中存储自定义信息。在HTML5出现之前我们处理一些被引入的数据是通过用的 class Attribute 或者元素自带的 attribute，或者开发人员自定义一些数据属性，这样操作数据很不方便。     </p>

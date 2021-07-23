@@ -1717,3 +1717,29 @@ WebSocket是HTML5开始提供的一种在单个 TCP 连接上进行全双工通�
 
 ### 返回页面顶部
 [Js实现返回页面顶部（从实现到增强）](https://www.cnblogs.com/art-poet/p/13755083.html)
+
+### 判断设备来源
+```
+// 判断移动端设备
+function deviceType() {
+  const ua = navigator.userAgent;
+  const agent = ["Android", "iPhone", "SymbianOS", "Windows Phone", "iPad", "iPod"];
+  for (let i = 0, len = agent.length; i < len; i++) {
+    if (ua.indexOf(agent[i]) > 0) {
+      return agent[i];
+      break;
+    }
+  }
+}
+console.log(`您当前使用的是：${deviceType()}`);
+
+// 判断微信浏览器
+function isWeixin(){
+  const ua = navigator.userAgent.toLowerCase();
+  if(ua.match(/MicroMessenger/i)=='micromessenger'){
+    return true;
+  }else{
+    return false;
+  }
+}
+```
