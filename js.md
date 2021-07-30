@@ -534,6 +534,118 @@ console.log(add());   //1
 console.log(add());   //2
 console.log(add());   //3
 ```
+## call apply bind
+call apply bind都可以改变函数调用的this指向。
+```
+let obj = {
+  name: '小明',
+  age: 17,
+  myFun: function(fm, t) {
+    console.log(`${this.name} 年龄 ${this.age}，来自${fm}，去往${t}`);
+  }
+}
+let db = {
+  name: '小张',
+  age: 99
+} 
+obj.myFun('成都', '上海');               //小明 年龄 17，来自成都，去往上海
+obj.myFun.call(db,'成都','上海');　　　　 // 小张 年龄 99，来自成都，去往上海
+obj.myFun.apply(db,['成都','上海']);      // 小张 年龄 99，来自成都，去往上海  
+obj.myFun.bind(db,'成都','上海')();       // 小张 年龄 99，来自成都，去往上海
+obj.myFun.bind(db,['成都', '上海'])();　　 // 小张 年龄 99，来自成都,上海，去往 undefined
+```
+call 、bind 、 apply 这三个函数的第一个参数都是 this 的指向对象，三者的参数不限定是 string 类型，允许是各种类型，包括函数 、 object 等。    
+call 的参数是直接放进去的，第二第三第 n 个参数全都用逗号分隔。    
+apply 的所有参数都必须放在一个数组里面传进去。       
+bind 参数和 call 一样，且返回一个函数。   
+如果想生成一个新的函数长期绑定某个函数给某个对象使用，则可以使用const newFn = fn.bind(thisObj);
+
+**手写call**
+```
+let bar = { a: 1 };
+function foo(b) {
+  console.log(`${this.a} + ${b} = ${this.a + b}`)
+}
+foo.call(bar, 2);
+
+// 相当于
+
+let bar = {
+  a: 1,
+  foo: function (b) {
+    console.log(`${this.a} + ${b} = ${this.a + b}`);
+  }
+}
+bar.foo(2);
+```
+
+```
+Function.prototype.myCall = function(context, ...args) { // 解构context 与arguments
+  if(typeof this !== 'function') { // this 必须是函数
+    throw new TypeError(`It's must be a function`)
+  }
+
+  if(!context) context = window; // 没有context，或者传递的是 null undefined，则重置为window
+  // context = context || window;
+
+  const fn = Symbol(); // 指定唯一属性，防止 delete 删除错误
+  context[fn] = this; // 将 this 添加到 context的属性上 ( this 指向 foo )
+  const result = context[fn](...args); // 直接调用context 的 fn
+  delete context[fn]; // 删除掉context新增的symbol属性
+  return result; // 返回返回值
+}
+
+let bar = { a: 1 };
+function foo(b) {
+  console.log(`${this.a} + ${b} = ${this.a + b}`)
+}
+foo.myCall(bar, 2);     // 1 + 2 = 3
+```
+**手写apply**
+```
+Function.prototype.myApply = function(context, args = []) { // 解构方式
+  if(typeof this !== 'function') {
+    throw new TypeError(`It's must be a function`)
+  }
+  if(!context) context = window;
+  const fn = Symbol();
+  context[fn] = this;
+  const result = context[fn](...args);
+  delete context[fn];
+  return result;
+}
+
+let bar = { a: 1 };
+function foo(b) {
+  console.log(`${this.a} + ${b} = ${this.a + b}`)
+}
+foo.myApply(bar, [2]);     // 1 + 2 = 3
+```
+**手写bind**
+```
+Function.prototype.myBind = function (context, ...args) {
+  const fn = this;   // 后续返回函数内部this可能改变，所以先存一遍
+  if(typeof fn !== 'function'){
+      throw new TypeError('It must be a function');
+  }
+  if(!context) context = window;
+  return function (...otherArgs) {
+    // return fn.apply(context, [...args, ...otherArgs]);
+    let p = Symbol();
+    context[p] = fn;
+    context[p](...args, ...otherArgs);
+    delete context[p];
+  };
+};
+
+let bar = { a: 1 };
+function foo(b) {
+  console.log(`${this.a} + ${b} = ${this.a + b}， ${c}， ${d}`)
+}
+fn = foo.myBind(bar, 2, '多个参数');
+fn('aa');     // 1 + 2 = 3, 多个参数, aa
+```
+
 # 数据类型及相关问题
 ## js数据类型及其存储
 1、 基本数据类型：数值(number)、字符串(string)、布尔(boolean)、null、undefined、Symbol(ES6新定义)    
