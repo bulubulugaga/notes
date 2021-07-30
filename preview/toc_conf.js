@@ -98,6 +98,7 @@ function init() {
                     <li class="html"><a href="./html.html">html</a><li>
                     <li class="css"><a href="./css.html">css</a><li>
                     <li class="js"><a href="./js.html">js</a><li>
+                    <li class="demo"><a href="./demo.html">demo</a><li>
                     <li class="vue"><a href="./vue.html">vue</a><li>
                     <li class="algorithm"><a href="./algorithm.html">算法</a><li>
                     <li class="other"><a href="./other.html">other</a><li>

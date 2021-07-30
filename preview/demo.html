@@ -1,0 +1,165 @@
+<html>
+  <head>
+	  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>i5ting_ztree_toc:demo</title>
+		<link href="toc/style/github-bf51422f4bb36427d391e4b75a1daa083c2d840e.css" media="all" rel="stylesheet" type="text/css"/>
+		<link href="toc/style/github2-d731afd4f624c99a4b19ad69f3083cd6d02b81d5.css" media="all" rel="stylesheet" type="text/css"/>
+		<link href="toc/css/zTreeStyle/zTreeStyle.css" media="all" rel="stylesheet" type="text/css"/>
+	  <style>
+		pre {
+		    counter-reset: line-numbering;
+		    border: solid 1px #d9d9d9;
+		    border-radius: 0;
+		    background: #fff;
+		    padding: 0;
+		    line-height: 23px;
+		    margin-bottom: 30px;
+		    white-space: pre;
+		    overflow-x: auto;
+		    word-break: inherit;
+		    word-wrap: inherit;
+		}
+
+		pre a::before {
+		  content: counter(line-numbering);
+		  counter-increment: line-numbering;
+		  padding-right: 1em; /* space after numbers */
+		  width: 25px;
+		  text-align: right;
+		  opacity: 0.7;
+		  display: inline-block;
+		  color: #aaa;
+		  background: #eee;
+		  margin-right: 16px;
+		  padding: 2px 10px;
+		  font-size: 13px;
+		  -webkit-touch-callout: none;
+		  -webkit-user-select: none;
+		  -khtml-user-select: none;
+		  -moz-user-select: none;
+		  -ms-user-select: none;
+		  user-select: none;
+		}
+
+		pre a:first-of-type::before {
+		  padding-top: 10px;
+		}
+
+		pre a:last-of-type::before {
+		  padding-bottom: 10px;
+		}
+
+		pre a:only-of-type::before {
+		  padding: 10px;
+		}
+
+		.highlight { background-color: #ffffcc } /* RIGHT */
+		</style>
+  </head>
+  <body>
+	  <div>
+				<div style='width:25%;'>
+						<ul id="tree" class="ztree" style='width:100%'>
+
+						</ul>
+				</div>
+        <div id='readme' style='width:70%;margin-left:20%;'>
+          	<article class='markdown-body'>
+            	<h1 id="-">动态效果</h1>
+<h2 id="-">液体加载</h2>
+<p>搬自b站&emsp;UID:35116390</p>
+<pre><code>&lt;style&gt;
+  * {
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    /* background: #010b10; */
+  }
+  svg {
+    width: 0;
+    height: 0;
+  }
+  .loader {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    filter: url(#gooey);
+  }
+  .loader span {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    animation: animate 4s ease-in-out infinite;
+    animation-delay: calc(0.2s * var(--i));
+  }
+  .loader span:before {
+    position: absolute;
+    content: &#39;&#39;;
+    top: 0;
+    left: calc(50% - 20px);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    box-shadow: 0 0 30px #03a8f4;
+    background: linear-gradient(#fce4ec, #03a8f4);
+  }
+  @keyframes animate {
+    0% {
+      transform: rotate(0deg);
+    }
+    50%,100% {
+      transform: rotate(360deg);
+    }
+  }
+&lt;/style&gt;
+&lt;div class=&quot;loader&quot;&gt;
+  &lt;span style=&quot;--i:1;&quot;&gt;&lt;/span&gt;
+  &lt;span style=&quot;--i:2;&quot;&gt;&lt;/span&gt;
+  &lt;span style=&quot;--i:3;&quot;&gt;&lt;/span&gt;
+  &lt;span style=&quot;--i:4;&quot;&gt;&lt;/span&gt;
+  &lt;span style=&quot;--i:5;&quot;&gt;&lt;/span&gt;
+  &lt;span style=&quot;--i:6;&quot;&gt;&lt;/span&gt;
+  &lt;span style=&quot;--i:7;&quot;&gt;&lt;/span&gt;
+&lt;/div&gt;
+&lt;svg&gt;
+  &lt;filter id=&quot;gooey&quot;&gt;
+    &lt;feGaussianBlur in=&quot;SourceGraphic&quot; stdDeviation=&quot;10&quot; /&gt;
+    &lt;feColorMatrix values=&quot;
+      1 0 0 0 0
+      0 1 0 0 0
+      0 0 1 0 0
+      0 0 0 20 -10
+    &quot; /&gt;
+  &lt;/filter&gt;
+&lt;/svg&gt;
+</code></pre><p><img src="./toc/images/demo/动画01.gif" alt="动画演示效果"></p>
+
+          	</article>
+        </div>
+		</div>
+  </body>
+</html>
+<script type="text/javascript" src="toc/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="toc/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="toc/js/ztree_toc.js"></script>
+<script type="text/javascript" src="toc_conf.js"></script>
+
+<SCRIPT type="text/javascript" >
+<!--
+$(document).ready(function(){
+    var css_conf = eval(markdown_panel_style);
+    $('#readme').css(css_conf)
+    
+    var conf = eval(jquery_ztree_toc_opts);
+		$('#tree').ztree_toc(conf);
+});
+//-->
+</SCRIPT>
