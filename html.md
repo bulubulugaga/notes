@@ -188,7 +188,24 @@ readonly，用于input和textarea，不可编辑，但可以选择和复制，�
 disabled，用于所有表单元素，不能编辑，不能复制，不能选择，值不可以传递到后台。    
 
 ## meta
-### viewport
+常用于定义页面的说明，关键字，最后修改日期，和其它的元数据。这些元数据将服务于浏览器（如何布局或重载页面），搜索引擎和其它网络服务。     
+
+meta 元素定义的元数据的类型包括以下几种：    
+* 如果设置了 name 属性，meta 元素提供的是文档级别（document-level）的元数据，应用于整个页面。   
+* 如果设置了 http-equiv 属性，meta 元素则是编译指令，提供的信息与类似命名的HTTP头部相同。  
+* 如果设置了 charset 属性，meta 元素是一个字符集声明，告诉文档使用哪种字符编码。   
+* 如果设置了 itemprop 属性，meta 元素提供用户定义的元数据。   
+
+### charset
+声明了文档的字符编码，一般是"utf-8"。
+```
+<meta charset="UTF-8">
+```
+### name
+name可以是作者、网页描述等，相应的content是对name的描述。  
+
+name常用值：   
+**1、viewport**    
 viewport 就是视区窗口，也就是浏览器中显示网页的部分。PC 端上基本等于设备显示区域，但在移动端上 viewport 会超出设备的显示区域（即会有横向滚动条出现），设备默认的 viewport 在 980 – 1024 之间。  
 
 为了让移动端可以很好地显示页面，因此需要对 viewport 进行设置。相关的设置值如下：   
@@ -206,6 +223,26 @@ viewport 就是视区窗口，也就是浏览器中显示网页的部分。PC �
 ```
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
 ```
+**2、keywords**
+主要描述网站的关键字。
+```
+<meta name="keywords" content="前端，学习，小慧">
+```
+**3、description**
+主要描述网站的主要内容。
+```
+<meta name="description" content="小慧的前端学习记录">
+```
+**4、author**
+网站作者
+```
+<meta name="author" content="小慧，biu~"> 
+```
+### http-equiv
+属性定义了一个编译指示指令。这个属性叫做 http-equiv(alent) 是因为所有允许的值都是特定HTTP头部的名称。    
+
+<a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/meta" target="_blank">MDN介绍</a><br />
+<a href="https://segmentfault.com/a/1190000004279791" target="_blank">Lxxyx的文章</a>
 
 ## map+area 
 map：用于定义一个客户端图像映射。图像映射（image-map）指带有可点击区域的一幅图像。   
@@ -337,6 +374,40 @@ Firefox: \[ALT\] \[SHIFT\] + accesskey
 
 非置换元素：官网并未对非置换元素做出具体定义，可以认为除去置换元素都是非置换元素。   
 HTML中的大多数元素都是不可置换元素，例如 label 标签，p 标签里的内容会被浏览器直接显示给用户。
+
+
+# web components
+## shadow DOM
+可以将一个隐藏的、独立的 DOM 附加到一个元素上。    
+例如，我们平时用的input、select、video等详细DOM结构不会展示在控制台Elements中，就是使用了shadowDOM。（可以在设置中打开查看） 
+```
+<style>
+  .box {
+    height: 80px;
+    width: 80px;
+    background-color: red;
+    margin-top: 20px;
+  }
+</style>
+<body>
+  <input />
+	<div id="box" class="box"></div>
+	<script>
+		const oBox = document.getElementById('box');
+		const shadowRoot = oBox.attachShadow({ mode:'open' })   // open 表示可以通过页面内的 JavaScript 方法来获取 Shadow DOM
+		// const shadowRoot = oBox.attachShadow({ mode:'closed' })
+		const children = document.createElement('div');
+		children.setAttribute('style', 'height: 40px; width: 40px; background-color: blue');
+		shadowRoot.appendChild(children);
+	</script>
+</body>
+```   
+![演示](./toc/images/html/web-components01.png)
+
+
+
+更多查看: <a href="https://developer.mozilla.org/zh-CN/docs/Web/Web_Components/Using_shadow_DOM" target="_blank">MDN·shadow DOM</a>
+
 # 题库
 ## 问题
 ### 页面导入样式时，使用link和@import有什么区别   

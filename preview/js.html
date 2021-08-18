@@ -486,7 +486,50 @@ create(Person,&#39;seven&#39;)
 </code></pre><p><img src="./toc/images/js/Object02.png" alt="运行结果"><br>[].shift.call(arguments)：首先shift函数获得参数数组的第一项，并且通过call函数，改变原来shift函数的指向，使其指向arguments，并对数组的第一项进行复制。而后返回一个数组。至此完成了arguments类数组转化为数组的目的。   </p>
 <p>参考文章：<a href="https://blog.csdn.net/weixin_44015821/article/details/105783172">对JS中new操作符的一些理解</a></p>
 <h1 id="-">函数</h1>
-<h2 id="-">闭包</h2>
+<h2 id="arguments">arguments</h2>
+<p>是一个对应于传递给函数的参数的类数组<strong>对象</strong>。<br>arguments对象不是一个 Array 。它类似于Array，但除了length属性和索引元素之外没有任何Array属性。</p>
+<pre><code>function test() {
+  console.log(arguments);
+}
+test(1, 2, [1, 2]);
+arguments.push(1);
+</code></pre><p><img src="./toc/images/js/函数01.png" alt="结果演示"><br><strong>1、可以通过索引获取和设置arguments值。</strong>   </p>
+<pre><code>console.log(Object.prototype.toString.call(arguments));   // &quot;[object Arguments]&quot;
+console.log(arguments[1]);   // 2
+arguments[1] = 4;
+</code></pre><p><strong>2、callee值指向函数本身</strong></p>
+<pre><code>console.log(arguments.callee === test);   // true
+</code></pre><p><strong>3、应用</strong></p>
+<pre><code>// 计算和
+function add() {
+  let sum = 0;
+  for(let val of arguments) {
+    if(typeof val !== &#39;number&#39;) {
+      return &#39;请传入数值类型&#39;;
+    }
+    sum += val;
+  }
+  return sum;
+}
+console.log(add(1, 2, 3, 4));
+console.log(add(1, &#39;2&#39;, 3, 4));
+</code></pre><pre><code>// 函数递归直接用函数名，但是匿名函数可以用arguments.callee
+// 递归生成数组（只是一个递归示例，不考虑方法简易）
+let arr = [];
+(function () {
+  arr.push(arguments[0]);
+  if(arguments[0] === 0) return;
+  arguments.callee(--arguments[0]);
+})(4)
+console.log(arr);   // [4, 3, 2, 1]
+</code></pre><pre><code>// 如果有固定的参数，其余不确定，可以用扩展语法（手写call、apply、bind）
+// 简单示例
+function test(cl, ...args) {
+  console.log(cl);       // 高二一班
+  console.log(args);     // [&#39;小王，18岁&#39;, &#39;小红，17岁&#39;]
+}
+test(&#39;高二一班&#39;, &#39;小王，18岁&#39;, &#39;小红，17岁&#39;);
+</code></pre><h2 id="-">闭包</h2>
 <p>闭包是指有权访问另一个函数作用域中变量的函数。<br>创建闭包的最常见的方式就是在一个函数A内创建另一个函数B，通过函数B访问函数A的局部变量。</p>
 <p><strong>1、优缺点</strong><br>&emsp;优点：<br>&emsp;1）读取另一个函数作用域中的变量；<br>&emsp;2）让这些变量始终保持在内存中，即闭包可以使得它诞生环境一直存在。(似乎是子函数调用了父函数变量，该变量不会被销毁，会一直存在)<br>&emsp;3）封装对象的私有属性和私有方法。（然后在全局作用域中通过调用闭包就能访问函数中的变量）<br>&emsp;缺点：<br>&emsp;由于闭包会携带包含它的函数的作用域，因此会比其他函数占用更多的内存，过度使用闭包可能会导致内存占用过多的问题。所以不能滥用闭包，否则会造成网页的性能问题，在IE中可能导致内存泄露。解决方法是，在退出函数之前，将不使用的局部变量全部删除。</p>
 <p><strong>2、简单应用</strong></p>
@@ -1144,7 +1187,40 @@ console.log(oDiv.attributes.value1);        //value=&#39;ni&#39;
 <li>更改property和attribute上的任意值，都会将更新反映到HTML页面中；   </li>
 </ul>
 <p>参考文章：<a href="https://www.cnblogs.com/lmjZone/p/8760232.html">JS中attribute和property的区别</a></p>
-<h1 id="-">其它</h1>
+<h1 id="es6-">ES6+</h1>
+<h2 id="promise">promise</h2>
+<h2 id="async-await">async/await</h2>
+<p>await只能在async函数里使用<br>await后面最好接Promise，如果后面接的是普通函数则会直接执行<br>async函数返回的是一个Promise    </p>
+<pre><code>function fn1 () {
+  return new Promise((resolve, reject) =&gt; {
+    api.getList1(res =&gt; {
+      resolve(res)
+    }, err =&gt; {
+      reject(err)
+    })
+  })
+}
+
+function fn2 (data) {
+  return new Promise((resolve, reject) =&gt; {
+    api.getList2(res =&gt; {
+      resolve(res)
+    }, err =&gt; {
+      reject(err)
+    })
+  })
+}
+
+async function req () {
+  try {
+    const data1 = await fn1()
+    const data2 = await fn2(data1)
+  } catch(err) {
+    console.log(err)
+  }
+}
+req()
+</code></pre><h1 id="-">其它</h1>
 <h2 id="-">严格模式</h2>
 <p>&quot;use strict&quot; 指令在 JavaScript 1.8.5 (ECMAScript5) 中新增。<br>它不是一条语句，但是是一个<strong>字面量表达式</strong>，在 JavaScript 旧版本中会被忽略。<br>&quot;use strict&quot; 的目的是指定代码在严格条件下执行。<br>支持严格模式的浏览器:Internet Explorer 10 +、 Firefox 4+ Chrome 13+、 Safari 5.1+、 Opera 12+。  </p>
 <p><strong>声明</strong><br>在脚本或函数的头部添加 use strict; 表达式来声明。</p>
@@ -1310,6 +1386,7 @@ handleCurrentChange (val, index) {
 },
 </code></pre><h1 id="-">题库</h1>
 <h2 id="-">小测试</h2>
+<h3 id="-">简单运算</h3>
 <pre><code>true + false      // 1
 [,,,].length      // 3
 [1, 2, 3] + [4, 5, 6]      // &quot;1,2,34,5,6&quot;
@@ -1331,6 +1408,19 @@ true + (&quot;true&quot; - 0)      // NaN
 !5 + !5       // 0
 [] + []       // &quot;&quot;
 </code></pre><pre><code>+0 === -0      // true
+</code></pre><h3 id="-">解释以下代码</h3>
+<pre><code>[].forEach.call($$(&quot;*&quot;), function(a){ 
+  a.style.outline = &quot;1px solid #&quot; + (~~(Math.random()*(1&lt;&lt;24))).toString(16) 
+})
+
+表示 给DOM元素添加不同颜色的边框
+[].forEach.call() =&gt; 调用引用数组的forEach方法
+$$(&#39;*&#39;) =&gt; document.querySelectorAll(&#39;*&#39;)
+~~a =&gt; parseInt(a)
+1&lt;&lt;24 =&gt; 对二进数1小数点右移24位
+(parseInt(Math.random()*(1&lt;&lt;24)).toString(16)) =&gt; 获得了一个位于0-16777216之间的随机整数，也就是随机颜色，再使用toString(16)将它转化为十六进制数
+
+注意：在控制台测试生效，在js中报错 $$未定义
 </code></pre><h2 id="-">数字</h2>
 <h3 id="-0-">将-0转换成字符串输出</h3>
 <pre><code>const a = -0;

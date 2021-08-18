@@ -384,7 +384,14 @@ a::after{
 <h3 id="-">页面中应该用偶数字体还是奇数字体</h3>
 <p>常用偶数号字体，但奇数号字体也没关系，例如 知乎正文使用15px字体，豆瓣电影使用13px字体。<strong>但是使用奇数号字体可能导致文本段落无法对齐。</strong>    </p>
 <p>偶数字体使用原因：<br>1、大多数UI设计提供的字号是偶数<br>2、相对来说偶数字号比较容易和页面中其他部分的字号构成一个比例关系。(乘除0.5还是整数)<br>3、某些低版本的浏览器如ie6会把奇数字体强制转化为偶数<br>4、Windows 自带的点阵宋体（中易宋体）从 Vista 开始只提供 12、14、16 px 这三个大小的点阵，而 13、15、17 px 时用的是小一号的点阵（即每个字占的空间大了 1 px，但点阵没变），于是略显稀疏。</p>
-<h2 id="-">编程</h2>
+<h3 id="-">修改谷歌自动填充表单的背景颜色</h3>
+<p>用内阴影</p>
+<pre><code>input:-webkit-autofill {
+    box-shadow: 0 0 0px 1000px rgba(255, 255, 255, 0) inset !important;
+    -webkit-text-fill-color: #000 !important;
+    transition: background-color 5000s ease-in-out 0s;
+}
+</code></pre><h2 id="-">编程</h2>
 <h3 id="-">圣杯布局和双飞翼布局</h3>
 <blockquote>
 <p><strong>作用：</strong><br>圣杯布局和双飞翼布局解决的问题是相同的，就是两边顶宽，中间自适应的三栏布局，中间栏要在放在文档流前面以优先渲染。   </p>

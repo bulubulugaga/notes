@@ -511,6 +511,63 @@ create(Person,'seven')
 
 参考文章：[对JS中new操作符的一些理解](https://blog.csdn.net/weixin_44015821/article/details/105783172)
 # 函数
+## arguments
+是一个对应于传递给函数的参数的类数组**对象**。    
+arguments对象不是一个 Array 。它类似于Array，但除了length属性和索引元素之外没有任何Array属性。
+```
+function test() {
+  console.log(arguments);
+}
+test(1, 2, [1, 2]);
+arguments.push(1);
+```
+![结果演示](./toc/images/js/函数01.png)     
+**1、可以通过索引获取和设置arguments值。**   
+```
+console.log(Object.prototype.toString.call(arguments));   // "[object Arguments]"
+console.log(arguments[1]);   // 2
+arguments[1] = 4;
+```
+**2、callee值指向函数本身**
+```
+console.log(arguments.callee === test);   // true
+```
+**3、应用**
+```
+// 计算和
+function add() {
+  let sum = 0;
+  for(let val of arguments) {
+    if(typeof val !== 'number') {
+      return '请传入数值类型';
+    }
+    sum += val;
+  }
+  return sum;
+}
+console.log(add(1, 2, 3, 4));
+console.log(add(1, '2', 3, 4));
+```
+```
+// 函数递归直接用函数名，但是匿名函数可以用arguments.callee
+// 递归生成数组（只是一个递归示例，不考虑方法简易）
+let arr = [];
+(function () {
+  arr.push(arguments[0]);
+  if(arguments[0] === 0) return;
+  arguments.callee(--arguments[0]);
+})(4)
+console.log(arr);   // [4, 3, 2, 1]
+```
+```
+// 如果有固定的参数，其余不确定，可以用扩展语法（手写call、apply、bind）
+// 简单示例
+function test(cl, ...args) {
+  console.log(cl);       // 高二一班
+  console.log(args);     // ['小王，18岁', '小红，17岁']
+}
+test('高二一班', '小王，18岁', '小红，17岁');
+```
 ## 闭包
 闭包是指有权访问另一个函数作用域中变量的函数。   
 创建闭包的最常见的方式就是在一个函数A内创建另一个函数B，通过函数B访问函数A的局部变量。
@@ -1355,6 +1412,44 @@ console.log(oDiv.attributes.value1);        //value='ni'
 
 参考文章：[JS中attribute和property的区别](https://www.cnblogs.com/lmjZone/p/8760232.html)
 
+# ES6+
+## promise
+## async/await
+await只能在async函数里使用    
+await后面最好接Promise，如果后面接的是普通函数则会直接执行    
+async函数返回的是一个Promise    
+```
+function fn1 () {
+  return new Promise((resolve, reject) => {
+    api.getList1(res => {
+      resolve(res)
+    }, err => {
+      reject(err)
+    })
+  })
+}
+
+function fn2 (data) {
+  return new Promise((resolve, reject) => {
+    api.getList2(res => {
+      resolve(res)
+    }, err => {
+      reject(err)
+    })
+  })
+}
+
+async function req () {
+  try {
+    const data1 = await fn1()
+    const data2 = await fn2(data1)
+  } catch(err) {
+    console.log(err)
+  }
+}
+req()
+```
+
 # 其它
 ## 严格模式
 "use strict" 指令在 JavaScript 1.8.5 (ECMAScript5) 中新增。  
@@ -1578,6 +1673,7 @@ handleCurrentChange (val, index) {
 
 # 题库
 ## 小测试
+### 简单运算
 ```
 true + false      // 1
 [,,,].length      // 3
@@ -1604,6 +1700,21 @@ true + ("true" - 0)      // NaN
 ```
 ```
 +0 === -0      // true
+```
+### 解释以下代码
+```
+[].forEach.call($$("*"), function(a){ 
+  a.style.outline = "1px solid #" + (~~(Math.random()*(1<<24))).toString(16) 
+})
+
+表示 给DOM元素添加不同颜色的边框
+[].forEach.call() => 调用引用数组的forEach方法
+$$('*') => document.querySelectorAll('*')
+~~a => parseInt(a)
+1<<24 => 对二进数1小数点右移24位
+(parseInt(Math.random()*(1<<24)).toString(16)) => 获得了一个位于0-16777216之间的随机整数，也就是随机颜色，再使用toString(16)将它转化为十六进制数
+
+注意：在控制台测试生效，在js中报错 $$未定义
 ```
 ## 数字
 ### 将-0转换成字符串输出

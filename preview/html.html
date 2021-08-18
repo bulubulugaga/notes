@@ -237,8 +237,20 @@ oDiv.className = &#39;active&#39;;
 </code></pre><h3 id="readonly-disable">readonly和disable</h3>
 <p>readonly，用于input和textarea，不可编辑，但可以选择和复制，值可以传递到后台；<br>disabled，用于所有表单元素，不能编辑，不能复制，不能选择，值不可以传递到后台。    </p>
 <h2 id="meta">meta</h2>
-<h3 id="viewport">viewport</h3>
-<p>viewport 就是视区窗口，也就是浏览器中显示网页的部分。PC 端上基本等于设备显示区域，但在移动端上 viewport 会超出设备的显示区域（即会有横向滚动条出现），设备默认的 viewport 在 980 – 1024 之间。  </p>
+<p>常用于定义页面的说明，关键字，最后修改日期，和其它的元数据。这些元数据将服务于浏览器（如何布局或重载页面），搜索引擎和其它网络服务。     </p>
+<p>meta 元素定义的元数据的类型包括以下几种：    </p>
+<ul>
+<li>如果设置了 name 属性，meta 元素提供的是文档级别（document-level）的元数据，应用于整个页面。   </li>
+<li>如果设置了 http-equiv 属性，meta 元素则是编译指令，提供的信息与类似命名的HTTP头部相同。  </li>
+<li>如果设置了 charset 属性，meta 元素是一个字符集声明，告诉文档使用哪种字符编码。   </li>
+<li>如果设置了 itemprop 属性，meta 元素提供用户定义的元数据。   </li>
+</ul>
+<h3 id="charset">charset</h3>
+<p>声明了文档的字符编码，一般是&quot;utf-8&quot;。</p>
+<pre><code>&lt;meta charset=&quot;UTF-8&quot;&gt;
+</code></pre><h3 id="name">name</h3>
+<p>name可以是作者、网页描述等，相应的content是对name的描述。  </p>
+<p>name常用值：<br><strong>1、viewport</strong><br>viewport 就是视区窗口，也就是浏览器中显示网页的部分。PC 端上基本等于设备显示区域，但在移动端上 viewport 会超出设备的显示区域（即会有横向滚动条出现），设备默认的 viewport 在 980 – 1024 之间。  </p>
 <p>为了让移动端可以很好地显示页面，因此需要对 viewport 进行设置。相关的设置值如下：   </p>
 <table>
 <thead>
@@ -276,7 +288,20 @@ oDiv.className = &#39;active&#39;;
 </table>
 <p>代码演示：</p>
 <pre><code>&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0&quot;&gt;
-</code></pre><h2 id="map-area">map+area</h2>
+</code></pre><p><strong>2、keywords</strong>
+主要描述网站的关键字。</p>
+<pre><code>&lt;meta name=&quot;keywords&quot; content=&quot;前端，学习，小慧&quot;&gt;
+</code></pre><p><strong>3、description</strong>
+主要描述网站的主要内容。</p>
+<pre><code>&lt;meta name=&quot;description&quot; content=&quot;小慧的前端学习记录&quot;&gt;
+</code></pre><p><strong>4、author</strong>
+网站作者</p>
+<pre><code>&lt;meta name=&quot;author&quot; content=&quot;小慧，biu~&quot;&gt; 
+</code></pre><h3 id="http-equiv">http-equiv</h3>
+<p>属性定义了一个编译指示指令。这个属性叫做 http-equiv(alent) 是因为所有允许的值都是特定HTTP头部的名称。    </p>
+<p><a href="https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/meta" target="_blank">MDN介绍</a><br />
+<a href="https://segmentfault.com/a/1190000004279791" target="_blank">Lxxyx的文章</a></p>
+<h2 id="map-area">map+area</h2>
 <p>map：用于定义一个客户端图像映射。图像映射（image-map）指带有可点击区域的一幅图像。<br>area：定义 map 的可点击区域。<br>当 map 设置 name 或者 id 属性时， img 标签的 usemap 属性会根据 map 的 id 和 name 属性来关联 map（由于浏览器的不同，usemap属性接收二者之一的值，所以通常name和id属性二者都写，值相同）。  </p>
 <p>map标签的用途：是与img标签绑定使用的，常被用来赋予给客户端图像某处区域特殊的含义，点击该区域可跳转到新的文档。</p>
 <p>area属性:    </p>
@@ -365,6 +390,31 @@ oDiv.dataset.id = 333;
 <p>例如：浏览器根据 img 标签的 src 属性显示图片，而如果查看 (x)html 代码，则看不到图片的实际内容；input 标签，根据type 属性决定是显示输入框还是按钮。  </p>
 <p>置换元素在其显示中生成了框，这也就是有的内联元素能够设置宽高的原因。<br>置换元素区别于一般的 inline 元素，他们本身拥有内在尺寸（宽度，高度，宽高比），也可以设置 width / height 属性，他们的性质同行内元素设置了 inline-block 一样。    </p>
 <p>非置换元素：官网并未对非置换元素做出具体定义，可以认为除去置换元素都是非置换元素。<br>HTML中的大多数元素都是不可置换元素，例如 label 标签，p 标签里的内容会被浏览器直接显示给用户。</p>
+<h1 id="web-components">web components</h1>
+<h2 id="shadow-dom">shadow DOM</h2>
+<p>可以将一个隐藏的、独立的 DOM 附加到一个元素上。<br>例如，我们平时用的input、select、video等详细DOM结构不会展示在控制台Elements中，就是使用了shadowDOM。（可以在设置中打开查看） </p>
+<pre><code>&lt;style&gt;
+  .box {
+    height: 80px;
+    width: 80px;
+    background-color: red;
+    margin-top: 20px;
+  }
+&lt;/style&gt;
+&lt;body&gt;
+  &lt;input /&gt;
+    &lt;div id=&quot;box&quot; class=&quot;box&quot;&gt;&lt;/div&gt;
+    &lt;script&gt;
+        const oBox = document.getElementById(&#39;box&#39;);
+        const shadowRoot = oBox.attachShadow({ mode:&#39;open&#39; })   // open 表示可以通过页面内的 JavaScript 方法来获取 Shadow DOM
+        // const shadowRoot = oBox.attachShadow({ mode:&#39;closed&#39; })
+        const children = document.createElement(&#39;div&#39;);
+        children.setAttribute(&#39;style&#39;, &#39;height: 40px; width: 40px; background-color: blue&#39;);
+        shadowRoot.appendChild(children);
+    &lt;/script&gt;
+&lt;/body&gt;
+</code></pre><p><img src="./toc/images/html/web-components01.png" alt="演示"></p>
+<p>更多查看: <a href="https://developer.mozilla.org/zh-CN/docs/Web/Web_Components/Using_shadow_DOM" target="_blank">MDN·shadow DOM</a></p>
 <h1 id="-">题库</h1>
 <h2 id="-">问题</h2>
 <h3 id="-link-import-">页面导入样式时，使用link和@import有什么区别</h3>
