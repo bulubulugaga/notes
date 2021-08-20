@@ -636,7 +636,7 @@ function foo(b) {
 }
 fn = foo.myBind(bar, 2, &#39;多个参数&#39;);
 fn(&#39;aa&#39;);     // 1 + 2 = 3, 多个参数, aa
-</code></pre><h1 id="-">数据类型及相关问题</h1>
+</code></pre><h1 id="-">数据存储与内存管理</h1>
 <h2 id="js-">js数据类型及其存储</h2>
 <p>1、 基本数据类型：数值(number)、字符串(string)、布尔(boolean)、null、undefined、Symbol(ES6新定义)<br>2、 引用数据类型：对象(数组、正则表达式、日期、函数)  </p>
 <blockquote>
@@ -901,6 +901,70 @@ console.log( arr instanceof Array );   //false
 console.log( Object.prototype.toString.call(arr) == &#39;[object Array]&#39; );   //true
 </code></pre><p>从结果中可以看出，constructor和instanceof都没有正确的判断出类型。  </p>
 <p>参考文章：<a href="https://www.cnblogs.com/onepixel/p/5126046.html">一像素</a>&emsp;<a href="https://blog.csdn.net/lhjuejiang/article/details/79623973">冰雪为融</a>  </p>
+<h2 id="-">垃圾回收机制</h2>
+<h3 id="-">变量回收原则</h3>
+<p>1、全局变量不会被回收。<br>2、局部变量会被回收，也就是函数一旦运行完以后，函数内部的东西都会被销毁。<br>3、只要被另外一个作用域所引用就不会被回收。   </p>
+<pre><code>var i = 1;   // 全局变量不会被回收
+var i = 2;   // 这里重复声明变量i,因此var声明被忽略，只是把i赋值为2
+var add = function () {  // 全局变量不会被回收
+  var i = 0;  // 局部变量
+  return function () {
+    i++;
+    console.log(i); // 被另一个作用域引用导致不会被回收
+  }
+}();
+add();
+</code></pre><h3 id="-">垃圾回收原则</h3>
+<p>在 JavaScript 内存管理中有一个概念叫做 可达性，就是那些以某种方式可访问或者说可用的值，它们被保证存储在内存中，反之不可访问则需回收。<br>常用的垃圾回收算法有两种</p>
+<h4 id="-">标记清除算法</h4>
+<p>最常用的垃圾回收策略。当变量进入上下文，比如在函数内部声明一个变量时，这个变量会被加上存在于上下文中的标记。而在上下文中的变量，逻辑上讲，永远不应该释放它们的内存，因为只要上下文中的代码在运行，就有可能用到它们。当变量离开上下文时，也会被加上离开上下文的标记。   </p>
+<p>1、垃圾回收程序运行的时候，会标记内存中存储的所有变量（标记方法有很多种)。<br>2、然后，它会将所有在上下文中的变量，以及被在上下文中的变量引用的变量的标记去掉。
+3、在此之后再被加上标记的变量就是待删除的了，原因是任何在上下文中的变量都访问不到它们了。<br>4、随后垃圾回收程序做一次内存清理，销毁带标记的所有值并收回它们的内存。</p>
+<h4 id="-">引用计数算法</h4>
+<p>对每个值记录它被引用的次数。    </p>
+<p>1、当声明了一个变量并且将一个引用类型赋值给该变量的时候这个值的引用次数就为1。<br>2、如果同一个值又被赋给另一个变量，那么引用数加1。<br>3、如果该变量的值被其他的值覆盖了，则引用次数减1。<br>4、当这个值的引用次数变为0的时候，说明没有变量在使用，这个值没法被访问了，回收空间，垃圾回收器会在运行的时候清理掉引用次数为0的值占用的内存。    </p>
+<p>參考：<a href="https://www.cnblogs.com/erqi/p/14436416.html">JavaScript变量回收原则/垃圾回收机制</a>&emsp;<a href="https://juejin.cn/post/6981588276356317214">垃圾回收机制</a></p>
+<h2 id="-">内存泄漏</h2>
+<p>指一块被分配的内存既不能使用，又不能回收，直到浏览器进程结束。<br>对于持续运行的服务进程（daemon），必须及时释放不再用到的内存。否则，内存占用越来越高，轻则影响系统性能，重则导致进程崩溃。<br>一次内存泄漏似乎不会有大的影响，但内存泄漏堆积后的后果就是内存溢出。    </p>
+<h3 id="-">常见的内存泄漏</h3>
+<h4 id="-">意外的全局变量</h4>
+<pre><code>function test() {
+  num = 1;
+  this.str = &#39;abc&#39;;
+}
+test();
+</code></pre><p>这里的num由于没有声明，自动提升为全局变量，str由this创建，这里调用也指向全局，str也是全局变量，不会被自动回收。</p>
+<pre><code>delete num;   // 手动删除(最好在函数内部声明)
+</code></pre><h4 id="-">闭包</h4>
+<pre><code>let outer = function() {
+  let name = &#39;Jack&#39;;
+  return function() {
+    return name;
+  }
+}
+</code></pre><p>这段代码执行后创建了一个内部闭包，只要返回的函数存在就不能清理name，因为闭包一直在使用。</p>
+<h4 id="-">定时器</h4>
+<pre><code>let name = &#39;Jack&#39;;
+setInterval(() =&gt; {
+  console.log(name)
+}, 100);
+</code></pre><p>只要定时器一直运行，回调函数中的name就会一直占用内存，不会被回收。</p>
+<h4 id="map-set">Map和Set</h4>
+<p>类似于脱离DOM的引用，如果不将其主动清除引用，其同样会造成内存不自动进行回收，对于键为对象的情况，可以采用WeakMap，WeakMap对象同样用来保存键值对，对于键是弱引用的而且必须为一个对象，而值可以是任意的对象或者原始值，且由于是对于对象的弱引用，其不会干扰Js的垃圾回收。</p>
+<h4 id="console-">console的滥用</h4>
+<p>传递给console.log的对象不能被垃圾回收，所以没有去掉console.log可能会存在内存泄漏。</p>
+<h4 id="dom-">DOM泄漏</h4>
+<pre><code>let a = {};
+document.getElementById(&#39;box&#39;).style = a;
+//  document.getElementById(&#39;box&#39;).style = null;  回收
+
+let a = document.getElementById(&#39;box&#39;);
+document.body.removeChild(a);  // 虽然移除了，但是a还在引用，不会清除
+//  a = null;
+</code></pre><h3 id="-">避免</h3>
+<p>1、减少不必要的全局变量，或者生命周期较长的对象，及时对无用的数据进行垃圾回收(即赋值为null)；<br>2、注意程序逻辑，避免“死循环”等；<br>3、避免创建过多的对象；<br>4、减少层级过多的引用。   </p>
+<h2 id="-">内存溢出</h2>
+<p>存在无法回收的内存或使用的内存过多，最终使得程序运行要用到的内存大于能提供的最大内存，就出抛出内存溢出的错误。</p>
 <h1 id="-">变量</h1>
 <h2 id="-">编译原理</h2>
 <p>JavaScript的源代码在运行的时候，会经过两个阶段：编译和执行。而且，编译阶段往往就在执行阶段的前几微秒甚至更短的时间内。<br>大家通常把 javascript 归类为一种“动态”或“解释执行”的语言，但事实上，它是一门编译语言，但和传统的编译语言不同，它不是提前编译的，编译结果也不能进行移植。  </p>
@@ -1535,6 +1599,22 @@ function build() {
   return arr[length-1] ? arr : build();
 }
 console.log(build());
+</code></pre><h3 id="-">获取数组最大值最小值</h3>
+<pre><code>// 初步想法
+function getMaxMin(arr) {
+  return { 
+    max: arr.reduce((r1, r2) =&gt; r1 &gt; r2 ? r1 : r2 ), 
+    min: arr.reduce((r1, r2) =&gt; r1 &lt; r2 ? r1 : r2 )
+  }
+}
+console.log(getMaxMin([1, 6, 0, 9, 2]));   // { max: 9, min: 0 }
+</code></pre><pre><code>// 学习别人的
+function getMaxMin(arr) {
+  return { 
+    max: Math.max.apply(Array, arr), 
+    min: Math.min.apply(Array, arr)
+  }
+}
 </code></pre><h2 id="-">对象</h2>
 <h3 id="-">修改对象属性</h3>
 <pre><code>const obj = {
