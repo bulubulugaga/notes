@@ -1,3 +1,5 @@
+123 
+456
 # 伪类和伪元素
 css3为了区分伪类和伪元素，伪元素采用双冒号写法
 * 常见伪类  :hover, :link, :active, :target, :not(), :focus。
