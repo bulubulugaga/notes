@@ -44,6 +44,222 @@ computed: {
   }
 }
 ```
+# 相关模块引用
+## async
+<a href="https://www.npmjs.com/package/async" target="_blank">npm更新(https://www.npmjs.com/package/async)</a><br />
+<a href="https://caolan.github.io/async/v3/" target="_blank">文档(https://caolan.github.io/async/v3/)</a><br />
+
+可用于解决异步操作顺序问题，可以代替promise的部分操作，比promise简洁    
+
+> func(tasks,[callback])    
+> tasks-函数名列表，callback里面一般含两个参数(err, res)，参数顺序似乎不可以修改，res如果返回结果数组，按函数列表顺序组成数组。      
+> 函数如果需要返回错误或者结果，函数传参，内部调用callback(err, res)；无错误返回callback(null, res)；callback(arg)表示返回了一个错误提示。   
+### parallel(tasks,[callback])
+函数之间并行进行，互不干扰。
+```
+fun1(cb) {
+  console.log('a');
+  setTimeout(() => {
+    cb(null, 'a');
+  }, 1000)
+},
+fun2(cb) {
+  console.log('b');
+  setTimeout(() => {
+    cb(null, 'b');
+  }, 200)
+},
+fun3(cb) {
+  console.log('c');
+  setTimeout(() => {
+    cb(null, 'c');
+  }, 300)
+}
+
+created() {
+  parallel([
+    this.fun1,
+    this.fun2,
+    this.fun3
+  ], (err, result) => {
+    console.log(result);
+  })
+}
+
+a
+b
+c    // a，b，c顺序几乎同时输出 
+['a', 'b', 'c']
+```     
+如果中途出错，则立即将err和值传到最终的回调函数，后面的函数执行，parallel回调的result取决于其他函数是否执行完毕。
+```
+fun2(cb) {
+  console.log('b');
+  setTimeout(() => {
+    cb('err', 'b');   // 有一个错误
+  }, 200)
+}
+
+parallel([
+  this.fun1,
+  this.fun2,
+  this.fun3,
+], (err, result) => {
+  if(err) {
+    console.log(err);
+    // return;   // 只要有一个返回失败，直接进行错误提示
+  }
+  console.log(JSON.parse(JSON.stringify(result)));
+})
+
+a
+b
+c
+err
+[null, 'b']   // 三个函数延时（1000，200，300） 抛错时其它函数还在执行 (按顺序在抛错前的函数还未执行完用null占位，后面省略)
+              // 如果不用JSON转换，导致展开时显示完成后的 [a, b, c]
+
+//  ['a', 'b', 'c']   //    （100，200，100）  抛错时其它函数执行完成
+```
+### series(tasks,[callback])
+函数从上到下依次执行，需要等待，相互之间没有数据交互
+```
+fun2(cb) {
+  console.log('b');
+  setTimeout(() => {
+    cb(null, 'b');
+  }, 200)
+}
+
+created() {
+  parallel([
+    this.fun1,
+    this.fun2,
+    this.fun3
+  ], (err, result) => {
+    console.log(result);
+  })
+}
+
+a
+b
+c    // a，b，c按延时时间输出  
+['a', 'b', 'c']
+```  
+如果中途出错，则立即将err和值传到最终的回调函数，后面的函数不再执行。
+```
+fun2(cb) {
+  console.log('b');
+  setTimeout(() => {
+    cb('err', 'b');   // 有一个错误
+  }, 200)
+}
+
+parallel([
+  this.fun1,
+  this.fun2,
+  this.fun3,
+], (err, result) => {
+  if(err) {
+    console.log(err);
+  }
+  console.log(result);
+})
+
+a
+b
+err
+['a', 'b']   // (1000, 200, 300)
+```
+### waterfall(tasks,[callback])
+函数从上到下依次执行，需要等待，前一个函数callback的result为后一个函数的参数(result在前，cb在后)，可用    
+waterfall回调里的result不再是函数resList数组，而是最后一个函数返回的结果
+```
+fun1(cb) {
+  console.log('func1', 'a');
+  setTimeout(() => {
+    cb(null, 'a');
+  }, 500)
+},
+fun2(data, cb) {
+  console.log('func2', 'b', data);
+  setTimeout(() => {
+    cb(null, 'b');
+  }, 200)
+},
+fun3(data, cb) {
+  console.log('func3', 'c', data);
+  setTimeout(() => {
+    cb(null, 'c');
+  }, 300)
+}
+
+waterfall([
+  this.fun1,
+  this.fun2,
+  this.fun3,
+], (err, result) => {
+  if(err) {
+    console.log(err);
+  }
+  console.log('waterfall', result);
+})
+
+func1 a
+func2 b a
+func3 c b
+waterfall c
+```
+如果中途出错，则立即将err和值传到最终的回调函数，后面的函数不再执行。
+```
+fun2(data, cb) {
+  console.log('func2', 'b', data);
+  setTimeout(() => {
+    cb('err', 'b');
+  }, 200)
+}
+
+func1 a
+func2 b a
+err
+waterfall b
+```
+项目中调取接口引用    
+模拟一个需要先调取一个接口的结果为参数再调取一个接口赋值
+```
+methods: {
+  getInfo(cb) {
+    api.get1().then(res => {
+      cb(null, res)
+    }, err => {
+      cb(err)
+    })
+  },
+  getData(params, cb) {
+    api.get2(params).then(res => {
+      this.list = res;
+      cb();
+    }, err => {
+      cb(err)
+    })
+  }
+}
+
+created() {
+  tis.loading = true;
+  waterfall([
+    this.getInfo,
+    this.getData
+  ], (err, result) => {
+    tis.loading = false;
+    if(err) {
+      this.$message.error(err);
+      return;
+    }
+    // 如果成功之后有一些其它操作，也可以放在这里
+  })
+}
+```
 
 # 项目中遇到的一些问题
 ## props传参时，父组件数据改变，子组件未更新
@@ -795,12 +1011,12 @@ handelReset(){
 提交之后   
 ![展示](./toc/images/vue/项目04.png)   
 ```
-// 将progress的id替换为字符串形式，即可
-progress: [
-  { id: '1', name: '按计划进行' },
-  { id: '2', name: '比计划提前' },
-  { id: '3', name: '落后计划' }
-],
+// 判断类型增加字符型（其它绑定数组等用相应类型判断）
+rules: {
+  progress_status: [
+    { required: true, type: 'number', message: "请选择项目进度状态", trigger: "blur" }
+  ],
+}
 ```
 提交之后   
 ![展示](./toc/images/vue/项目05.png)
@@ -950,6 +1166,53 @@ methods: {
   },
 }
 ```
+#### select value绑定对象
+有时候可能需要联动处理，select选择时返回的是绑定的value值，但是想要点击时的对象值，如下  
+![展示联动](./toc/images/vue/项目07.png)   
+
+有一个用户对象，选择某个用户时，联系电话更新为相应用户的电话
+```
+<el-form-item prop="part_a_contacts" label="甲方联系人"> 
+  <!-- value为对象时，必须绑定value-key值 -->
+  <el-select v-model="partAContacts" @change="changeContactA" value-key="contact_name">
+    <el-option v-for="item in contactAList" :key="item.id" :label="item.contact_name" :value="item"></el-option>
+  </el-select>
+</el-form-item>
+<el-form-item prop="part_a_tel" label="甲方联系电话">
+  <el-input v-model="dataForm.part_a_tel" name="part_a_tel"></el-input>
+</el-form-item>
+
+data() {
+  return {
+    dataForm: {
+      part_a_contacts: '',  //联系人
+      part_a_tel: '',  //电话
+    }
+    partAContacts: {},   // 不直接绑定dataform里的数据
+    contactAList: []  // 联系人列表
+  }
+},
+methods: {
+  getList() {
+    // 一般需要调接口获取初始值
+    this.contactAList = [
+      { contact_mobile: "15512341234", contact_name: "张一旦", id: "7mpykzrqm5lq48v3" },
+      { contact_mobile: "17712341234", contact_name: "张二旦", id: "7mpykzrqm5lq48v4" }
+    ]
+    // 如果需要默认选中第一个
+    this.dataForm.part_a_contacts = this.contactAList[0].contact_name;
+    this.dataForm.part_a_tel = this.contactAList[0].contact_mobile;
+  },
+  changeContactA(e) {
+    this.$set(this.dataForm, 'part_a_contacts', e.contact_name);
+    this.$set(this.dataForm, 'part_a_tel', e.contact_mobile);
+  },
+},
+created() {
+  this.getList();
+}
+```
+这种方法可能编辑这种需要赋初始值的需要另作修改。
 #### 封装一个简易版的el远程搜索
 需求：输入的时候进行搜索，可以选择搜索到的值，如果没有搜索到，就用输入的值。   
 如果直接使用el远程搜索，没有搜索到时或者说没有选择搜索到的值时，失去焦点输入内容会是输入前的，不能满足没有搜索到使用输入的值。   
@@ -1076,53 +1339,141 @@ export default {
 }
 </style>
 ```
-#### select value绑定对象
-有时候可能需要联动处理，select选择时返回的是绑定的value值，但是想要点击时的对象值，如下  
-![展示联动](./toc/images/vue/项目07.png)   
-
-有一个用户对象，选择某个用户时，联系电话更新为相应用户的电话
+#### 封装一个搜索姓名组件，可回显
+经常在创建表单时需要搜索选择人物，然后可编辑，这时候就需要回显，如上述远程搜索赋初始值，最好用的还是用拼凑userList。
 ```
-<el-form-item prop="part_a_contacts" label="甲方联系人"> 
-  <!-- value为对象时，必须绑定value-key值 -->
-  <el-select v-model="partAContacts" @change="changeContactA" value-key="contact_name">
-    <el-option v-for="item in contactAList" :key="item.id" :label="item.contact_name" :value="item"></el-option>
+<!-- 如果有回显，拼一个userList传入 -->
+<!-- 可能回显存在检测不到的情况，用$nextTick或者ref可解决 -->
+<template>
+  <el-select
+    v-model="userId"
+    filterable
+    clearable
+    remote
+    :placeholder="placeholder"
+    :multiple="multiple"
+    :style="{ width: width}"
+    :remote-method="remoteMethod"
+    :loading="remoteLoading">
+    <el-option
+      v-for="user in userList"
+      :key="user.user.data.id"
+      :label="user.user.data.name"
+      :value="user.user.data.id">
+      <span style="float: left">{{user.user.data.name }}</span>
+      <span style="float: right;color: #8492a6;font-size: 13px">{{user.user.data.mobile }}</span>
+    </el-option>
   </el-select>
-</el-form-item>
-<el-form-item prop="part_a_tel" label="甲方联系电话">
-  <el-input v-model="dataForm.part_a_tel" name="part_a_tel"></el-input>
-</el-form-item>
+</template>
 
-data() {
-  return {
-    dataForm: {
-      part_a_contacts: '',  //联系人
-      part_a_tel: '',  //电话
+<script>
+import { debounce } from 'lodash'
+import userApi from '@/api/user'
+export default {
+  props: {
+    placeholder: {
+      type: String,
+      default: '请输入'
+    },
+    width: {
+      type: String,
+      default: ''
+    },
+    multiple: {
+      type: Boolean,
+      default: false
+    },
+    pUserId: {   // 父组件传来的需要绑定的id
+      type: String | Array
+    },
+    pUserList: {   // 父组件传来的搜索到的用户列表
+      type: Array,
+      default() {
+        return []
+      }
     }
-    partAContacts: {},   // 不直接绑定dataform里的数据
-    contactAList: []  // 联系人列表
+  },
+  data() {
+    return {
+      userId: this.pUserId,
+      userList: this.pUserList,
+      remoteLoading: false,
+    }
+  },
+  methods: {
+    remoteMethod: debounce(function(keyword) {
+      // 搜索申请人
+      if (!keyword) {
+        this.userList = [];
+        return;
+      }
+      userApi.getUserList({
+        limit: 0,
+        search: keyword
+      }).then(res => {
+        this.userList = res.data.data;
+        this.remoteLoading = false;
+      }, err => {
+        this.$message.error(err.data.message);
+        this.remoteLoading = false;
+      })
+    }, 500)
+  },
+  watch: {
+    userId(val) {
+      // 选择了用户
+      this.$emit('change', val);
+    },
+    pUserId(val) {
+      // 父组件传来的id改变
+      this.userId = val;
+    },
+    pUserList(val) {
+      // 父组件传来的列表改变
+      this.userList = val;
+    }
   }
+}
+</script>
+```
+使用：      
+&emsp;1、仅用于搜索
+```
+<search-param-user :pUserId="searchParams.user_id" width="90%" @change="changeUser"></search-param-user>
+
+changeUser(val) {
+  this.searchParams.user_id = val;
 },
-methods: {
-  getList() {
-    // 一般需要调接口获取初始值
-    this.contactAList = [
-      { contact_mobile: "15512341234", contact_name: "张一旦", id: "7mpykzrqm5lq48v3" },
-      { contact_mobile: "17712341234", contact_name: "张二旦", id: "7mpykzrqm5lq48v4" }
+```
+&emsp;2、回显
+```
+<search-param-user ref="searchUser" :pUserId="searchParams.user_id" :pUserList="userList" width="90%" @change="changeUser"></search-param-user>
+
+changeUser(val) {
+  this.searchParams.user_id = val;
+},
+getInfo() {
+  api.get().then(res => {
+
+    // 普通使用
+    this.userList = [
+      { id: res.id, name: res.name, ··· }
     ]
-    // 如果需要默认选中第一个
-    this.dataForm.part_a_contacts = this.contactAList[0].contact_name;
-    this.dataForm.part_a_tel = this.contactAList[0].contact_mobile;
-  },
-  changeContactA(e) {
-    this.$set(this.dataForm, 'part_a_contacts', e.contact_name);
-    this.$set(this.dataForm, 'part_a_tel', e.contact_mobile);
-  },
-},
-created() {
-  this.getList();
+
+    // 回显不显示解决方法1 
+    this.$nextTick(() => {
+      this.userList = [
+        { id: res.id, name: res.name, ··· }
+      ]
+    })
+
+    // 回显不显示解决方法2
+    this.$refs.searchUser.userList = [
+      { id: res.id, name: res.name, ··· }
+    ]
+  })
 }
 ```
-这种方法可能编辑这种需要赋初始值的需要另作修改。
 ### others
 #### el-dialog封装为子组件时，弹窗关闭
 例如列表有编辑功能，将dialog封装为子组件时，由于显隐值通过props传参，关闭dialog相当于直接修改props值，会报错。
