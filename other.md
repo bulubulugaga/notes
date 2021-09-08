@@ -58,6 +58,7 @@ LF = Line Feed，换行符号（ \n, 十六进制 ascii 码为 0x0A，十进制 
 
 ## js
 <a href="https://zh.javascript.info/" target="_blank">现代js教程</a><br />
+<a href="https://juejin.cn/post/7002248038529892383" target="_blank">实现js原生方法</a><br />
 <a href="https://www.jianshu.com/p/2975c25e4d71" target="_blank">函数柯里化</a><br />
 <a href="https://www.cnblogs.com/dhui/p/12982452.html" target="_blank">构造函数、原型和原型链</a><br />
 <a href="https://zhuanlan.zhihu.com/p/88592583" target="_blank">自有属性、继承属性、枚举属性、不可枚举属性</a><br />
