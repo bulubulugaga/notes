@@ -1484,7 +1484,14 @@ methods: {
     this.$emit(&quot;update:isShow&quot;,!this.isShow);
   }
 }
-</code></pre>
+</code></pre><h1 id="vue2-x-">vue2.x原理部分</h1>
+<h2 id="-">工作机制</h2>
+<p><strong>1、初始化</strong><br>在 new Vue() 之后，Vue会调用进行初始化，会初始化生命周期、事件、props、methods、data、computed 与 watch 等，其中最重要的是通过 Object.defineProperty 设置 setter 和 getter ，用来实现<strong>响应式</strong>和<strong>依赖收集</strong>。   </p>
+<p>初始化后调用$mount挂载组件</p>
+<h2 id="-">响应式原理</h2>
+<h2 id="-">依赖收集与追踪</h2>
+<h2 id="-compile">编译compile</h2>
+
           	</article>
         </div>
 		</div>

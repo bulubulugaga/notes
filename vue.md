@@ -1529,3 +1529,14 @@ methods: {
   }
 }
 ```
+
+# vue2.x原理部分
+根据学习开课吧-杨老师的视频整理相关笔记。
+## 工作机制   
+**1、初始化**   
+在 new Vue() 之后，Vue会调用进行初始化，会初始化生命周期、事件、props、methods、data、computed 与 watch 等，其中最重要的是通过 Object.defineProperty 设置 setter 和 getter ，用来实现**响应式**和**依赖收集**。   
+
+初始化后调用$mount挂载组件
+## 响应式原理
+## 依赖收集与追踪
+## 编译compile
