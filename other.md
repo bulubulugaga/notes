@@ -71,6 +71,7 @@ LF = Line Feed，换行符号（ \n, 十六进制 ascii 码为 0x0A，十进制 
 ## vue
 <a href="https://juejin.cn/post/6981031288803164173" target="_blank">vue后台管理权限校验与动态路由</a><br />
 <a href="https://juejin.cn/post/6906028995133833230#heading-8" target="_blank">vue实用自定义指令</a><br />
+<a href="https://panjiachen.github.io/vue-element-admin-site/zh/guide/" target="_blank">vue + elementui后台</a><br />
 
 ## 面试
 ### 系统

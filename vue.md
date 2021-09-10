@@ -1532,11 +1532,37 @@ methods: {
 
 # vue2.x原理部分
 根据学习开课吧-杨老师的视频整理相关笔记。
-## 工作机制   
-**1、初始化**   
-在 new Vue() 之后，Vue会调用进行初始化，会初始化生命周期、事件、props、methods、data、computed 与 watch 等，其中最重要的是通过 Object.defineProperty 设置 setter 和 getter ，用来实现**响应式**和**依赖收集**。   
+## 工作机制  
+![原理图片演示](./toc/images/vue/2-原理部分01.png)        
 
-初始化后调用$mount挂载组件
+**1、初始化**   
+在 new Vue() 之后，Vue会调用init进行初始化，会初始化生命周期、事件、props、methods、data、computed 与 watch 等，其中最重要的是通过 Object.defineProperty 设置 setter 和 getter ，用来实现**响应式**和**依赖收集**。   
+
+初始化后调用$mount挂载组件，在main.js中   
+
+**2、编译**   
+编译模块快分为三个阶段   
+1 parse: 使用正则解析template中的vue的指令 ( v-xxx ) 变量等等形成抽象语法树AST。   
+2 optimize: 标记一些静态节点，用作后面的性能优化，在diff的时候直接忽略。   
+3 generate: 把一部分AST转化为渲染函数 render()。   
+
+**3、响应式**   
+响应式原理为数据劫持，通过Object.definedProperty()定义对象getter和setter，设置通知机制，当编译生成的渲染函数被实际渲染的时候会触发getter进行依赖收集，在数据变化的时候，触发setter进行更新。   
+
+**4、虚拟DOM**   
+用js对象描述dom结构，数据修改的时候，先修改虚拟dom的数据，然后做diff，尽量减少对真实DOM的操作，进而提高效率。   
+
+**5、更新视图**    
+数据修改触发setter，然后监听器会通知进行修改，通过patch对比两个虚拟dom，得到修改的地方，更新dom。
+
+**注意：**    
+1、 mount生命周期函数就是在虚拟dom渲染完成后执行的    
+2、 上边的watcher和组件中写的watch不相同，那是小的独立的watch，和渲染watcher不同，每个组件只存在一个上边的渲染watcher     
+3、 Created只是有组件中的数据还没有生成虚拟dom，所以在页面中初始化相关的数据最好放在created中，那样就不会触发两个mounted     
+4、 Vue2中的响应式的原理是Object.defineProperty,通过get和set来触发的获取数据和重新设置数据。Vue3中使用的更底层的proxy，性能更好      
+   
 ## 响应式原理
+简化版本   
+![原理图片演示](./toc/images/vue/2-原理部分02.png)
 ## 依赖收集与追踪
 ## 编译compile
