@@ -1563,6 +1563,95 @@ methods: {
    
 ## 响应式原理
 简化版本   
-![原理图片演示](./toc/images/vue/2-原理部分02.png)
+![原理图片演示](./toc/images/vue/2-原理部分02.png)    
+
+**Object.defineProperty**
+```
+<div id="app">
+  <p id="name"></p>
+</div>
+
+<script>
+  let obj = {};
+  Object.defineProperty(obj, 'name', {
+    get() {
+      // 调用时
+      console.log(1);
+      return document.querySelector('#name').innerHTML;
+    },
+    set(val) {
+      // 给name赋值时
+      document.querySelector('#name').innerHTML = val;
+    } 
+  })
+
+  obj.name = 'Jerry';
+  console.log(obj.name);
+</script>
+```
+页面渲染 p 标签里包含 Jerry，由于 log 里调用了 obj.name，会执行 get，控制台打印 1。    
+
+**实现简单的vue响应功能**   
+> kvue.js    
+
+```
+// 使用：new KVue({ data: { ··· } })
+
+class KVue {
+  constructor(options) {
+    this.$options = options;
+
+    // 数据响应化
+    this.$data = options.data;
+    this.observe(this.$data);
+  }
+
+  observe(value) {
+    if(!value || typeof value !== 'object') {
+      return;
+    }
+    // 遍历对象
+    Object.keys(value).forEach(key => {
+      this.defineReactive(value, key, value[key]);
+    })
+  }
+
+  // 数据响应化
+  defineReactive(obj, key, val) {
+
+    // 递归解决数据嵌套问题（data中含有对象）
+    this.observe(val);
+
+    Object.defineProperty(obj, key, {
+      get() {
+        return val;
+      },
+      set(newVal) {
+        if(newVal === val) return;
+        val = newVal;
+        console.log(`${key}属性更新了，值为${val}`);
+      }
+    })
+  }
+}
+```
+> index.html    
+
+```
+<script src="./kvue.js"></script>
+<script>
+  const app = new KVue({
+    data: {
+      test: 'I am test',
+      foo: {
+        bar: 'bar'
+      }
+    }
+  })
+  app.$data.test = 'hello, xiaohui~';
+  app.$data.foo.bar = 'oh my bar';
+```
+打印：test属性更新了，值为hello, xiaohui~      
+&emsp;&emsp;&emsp;bar属性更新了，值为oh my bar~      
 ## 依赖收集与追踪
 ## 编译compile
