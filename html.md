@@ -408,6 +408,58 @@ HTML中的大多数元素都是不可置换元素，例如 label 标签，p 标�
 
 更多查看: <a href="https://developer.mozilla.org/zh-CN/docs/Web/Web_Components/Using_shadow_DOM" target="_blank">MDN·shadow DOM</a>
 
+# iframe
+当一个网页页面中需要嵌套另一个网页的页面时，通常使用iframe
+
+## 子页面中含有视频信息
+一定要加上 allow="microphone;camera;midi;encrypted-media;" 属性，否则视频不显示
+```
+<iframe 
+  id="iframe"
+  src="http://localhost:8081/" 
+  frameborder="0" 
+  scrolling="no"
+  width="100%" 
+  height="450px" 
+  allow="microphone;camera;midi;encrypted-media;"
+></iframe>
+```
+## 父子页面传参
+**1、父传子**
+```
+// 父页面
+this.params = {
+  api: '11111',
+  abc: 'cccc'
+}
+document.querySelector('#iframe').contentWindow.postMessage(this.params, '*');
+
+document.querySelector('#iframe').contentWindow.postMessage({close: true}, '*');
+```
+```
+// 子页面
+window.addEventListener('message', e => {
+  if(e.data.api) {
+    // 第一个传参操作
+  }
+  if(e.data.close) {
+    //  第二个传参操作
+  }
+}, false);
+```
+**2、子传父**
+```
+// 子页面
+parent.postMessage({id: 1111, msg: 'aaaa'}, '*');
+```
+```
+// 父页面
+window.addEventListener('message', e => {
+  if(e.data.id) {
+    // ···
+  }
+}, false);
+```
 # 题库
 ## 问题
 ### 页面导入样式时，使用link和@import有什么区别   

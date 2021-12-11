@@ -415,7 +415,48 @@ oDiv.dataset.id = 333;
 &lt;/body&gt;
 </code></pre><p><img src="./toc/images/html/web-components01.png" alt="演示"></p>
 <p>更多查看: <a href="https://developer.mozilla.org/zh-CN/docs/Web/Web_Components/Using_shadow_DOM" target="_blank">MDN·shadow DOM</a></p>
-<h1 id="-">题库</h1>
+<h1 id="iframe">iframe</h1>
+<p>当一个网页页面中需要嵌套另一个网页的页面时，通常使用iframe</p>
+<h2 id="-">子页面中含有视频信息</h2>
+<p>一定要加上 allow=&quot;microphone;camera;midi;encrypted-media;&quot; 属性，否则视频不显示</p>
+<pre><code>&lt;iframe 
+  id=&quot;iframe&quot;
+  src=&quot;http://localhost:8081/&quot; 
+  frameborder=&quot;0&quot; 
+  scrolling=&quot;no&quot;
+  width=&quot;100%&quot; 
+  height=&quot;450px&quot; 
+  allow=&quot;microphone;camera;midi;encrypted-media;&quot;
+&gt;&lt;/iframe&gt;
+</code></pre><h2 id="-">父子页面传参</h2>
+<p><strong>1、父传子</strong></p>
+<pre><code>// 父页面
+this.params = {
+  api: &#39;11111&#39;,
+  abc: &#39;cccc&#39;
+}
+document.querySelector(&#39;#iframe&#39;).contentWindow.postMessage(this.params, &#39;*&#39;);
+
+document.querySelector(&#39;#iframe&#39;).contentWindow.postMessage({close: true}, &#39;*&#39;);
+</code></pre><pre><code>// 子页面
+window.addEventListener(&#39;message&#39;, e =&gt; {
+  if(e.data.api) {
+    // 第一个传参操作
+  }
+  if(e.data.close) {
+    //  第二个传参操作
+  }
+}, false);
+</code></pre><p><strong>2、子传父</strong></p>
+<pre><code>// 子页面
+parent.postMessage({id: 1111, msg: &#39;aaaa&#39;}, &#39;*&#39;);
+</code></pre><pre><code>// 父页面
+window.addEventListener(&#39;message&#39;, e =&gt; {
+  if(e.data.id) {
+    // ···
+  }
+}, false);
+</code></pre><h1 id="-">题库</h1>
 <h2 id="-">问题</h2>
 <h3 id="-link-import-">页面导入样式时，使用link和@import有什么区别</h3>
 <ol>

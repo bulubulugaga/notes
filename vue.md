@@ -260,6 +260,47 @@ created() {
   })
 }
 ```
+## vue-pdf
+主要是pdf预览放大缩小，看了一个博主的介绍，觉得很不戳，下满整合了部分代码         
+<a href="https://blog.csdn.net/weixin_43837268/article/details/103746743" target="_blank">https://blog.csdn.net/weixin_43837268/article/details/103746743</a>
+
+```
+<template>
+  <div class="home">
+    {{ parseInt(this.scale) +"%" }}
+    <button @click="scaleD">放大</button> 
+    <button @click="scaleX">缩小</button>
+
+    <pdf ref="pdf" :src="url"></pdf>
+  </div>
+</template>
+
+<script>
+import pdf from 'vue-pdf'
+export default {
+  components:{
+      pdf
+  },
+  data(){
+      return {
+          url: './JavaScript设计模式与开发实践.pdf',   // 本低测试时将pdf放入public下，后面可替换为api路径
+          scale: 100,
+          idx: -1
+      }
+  },
+  methods: {
+    scaleD() {
+      this.scale += 10;
+      this.$refs.pdf.$el.style.width = parseInt(this.scale) +"%";
+    },
+    scaleD() {
+      this.scale -= 10;
+      this.$refs.pdf.$el.style.width = parseInt(this.scale) +"%";
+    }
+  }
+};
+</script>
+```
 
 # 项目中遇到的一些问题
 ## props传参时，父组件数据改变，子组件未更新
@@ -939,6 +980,29 @@ computed: {
   },
 }
 ```
+**推荐**使用过滤器
+```
+<el-table-column label="项目状态" align="center" prop="status">
+  <template slot-scope="{ row }">
+    <el-tag :type="{{ row.status | filterStatus }}">{{ row.status | filterStatusText }}</el-tag>
+  </template>
+</el-table-column>
+
+filters: {
+  filterStatus(val) {
+    switch(val) {
+      case 1: return 'success';
+      ····
+    }
+  },
+  filterStatusText(val) {
+    switch(val) {
+      case 1: return '通过';
+      ····
+    }
+  }
+}
+```
 #### 有排序时重置搜索
 表格列表有选项，有排序，重置清空所有选项和排序，主要是针对1.4版本，后续版本有重置方法可以调用。    
 ![示例图片](./toc/images/vue/项目08.png)
@@ -963,6 +1027,120 @@ handelReset(){
   } 
 }
 ```   
+
+#### 某一行高亮显示
+**1、row-class-name属性：为行设置className（按钮点击设置行高亮）**   
+```
+<el-table border :data="process" :row-class-name="tableRowClassName">
+  <el-table-column type="index" align="center" label="编号" width="80"></el-table-column>
+  <el-table-column align="center" label="询价单位/个人" prop="company"></el-table-column>
+  <el-table-column align="center" label="协作费用" prop="money"></el-table-column>
+  <el-table-column align="center" label="操作" width="80">
+    <template slot-scope="{ $index }">
+      <el-button type="text" @click="handleRow($index)">选择</el-button>
+    </template>
+  </el-table-column>
+</el-table>
+
+process: [
+  { id: 11, company: '11', money: 11, is_selected: false},
+  { id: 22, company: '22', money: 22, is_selected: false},
+  { id: 33, company: '33', money: 33, is_selected: false}
+]
+
+tableRowClassName (row) {
+  // 高亮(通过 is_selected 判断是否返回行class设置)
+  if(row.is_selected) {
+    return 'select-row';
+  }
+},
+handleRow(index) {
+  // 选择某行询价
+  this.process.forEach(item => {
+    item.is_selected = false;
+  })
+  this.process[index].is_selected = true;
+}
+
+/deep/ .el-table {
+  .select-row td {
+    background: #EEF1F6 !important;
+    ····
+  }
+}
+```
+**2、row-class-name属性（单选选择设置行高亮）**  
+```
+<el-table border :data="process" :row-class-name="tableRowClassName">
+  <el-table-column type="index" align="center" label="编号" width="80"></el-table-column>
+  <el-table-column align="center" label="询价单位/个人" prop="company"></el-table-column>
+  <el-table-column align="center" label="协作费用" prop="money"></el-table-column>
+  <el-table-column align="center" label="操作" width="80">
+    <template slot-scope="{ $index }">
+      <el-radio v-model="selectedIndex" :label="$index"><span></span></el-radio>  <!-- 空span不可少 -->
+    </template>
+  </el-table-column>
+</el-table>
+
+
+selectedIndex: -1,    // 选中的下标
+process: [
+  { id: 11, company: '11', money: 11, is_selected: false},
+  { id: 22, company: '22', money: 22, is_selected: false},
+  { id: 33, company: '33', money: 33, is_selected: false}
+]
+
+tableRowClassName (row) {
+  // 高亮(通过 is_selected 判断是否返回行class设置)
+  if(row.is_selected) {
+    return 'select-row';
+  }
+}
+
+/deep/ .el-table {
+  .select-row td {
+    background: #EEF1F6 !important;
+    ····
+  }
+}
+```
+**上面两种方式回显**   
+返回的数据类型与上述一致，也需要循环找出对 selectedIndex 赋值，不一致则需要循环对 process 内的 is_selected 赋值。   
+
+**3、highlight-current-row属性（是否要高亮当前行）** 
+```
+<el-table ref="singleTable" class="select-project-table" border highlight-current-row :data="projectList" @current-change="handleCurrentChange">
+  <el-table-column type="index" align="center" label="编号" width="80"></el-table-column>
+  <el-table-column align="center" label="询价单位/个人" prop="company"></el-table-column>
+  <el-table-column align="center" label="协作费用" prop="money"></el-table-column>
+  <el-table-column align="center" label="操作" width="80">
+    <template slot-scope="{ $index }">
+      <el-radio v-model="selectProjectId" :label="scope.row.id"><span></span></el-radio>
+    </template>
+  </el-table-column>
+</el-table>
+
+selectProjectId: -1,
+projectList: [
+  { id: 11, company: '11', money: 11},
+  { id: 22, company: '22', money: 22},
+  { id: 33, company: '33', money: 33}
+]
+
+handleCurrentChange (row) {
+  // 选择行
+  if(row) {
+    // 防止重置数据时row被置为null
+    this.selectProject = row;
+    this.selectProjectId = row.id;
+  }
+}
+
+/deep/ .select-project-table .current-row {
+  color: #ff4949;
+}
+```
+
 
 ### el-form
 #### rules判断select value为数值检测失效
@@ -1528,6 +1706,101 @@ methods: {
     this.$emit("update:isShow",!this.isShow);
   }
 }
+```
+#### el-dialog自定义拖拽
+**1、新建src/utils/dialog.js**
+```
+import Vue from 'vue'
+// v-dialogDrag: 弹窗拖拽属性
+Vue.directive('dialogDrag', {
+  bind(el, binding, vnode, oldVnode) {
+    const dialogHeaderEl = el.querySelector('.el-dialog__header')
+    const dragDom = el.querySelector('.el-dialog')
+    dialogHeaderEl.style.cssText += ';cursor:grab;'   // 这里修改拖拽鼠标形状
+    dragDom.style.cssText += `;top:${(binding.value && binding.value.height) || '15%'};`   // 默认初始高度15%
+
+    // 获取原有属性 ie dom元素.currentStyle 火狐谷歌 window.getComputedStyle(dom元素, null);
+    const sty = (function () {
+      if (document.body.currentStyle) {
+        // 在ie下兼容写法
+        return (dom, attr) => dom.currentStyle[attr]
+      } else {
+        return (dom, attr) => getComputedStyle(dom, false)[attr]
+      }
+    })()
+
+    dialogHeaderEl.onmousedown = (e) => {
+      // 鼠标按下，计算当前元素距离可视区的距离
+      const disX = e.clientX - dialogHeaderEl.offsetLeft
+      const disY = e.clientY - dialogHeaderEl.offsetTop
+
+      const screenWidth = document.body.clientWidth // body当前宽度
+      const screenHeight = document.documentElement.clientHeight // 可见区域高度(应为body高度，可某些环境下无法获取)
+
+      const dragDomWidth = dragDom.offsetWidth // 对话框宽度
+      const dragDomheight = dragDom.offsetHeight // 对话框高度
+
+      const minDragDomLeft = dragDom.offsetLeft
+      const maxDragDomLeft = screenWidth - dragDom.offsetLeft - dragDomWidth
+
+      const minDragDomTop = dragDom.offsetTop
+      const maxDragDomTop = screenHeight - dragDom.offsetTop - dragDomheight
+
+      // 获取到的值带px 正则匹配替换
+      let styL = sty(dragDom, 'left')
+      // 为兼容ie　
+      if (styL === 'auto') styL = '0px'
+      let styT = sty(dragDom, 'top')
+
+      // console.log(styL)
+      // 注意在ie中 第一次获取到的值为组件自带50% 移动之后赋值为px
+      if (styL.includes('%')) {
+        styL = +document.body.clientWidth * (+styL.replace(/%/g, '') / 100)
+        styT = +document.body.clientHeight * (+styT.replace(/%/g, '') / 100)
+      } else {
+        styL = +styL.replace(/px/g, '')
+        styT = +styT.replace(/px/g, '')
+      };
+
+      document.onmousemove = function (e) {
+        // 通过事件委托，计算移动的距离
+        let left = e.clientX - disX
+        let top = e.clientY - disY
+        // 边界处理(全部使用为只能在可视区内拖拽)
+        // if (-(left) > minDragDomLeft) {
+        //   left = -(minDragDomLeft)
+        // } else if (left > maxDragDomLeft) {
+        //   left = maxDragDomLeft
+        // }
+
+        if (-(top) > minDragDomTop) {
+          top = -(minDragDomTop)
+        } 
+        // else if (top > maxDragDomTop) {
+        //   top = maxDragDomTop
+        // }
+
+        // 移动当前元素
+        dragDom.style.cssText += `;left:${left + styL}px;top:${top + styT}px;`
+      }
+
+      document.onmouseup = function (e) {
+        document.onmousemove = null
+        document.onmouseup = null
+      }
+      return false
+    }
+  }
+})
+```
+**2、mian.js中进入**
+```
+import './utils/dialog.js'
+```
+**3、el-dialog中使用**
+```
+<el-dialog v-dialogDrag><el-dialog>
+<el-dialog v-dialogDrag="{ height: '10%' }"><el-dialog>
 ```
 
 # vue2.x原理部分

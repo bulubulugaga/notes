@@ -510,6 +510,7 @@ create(Person,'seven')
 [].shift.call(arguments)：首先shift函数获得参数数组的第一项，并且通过call函数，改变原来shift函数的指向，使其指向arguments，并对数组的第一项进行复制。而后返回一个数组。至此完成了arguments类数组转化为数组的目的。   
 
 参考文章：[对JS中new操作符的一些理解](https://blog.csdn.net/weixin_44015821/article/details/105783172)
+
 # 函数
 ## arguments
 是一个对应于传递给函数的参数的类数组**对象**。    
@@ -1414,6 +1415,35 @@ bar(); // [2, 2]
 ```
 参考文章：[详细介绍JS中“暂时性死区”的概念](https://www.gxlcms.com/JavaScript-253414.html)
 
+
+# 正则
+## 用到的例子
+###  decimal(val, intLength, fLength)
+```
+/**
+  * 数据过滤，保持 length - 2 位整数，两位小数
+  * @param { String } val 需要过滤的数值 
+  * @param { Number } intLength 整数位数 
+  * @param { Number } fLength 整数位数 
+  * @returns { String } 过滤后的值
+*/
+decimal: function(val = '0', intLength = 10, fLength = 2) {
+  val = val.replace(/^0*(0\.|[1-9])/, "$1");
+  val = val.replace(/[^\d.]/g, "");     // 清除非数字和0
+  val = val.replace(/^\./g, "");      // 第一个字符不能为.
+  val = val.replace(/\.{1,}/g, ".");     // 只保留第一个. 清除多余的
+  val = val
+    .replace(".", "$#$")
+    .replace(/\./g, "")
+    .replace("$#$", ".");
+  // val = val.replace(/^(\-)*(\d*)\.(\d\d).*$/, "$1$2.$3");    // 两位小数
+  val = val.indexOf(".") > 0
+    ? val.split(".")[0].substring(0, intLength) + "." + val.split(".")[1].substring(0, fLength)
+    : val.substring(0, intLength);
+  return val;
+}
+```
+
 # DOM
 ## attribute和property
 ### 区别
@@ -1662,6 +1692,746 @@ yield
 var public = 1500;      // 报错
 ```
 
+## pc端获取地理位置信息
+### navigator.geolocation.getCurrentPosition
+```
+if(navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(position => {
+    console.log(position);
+  }, err =>  {
+    console.log(err.message);
+  }) 
+}
+else {
+  alert('您的浏览器不支持使用HTML5获取位置信息')
+}
+```
+使用html5自带的api获取信息，但是试过之后发现在浏览器中获取不到，错误信息 ==> Network location provider at 'https://www.googleapis.com/' : ERR_CONNECTION_RESET. 似乎是因为信息由谷歌提供，国内访问被墙，需要挂vpn。且根据查看的一些信息和我们使用的经纬度信息不一致，需要转换。
+### 使用百度地图api中定位
+```
+// 先引入
+// 第一种：js引入 <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=密钥"></script>
+// 第二种：npm 引入 npm install vue-baidu-map -s
+
+const geolocation = new BMap.Geolocation();
+const gc = new BMap.Geocoder();
+const _this = this;
+geolocation.getCurrentPosition(res => {
+  // 获取经纬度
+  gc.getLocation(res.point, info => {
+    // 获取位置信息
+    console.log(res, info);
+  })
+})
+```
+但是在使用之后发现似乎只能获取到市区，加上精准定位和sdk定位也不行。
+### 使用百度地图自己的api
+<a href="https://map.baidu.com/?qt=ipLocation&t=1636537181641" target="_blank">https://map.baidu.com/?qt=ipLocation&t=1636537181641</a>   
+可以当接口调用，注意：会跨域。t是当前时间戳，在vue中使用同样需要配置
+```
+let time = new Date().getTime();
+$.ajax({
+  type: "GET",
+  url: "https://map.baidu.com/?qt=ipLocation&t=" + time,
+  dataType: "jsonp",   // 解决跨域
+  success: function (result) {
+      console.log(result);
+  },
+});
+```
+偶尔还是会存在定位不精准，但与百度地图位置完全一致。  
+
+##  金额转大写
+```
+numberFun: function(n = 0) {
+  const fraction = ['角', '分'];
+  const digit = ['零', '壹', '贰', '叁', '肆', '伍', '陆', '柒', '捌', '玖'];
+  const unit = [
+    ['元', '万', '亿'],
+    ['', '拾', '佰', '仟']
+  ];
+  const head = n < 0 ? '欠' : '';   // 负数抬头
+  n = Math.abs(n);
+  let s = '';
+  for (let i = 0; i < fraction.length; i++) {
+    s += (digit[Math.floor(n * 10 * Math.pow(10, i)) % 10] + fraction[i]).replace(/零./, '');
+  }
+  s = s || '整';
+  n = Math.floor(n);
+  for (let i = 0; i < unit[0].length && n > 0; i++) {
+    let p = '';
+    for (var j = 0; j < unit[1].length && n > 0; j++) {
+      p = digit[n % 10] + unit[1][j] + p;
+      n = Math.floor(n / 10);
+    }
+    s = p.replace(/(零.)*零$/, '').replace(/^$/, '零') + unit[0][i] + s;
+  }
+  return head + s
+    .replace(/(零.)*零元/, '元')
+    .replace(/(零.)+/g, '零')
+    .replace(/^整$/, '零元整');
+}
+```
+
+## webRTC
+在做web推流时了解到这个，查了很多资料，在web端几乎无延迟，在这篇文章下初始并了解，代码亲测可用。    
+<a href="https://juejin.cn/post/6884851075887661070" target="_blank">https://juejin.cn/post/6884851075887661070</a>   
+此链接代码整合，在一个页面实现推拉流 
+
+### 普通js
+```
+// index.html   
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo</title>
+    <style>
+        video {
+            width: 320px;
+        }
+    </style>
+</head>
+<body>
+    <video id="localVideo" autoplay playsinline></video>
+    <video id="remoteVideo" autoplay playsinline></video>
+    <div>
+        <button id="startBtn" onclick="startHandle()">打开本地视频</button>
+        <button id="callBtn" onclick="callHandle()">建立连接</button>
+        <button id="hangupBtn" onclick="hangupHandle()">断开连接</button>
+    </div>
+    <!-- 适配各浏览器 API 不统一的脚本 -->
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <script src="./jq.js"></script>   <!-- jquery -->
+    <script src="./webrtc.js"></script>
+</body>
+</html>
+```
+```
+// webrtc.js
+
+// 本地流和远端流
+let localStream;
+let remoteStream;
+
+// 本地和远端连接对象
+let localPeerConnection;
+let remotePeerConnection;
+
+// 本地视频和远端视频
+const localVideo = document.getElementById('localVideo');
+const remoteVideo = document.getElementById('remoteVideo');
+
+// 设置约束
+const mediaStreamConstraints = {
+    video: true
+}
+
+// 设置仅交换视频
+const offerOptions = {
+    offerToReceiveVideo: 1
+}
+
+function startHandle() {
+  startBtn.disabled = true;
+  // 1.获取本地音视频流
+  // 调用 getUserMedia API 获取音视频流
+  navigator.mediaDevices.getUserMedia(mediaStreamConstraints)
+      .then(gotLocalMediaStream)
+      .catch((err) => {
+          console.log('getUserMedia 错误', err);
+      });
+}
+
+function callHandle() {
+  callBtn.disabled = true;
+  hangupBtn.disabled = false;
+
+  // 视频轨道
+  const videoTracks = localStream.getVideoTracks();
+  // 音频轨道
+  const audioTracks = localStream.getAudioTracks();
+  // 判断视频轨道是否有值
+  if (videoTracks.length > 0) {
+      console.log(`使用的设备为: ${videoTracks[0].label}.`);
+  }
+  // 判断音频轨道是否有值
+  if (audioTracks.length > 0) {
+      console.log(`使用的设备为: ${audioTracks[0].label}.`);
+  }
+  const servers = null;
+
+  // 创建 RTCPeerConnection 对象
+  localPeerConnection = new RTCPeerConnection(servers);
+  // 监听返回的 Candidate
+  localPeerConnection.addEventListener('icecandidate', handleConnection);
+  // 监听 ICE 状态变化
+  localPeerConnection.addEventListener('iceconnectionstatechange', handleConnectionChange)
+
+  remotePeerConnection = new RTCPeerConnection(servers);
+  remotePeerConnection.addEventListener('icecandidate', handleConnection);
+  remotePeerConnection.addEventListener('iceconnectionstatechange', handleConnectionChange);
+  remotePeerConnection.addEventListener('track', gotRemoteMediaStream);
+
+  // 将音视频流添加到 RTCPeerConnection 对象中
+  // 注意：新的协议中已经不再推荐使用 addStream 方法来添加媒体流，应使用 addTrack 方法
+  // localPeerConnection.addStream(localStream);
+  // 遍历本地流的所有轨道
+  localStream.getTracks().forEach((track) => {
+      localPeerConnection.addTrack(track, localStream)
+  })
+
+  // 2.交换媒体描述信息
+  localPeerConnection.createOffer(offerOptions)
+  .then(createdOffer).catch((err) => {
+      console.log('createdOffer 错误', err);
+  });
+}
+
+function hangupHandle() {
+  // 关闭连接并设置为空
+  localPeerConnection.close();
+  remotePeerConnection.close();
+  localPeerConnection = null;
+  remotePeerConnection = null;
+  hangupBtn.disabled = true;
+  callBtn.disabled = false;
+}
+
+// getUserMedia 获得流后，将音视频流展示并保存到 localStream
+function gotLocalMediaStream(mediaStream) {
+  // console.log(mediaStream);
+  localVideo.srcObject = mediaStream; 
+  localStream = mediaStream; 
+  callBtn.disabled = false;
+}
+
+function createdOffer(description) {
+  console.log(`本地创建offer返回的sdp:\n${description.sdp}`)
+  // 本地设置描述并将它发送给远端
+  // 将 offer 保存到本地
+  localPeerConnection.setLocalDescription(description) 
+      .then(() => {
+          console.log('local 设置本地描述信息成功');
+      }).catch((err) => {
+          console.log('local 设置本地描述信息错误', err)
+      });
+  // 远端将本地给它的描述设置为远端描述
+  // 远端将 offer 保存
+  remotePeerConnection.setRemoteDescription(description) 
+      .then(() => { 
+          console.log(description);
+          console.log('remote 设置远端描述信息成功');
+      }).catch((err) => {
+          console.log('remote 设置远端描述信息错误', err);
+      });
+  // 远端创建应答 answer
+  remotePeerConnection.createAnswer() 
+      .then(createdAnswer)
+      .catch((err) => {
+          console.log('远端创建应答 answer 错误', err);
+      });
+
+}
+
+function createdAnswer(description) {
+  console.log(`远端应答Answer的sdp:\n${description.sdp}`)
+  // 远端设置本地描述并将它发给本地
+  // 远端保存 answer
+  remotePeerConnection.setLocalDescription(description)
+      .then(() => { 
+          console.log(description);
+          console.log('remote 设置本地描述信息成功');
+      }).catch((err) => {
+          console.log('remote 设置本地描述信息错误', err);
+      });
+  // 本地将远端的应答描述设置为远端描述
+  // 本地保存 answer
+  localPeerConnection.setRemoteDescription(description) 
+      .then(() => { 
+          console.log('local 设置远端描述信息成功');
+      }).catch((err) => {
+          console.log('local 设置远端描述信息错误', err);
+      });
+}
+
+// 3.端与端建立连接
+function handleConnection(event) {
+  // 获取到触发 icecandidate 事件的 RTCPeerConnection 对象 
+  // 获取到具体的Candidate
+  const peerConnection = event.target;
+  const iceCandidate = event.candidate;
+
+  if (iceCandidate) {
+      // 创建 RTCIceCandidate 对象
+      const newIceCandidate = new RTCIceCandidate(iceCandidate);
+      // 得到对端的 RTCPeerConnection
+      const otherPeer = getOtherPeer(peerConnection);
+
+      // 将本地获得的 Candidate 添加到远端的 RTCPeerConnection 对象中
+      // 为了简单，这里并没有通过信令服务器来发送 Candidate，直接通过 addIceCandidate 来达到互换 Candidate 信息的目的
+      otherPeer.addIceCandidate(newIceCandidate)
+          .then(() => {
+              handleConnectionSuccess(peerConnection);
+          }).catch((error) => {
+              handleConnectionFailure(peerConnection, error);
+          });
+  }
+}
+
+// 4.显示远端媒体流
+function gotRemoteMediaStream(event) {
+    console.log(event);
+  if (remoteVideo.srcObject !== event.streams[0]) {
+      remoteVideo.srcObject = event.streams[0];
+      remoteStream = event.streams[0];
+      console.log('remote 开始接受远端流')
+  }
+}
+
+
+function handleConnectionChange(event) {
+  const peerConnection = event.target;
+  console.log('ICE state change event: ', event);
+  console.log(`${getPeerName(peerConnection)} ICE state: ` + `${peerConnection.iceConnectionState}.`);
+}
+
+function handleConnectionSuccess(peerConnection) {
+  console.log(`${getPeerName(peerConnection)} addIceCandidate 成功`);
+}
+
+function handleConnectionFailure(peerConnection, error) {
+  console.log(`${getPeerName(peerConnection)} addIceCandidate 错误:\n`+ `${error.toString()}.`);
+}
+
+function getPeerName(peerConnection) {
+  return (peerConnection === localPeerConnection) ? 'localPeerConnection' : 'remotePeerConnection';
+}
+
+function getOtherPeer(peerConnection) {
+  return (peerConnection === localPeerConnection) ? remotePeerConnection : localPeerConnection;
+}
+
+```
+
+### 修改为vue下    
+```
+<template>
+  <div id="app">
+    
+    <video id="localVideo" autoplay width="320" height="240" style="background: #333;" controls></video>
+    <video id="remoteVideo" autoplay width="320" height="240" style="margin-left: 5px;"></video>    
+
+    <div style="margin-top: 20px;">
+      <el-button type="primary" :disabled="callBtn" @click="startHandle">建立连接</el-button>
+      <el-button type="primary" :disabled="hangupBtn" @click="hangupHandle">断开连接</el-button>
+    </div>
+
+  </div>
+</template>
+
+<script>
+export default {
+  name: "App",
+  data() {
+    return {
+      // 本地流和远端流
+      localStream: "",
+      remoteStream: "",
+
+      // 本地和远端连接对象
+      localPeerConnection: "",
+      remotePeerConnection: "",
+
+      // 本地视频和远端视频
+      localVideo: document.getElementById("localVideo"),
+      remoteVideo: document.getElementById("remoteVideo"),
+
+      // 设置约束
+      mediaStreamConstraints: {
+        video: true,
+        audio: true
+      },
+
+      // 设置仅交换视频
+      offerOptions: {
+        offerToReceiveVideo: 1,
+      },
+
+      callBtn: false,
+      hangupBtn: true,
+    };
+  },
+  methods: {
+    startHandle() {
+      // 1.获取本地音视频流
+      // 调用 getUserMedia API 获取音视频流
+      navigator.mediaDevices.getUserMedia(this.mediaStreamConstraints)
+        .then(mediaStream => {
+          // getUserMedia 获得流后，将音视频流展示并保存到 localStream
+          this.localVideo.srcObject = mediaStream;
+          this.localStream = mediaStream;
+
+          this.callHandle();
+        })
+        .catch(err => {
+          this.$message.error(`摄像头打开失败：${err}`);
+        });
+    },
+
+    callHandle() {
+      this.callBtn = true;
+      this.hangupBtn = false;
+
+      // 视频轨道
+      const videoTracks = this.localStream.getVideoTracks();
+      // 音频轨道
+      const audioTracks = this.localStream.getAudioTracks();
+
+      // 判断视频轨道是否有值
+      if (videoTracks.length > 0) {
+        console.log(`使用的设备为: ${videoTracks[0].label}.`);
+      }
+      // 判断音频轨道是否有值
+      if (audioTracks.length > 0) {
+        console.log(`使用的设备为: ${audioTracks[0].label}.`);
+      }
+      
+      // 创建 RTCPeerConnection 对象
+      this.localPeerConnection = new RTCPeerConnection();
+      // 监听返回的 Candidate
+      this.localPeerConnection.addEventListener(
+        "icecandidate",
+        this.handleConnection
+      );
+      // 监听 ICE 状态变化
+      this.localPeerConnection.addEventListener(
+        "iceconnectionstatechange",
+        this.handleConnectionChange
+      );
+
+      this.remotePeerConnection = new RTCPeerConnection();
+      this.remotePeerConnection.addEventListener(
+        "icecandidate",
+        this.handleConnection
+      );
+      this.remotePeerConnection.addEventListener(
+        "iceconnectionstatechange",
+        this.handleConnectionChange
+      );
+      this.remotePeerConnection.addEventListener(
+        "track",
+        this.gotRemoteMediaStream
+      );
+
+      // 将音视频流添加到 RTCPeerConnection 对象中
+      // 注意：新的协议中已经不再推荐使用 addStream 方法来添加媒体流，应使用 addTrack 方法
+      // localPeerConnection.addStream(localStream);
+      // 遍历本地流的所有轨道
+      this.localStream.getTracks().forEach((track) => {
+        this.localPeerConnection.addTrack(track, this.localStream);
+      });
+
+      // 2.交换媒体描述信息
+      this.localPeerConnection
+        .createOffer(this.offerOptions)
+        .then(this.createdOffer)
+        .catch((err) => {
+          this.$message.error(`createdOffer 错误：${err}`);
+        });
+    },
+
+    hangupHandle() {
+      // 关闭连接并设置为空
+      this.localPeerConnection.close();
+      this.remotePeerConnection.close();
+      this.localPeerConnection = null;
+      this.remotePeerConnection = null;
+      this.hangupBtn = true;
+      this.callBtn = false;
+    },
+
+    createdOffer(description) {
+      console.log(`本地创建offer返回的sdp:\n${description.sdp}`);
+      // 本地设置描述并将它发送给远端
+      // 将 offer 保存到本地
+      this.localPeerConnection
+        .setLocalDescription(description)
+        .then(() => {
+          console.log("local 设置本地描述信息成功");
+        })
+        .catch((err) => {
+          console.log("local 设置本地描述信息错误", err);
+        });
+      // 远端将本地给它的描述设置为远端描述
+      // 远端将 offer 保存
+      this.remotePeerConnection
+        .setRemoteDescription(description)
+        .then(() => {
+          console.log("remote 设置远端描述信息成功");
+        })
+        .catch((err) => {
+          console.log("remote 设置远端描述信息错误", err);
+        });
+      // 远端创建应答 answer
+      this.remotePeerConnection
+        .createAnswer()
+        .then(this.createdAnswer)
+        .catch((err) => {
+          console.log("远端创建应答 answer 错误", err);
+        });
+    },
+
+    createdAnswer(description) {
+      console.log(`远端应答Answer的sdp:\n${description.sdp}`);
+      // 远端设置本地描述并将它发给本地
+      // 远端保存 answer
+      this.remotePeerConnection
+        .setLocalDescription(description)
+        .then(() => {
+          console.log("remote 设置本地描述信息成功");
+        })
+        .catch((err) => {
+          console.log("remote 设置本地描述信息错误", err);
+        });
+      // 本地将远端的应答描述设置为远端描述
+      // 本地保存 answer
+      this.localPeerConnection
+        .setRemoteDescription(description)
+        .then(() => {
+          console.log("local 设置远端描述信息成功");
+        })
+        .catch((err) => {
+          console.log("local 设置远端描述信息错误", err);
+        });
+    },
+
+
+    handleConnection(event) {
+      // 3.端与端建立连接
+      // 获取到触发 icecandidate 事件的 RTCPeerConnection 对象
+      // 获取到具体的Candidate
+      const peerConnection = event.target;
+      const iceCandidate = event.candidate;
+
+      if (iceCandidate) {
+        // 创建 RTCIceCandidate 对象
+        const newIceCandidate = new RTCIceCandidate(iceCandidate);
+        // 得到对端的 RTCPeerConnection
+        const otherPeer = this.getOtherPeer(peerConnection);
+
+        // 将本地获得的 Candidate 添加到远端的 RTCPeerConnection 对象中
+        // 为了简单，这里并没有通过信令服务器来发送 Candidate，直接通过 addIceCandidate 来达到互换 Candidate 信息的目的
+        otherPeer
+          .addIceCandidate(newIceCandidate)
+          .then(() => {
+            this.handleConnectionSuccess(peerConnection);
+          })
+          .catch((error) => {
+            this.handleConnectionFailure(peerConnection, error);
+          });
+      }
+    },
+
+
+    gotRemoteMediaStream(event) {
+      // 4.显示远端媒体流
+      if (this.remoteVideo.srcObject !== event.streams[0]) {
+        this.remoteVideo.srcObject = event.streams[0];
+        this.remoteStream = event.streams[0];
+        console.log("remote 开始接受远端流");
+      }
+    },
+
+    handleConnectionChange(event) {
+      const peerConnection = event.target;
+      console.log("ICE state change event: ", event);
+      console.log(
+        `${this.getPeerName(peerConnection)} ICE state: ` +
+          `${peerConnection.iceConnectionState}.`
+      );
+    },
+    handleConnectionSuccess(peerConnection) {
+      console.log(`${this.getPeerName(peerConnection)} addIceCandidate 成功`);
+    },
+    handleConnectionFailure(peerConnection, error) {
+      console.log(
+        `${this.getPeerName(peerConnection)} addIceCandidate 错误:\n` +
+          `${error.toString()}.`
+      );
+    },
+    getPeerName(peerConnection) {
+      return peerConnection === this.localPeerConnection
+        ? "localPeerConnection"
+        : "remotePeerConnection";
+    },
+    getOtherPeer(peerConnection) {
+      return peerConnection === this.localPeerConnection
+        ? this.remotePeerConnection
+        : this.localPeerConnection;
+    },
+  },
+  mounted() {
+    this.localVideo = document.getElementById("localVideo");
+    this.remoteVideo = document.getElementById("remoteVideo");
+
+    this.localVideo.addEventListener('pause', this.hangupHandle);
+    this.localVideo.addEventListener('play', this.callHandle);
+  }
+};
+</script>
+```
+
+### vue中和后端配合实现推流
+在项目实践中主要针对推流，推流之后调用后端接口，实现应答。    
+![流程简析](./toc/images/js/其它01.png)    
+
+在vue中用推流
+```
+// 因为大多数方法都返回 promise ，封装一个async awite 方法    awaitWrap.js
+export default (promise) => {
+  return promise
+    .then(data =>[data, null])
+    .catch(err =>[null, err])
+}
+
+
+// 推流页
+<template>
+  <div>
+    
+    <video id="localVideo" autoplay width="320" height="240" style="background: #333;"></video>
+
+    <div style="margin-top: 20px;">
+      <el-button type="primary" :disabled="callBtn" @click="startHandle">建立连接</el-button>
+      <el-button type="primary" :disabled="hangupBtn" @click="hangupHandle">断开连接</el-button>
+    </div>
+
+  </div>
+</template>
+
+<script>
+import request from "@/api/request";
+import awaitWrap from '@/utils/awaitWrap';
+export default {
+  name: "App",
+  data() {
+    return {
+      // 本地流
+      localStream: "",
+
+      // 本地连接对象
+      localPeerConnection: "",
+
+      // 本地视频
+      localVideo: document.getElementById("localVideo"),
+
+      // 设置约束
+      mediaStreamConstraints: {
+        audio: true,
+        video: {
+            width: {ideal: 320, max: 576}
+        }
+      },
+
+      // 设置交换视频
+      offerOptions: {
+        offerToReceiveVideo: true,
+        offerToReceiveAudio: true
+      },
+      
+      // 按钮状态
+      callBtn: false,
+      hangupBtn: true,
+    };
+  },
+  methods: {
+    async startHandle() {
+      // 1.获取本地音视频流
+      // 调用 getUserMedia API 获取音视频流
+      const [mediaStream, mediaStreamErr] = await awaitWrap(navigator.mediaDevices.getUserMedia(this.mediaStreamConstraints));
+      if(mediaStreamErr) {
+        this.$message.error(`摄像头打开失败：${mediaStreamErr}`);
+        return;
+      }
+      console.log(mediaStream);
+      this.localVideo.srcObject = mediaStream;
+      this.localStream = mediaStream;
+
+      // 2. 建立连接  
+      this.callBtn = true;
+      this.hangupBtn = false;
+
+      // 创建 RTCPeerConnection 对象
+      this.localPeerConnection = new RTCPeerConnection(null);
+
+      // 将音视频流添加到 RTCPeerConnection 对象中
+      // 注意：新的协议中已经不再推荐使用 addStream 方法来添加媒体流，应使用 addTrack 方法
+      // localPeerConnection.addStream(localStream);
+      // 遍历本地流的所有轨道
+      this.localStream.getTracks().forEach(track => {
+        this.localPeerConnection.addTrack(track, this.localStream);
+      });
+
+      // 3.交换媒体描述信息，创建offer，返回description
+      const [description, descriptionErr] = await awaitWrap(this.localPeerConnection.createOffer(this.offerOptions));
+      if(descriptionErr) {
+        this.$message.error(`createdOffer 错误：${descriptionErr}`);
+        return;
+      }
+      console.log(`本地创建offer成功`);
+
+      // 4. 本地设置描述
+      const [localDescription, localDescriptionErr] = await awaitWrap(this.localPeerConnection.setLocalDescription(description));
+      if(localDescriptionErr) {
+        this.$message.error(`local 设置本地描述信息错误：${localDescriptionErr}`);
+        return;
+      }
+      console.log(`local 设置本地描述信息成功：${localDescription}`);
+
+      // 调取接口连接远端，获取远端应答
+      const [anwser, anwserErr] = await awaitWrap(request.post("/rtc/v1/publish/", {
+        clientip: null,
+        sdp: description.sdp,
+        streamurl: "webrtc://192.168.0.149/live/livestream",
+        tid: Number(parseInt(new Date().getTime()*Math.random()*100)).toString(16).substr(0, 7)
+      }));
+      if(anwserErr) {
+        this.$message.error(`远端连接失败：${anwserErr}`);
+        return;
+      }
+
+      // 本地将远端的应答描述设置为远端描述
+      // 本地保存 answer
+      this.localPeerConnection.setRemoteDescription({type: 'answer', sdp: anwser.sdp}).then(() => {
+        console.log("local 设置远端描述信息成功");
+      }).catch(err => {
+        console.log("local 设置远端描述信息错误", err);
+      });
+
+    },
+
+    hangupHandle() {
+      // 关闭连接并设置为空
+      this.localPeerConnection.close();
+      this.localPeerConnection = null;
+      this.localVideo.srcObject = null;
+      this.localStream = null;
+      this.hangupBtn = true;
+      this.callBtn = false;
+    }
+  },
+  mounted() {
+    this.localVideo = document.getElementById("localVideo");
+
+    // this.localVideo.addEventListener('pause', this.hangupHandle);
+    // this.localVideo.addEventListener('play', this.callHandle);
+  }
+};
+</script>
+```
+
 # 项目中的一些问题
 ## 根据数组某个元素循环请求api，按顺序获得相应值
 ![项目图片](./toc/images/js/项目01.png)
@@ -1762,6 +2532,7 @@ handleCurrentChange (val, index) {
   })
 },
 ```
+
 
 # 题库
 ## 小测试
