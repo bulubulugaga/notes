@@ -1090,8 +1090,38 @@ tableRowClassName (row) {
   }
 }
 </code></pre><p><strong>上面两种方式回显</strong><br>返回的数据类型与上述一致，也需要循环找出对 selectedIndex 赋值，不一致则需要循环对 process 内的 is_selected 赋值。   </p>
-<p><strong>3、row-class-name属性（单选选择设置行高亮）</strong> </p>
-<h3 id="el-form">el-form</h3>
+<p><strong>3、highlight-current-row属性（是否要高亮当前行）</strong> </p>
+<pre><code>&lt;el-table ref=&quot;singleTable&quot; class=&quot;select-project-table&quot; border highlight-current-row :data=&quot;projectList&quot; @current-change=&quot;handleCurrentChange&quot;&gt;
+  &lt;el-table-column type=&quot;index&quot; align=&quot;center&quot; label=&quot;编号&quot; width=&quot;80&quot;&gt;&lt;/el-table-column&gt;
+  &lt;el-table-column align=&quot;center&quot; label=&quot;询价单位/个人&quot; prop=&quot;company&quot;&gt;&lt;/el-table-column&gt;
+  &lt;el-table-column align=&quot;center&quot; label=&quot;协作费用&quot; prop=&quot;money&quot;&gt;&lt;/el-table-column&gt;
+  &lt;el-table-column align=&quot;center&quot; label=&quot;操作&quot; width=&quot;80&quot;&gt;
+    &lt;template slot-scope=&quot;{ $index }&quot;&gt;
+      &lt;el-radio v-model=&quot;selectProjectId&quot; :label=&quot;scope.row.id&quot;&gt;&lt;span&gt;&lt;/span&gt;&lt;/el-radio&gt;
+    &lt;/template&gt;
+  &lt;/el-table-column&gt;
+&lt;/el-table&gt;
+
+selectProjectId: -1,
+projectList: [
+  { id: 11, company: &#39;11&#39;, money: 11},
+  { id: 22, company: &#39;22&#39;, money: 22},
+  { id: 33, company: &#39;33&#39;, money: 33}
+]
+
+handleCurrentChange (row) {
+  // 选择行
+  if(row) {
+    // 防止重置数据时row被置为null
+    this.selectProject = row;
+    this.selectProjectId = row.id;
+  }
+}
+
+/deep/ .select-project-table .current-row {
+  color: #ff4949;
+}
+</code></pre><h3 id="el-form">el-form</h3>
 <h4 id="rules-select-value-">rules判断select value为数值检测失效</h4>
 <p>通过rules验证表单规则，el-select =&gt; options绑定的是数值类型时，会监测不到。   </p>
 <pre><code>&lt;template&gt;
@@ -1705,6 +1735,23 @@ Vue.directive(&#39;dialogDrag&#39;, {
 </code></pre><p><strong>3、el-dialog中使用</strong></p>
 <pre><code>&lt;el-dialog v-dialogDrag&gt;&lt;el-dialog&gt;
 &lt;el-dialog v-dialogDrag=&quot;{ height: &#39;10%&#39; }&quot;&gt;&lt;el-dialog&gt;
+</code></pre><h1 id="-">打包调整</h1>
+<h2 id="-log-debugger">打包去除所有的log和debugger</h2>
+<pre><code>// vue.config.js
+module.exports = {
+  publicPath: &#39;./&#39;,
+  configureWebpack: config =&gt; {
+    if (process.env.NODE_ENV === &quot;production&quot;) {
+      config.optimization.minimizer[0].options.terserOptions.compress.warnings = false;
+      config.optimization.minimizer[0].options.terserOptions.compress.drop_console = true;
+      config.optimization.minimizer[0].options.terserOptions.compress.drop_debugger = true;
+      config.optimization.minimizer[0].options.terserOptions.compress.pure_funcs = [&quot;console.log&quot;];
+    }
+  }
+}
+</code></pre><p>如果需要在开发测试版就去除的话不适用，可以暴力修改log方法</p>
+<pre><code>// main.js
+window[&#39;console&#39;][&#39;log&#39;] = () =&gt; {}
 </code></pre><h1 id="vue2-x-">vue2.x原理部分</h1>
 <p>根据学习开课吧-杨老师的视频整理相关笔记。</p>
 <h2 id="-">工作机制</h2>

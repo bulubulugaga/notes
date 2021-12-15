@@ -1803,6 +1803,28 @@ import './utils/dialog.js'
 <el-dialog v-dialogDrag="{ height: '10%' }"><el-dialog>
 ```
 
+# 打包调整
+## 打包去除所有的log和debugger
+```
+// vue.config.js
+module.exports = {
+  publicPath: './',
+  configureWebpack: config => {
+    if (process.env.NODE_ENV === "production") {
+      config.optimization.minimizer[0].options.terserOptions.compress.warnings = false;
+      config.optimization.minimizer[0].options.terserOptions.compress.drop_console = true;
+      config.optimization.minimizer[0].options.terserOptions.compress.drop_debugger = true;
+      config.optimization.minimizer[0].options.terserOptions.compress.pure_funcs = ["console.log"];
+    }
+  }
+}
+```
+如果需要在开发测试版就去除的话不适用，可以暴力修改log方法
+```
+// main.js
+window['console']['log'] = () => {}
+```
+
 # vue2.x原理部分
 根据学习开课吧-杨老师的视频整理相关笔记。
 ## 工作机制  

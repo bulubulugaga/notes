@@ -20,6 +20,9 @@
 > 140.82.112.4 github.com
 4. 本条参照<https://zhuanlan.zhihu.com/p/158938544>
 
+**github--->加速器**   
+<a href="http://www.oniongeeker.com/2021/05/08/git-slow/" target="_blank">http://www.oniongeeker.com/2021/05/08/git-slow/</a>
+
 # 常用快捷键
 
 | 快捷键 | 说明 |
