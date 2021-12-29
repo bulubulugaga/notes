@@ -2533,7 +2533,70 @@ handleCurrentChange (val, index) {
 },
 ```
 
+## 平级数组转化多层父子级
+```
+function delTreeData(treeArr, id, parentId, childrenList) {
+  let cloneData = JSON.parse(JSON .stringify(treeArr));
+  return cloneData.filter(fatherItem => {
+      let warpArr = cloneData.filter(sonItem => fatherItem[id] == sonItem[parentId]);
+      warpArr.length ? fatherItem[childrenList] = warpArr : null;
+      return !fatherItem[parentId];
+  })
+}
 
+console.log(delTreeData([
+  { id: '1', number: '1', parentId: '' },
+  { id: '2', number: '2', parentId: '' },
+  { id: '3', number: '3', parentId: '' },
+  { id: '1-1', number: '1-1', parentId: '1' },
+  { id: '1-1-1', number: '1-1-1', parentId: '1-1' },
+  { id: '3-1', number: '3-1', parentId: '3' },
+  { id: '1-2', number: '1-2', parentId: '1' },
+], 'id', 'parentId', 'children'));
+```
+## 替换对象key值
+**1. 无子级嵌套**
+```
+function replaceKey(arr) {
+  return arr.map(o => {
+    const { id: value, name: label } = o;
+    delete o.id;
+    delete o.name;
+    return { label, value, ...o }
+  })
+}
+const arr = [
+  { id: 1, name: 1, age: 11, height: 1.1 },
+  { id: 2, name: 2, age: 12, height: 1.2 },
+  { id: 3, name: 3, age: 13, height: 1.3 }
+]
+console.log(replaceKey(arr));
+```
+**2. 含子级嵌套**
+```
+function replaceKey(arr) {
+    return arr.map(item => {
+        const subObj = null;
+        Object.keys(item).forEach(key => {
+            if(Object.prototype.toString.call(item[key]) === '[object Array]') {
+                subObj = replaceKey(item[key]);
+            }
+        })
+        const { id: value, name: label } = item;
+        delete item.id;
+        delete item.name;
+        return subObj ? subObj : { label, value, ...item }
+    })
+}
+const arr = [
+    { id: '1', name: '1', age: '11', height: '1.1' },
+    { id: '2', name: '2', age: '12', height: '1.2', children: [
+        { id: '2-2', name: '2-2', age: '12-2', height: '1.2-2' }
+    ]},
+    { id: '3', name: '3', age: '13', height: '1.3' }
+]
+console.log(replaceKey(arr));
+```
 # 题库
 ## 小测试
 ### 简单运算
