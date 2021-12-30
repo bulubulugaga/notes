@@ -2186,6 +2186,135 @@ handleCurrentChange (val, index) {
     this.$set(this.reimburseRecordsList, index, res);
   })
 },
+</code></pre><h2 id="-">平级数组转化多层父子级</h2>
+<pre><code>function delTreeData(treeArr, id, parentId, childrenList) {
+  let cloneData = JSON.parse(JSON .stringify(treeArr));
+  return cloneData.filter(fatherItem =&gt; {
+      let warpArr = cloneData.filter(sonItem =&gt; fatherItem[id] === sonItem[parentId]);
+      warpArr.length ? fatherItem[childrenList] = warpArr : null;
+      return !fatherItem[parentId];
+  })
+}
+
+console.log(delTreeData([
+  { id: &#39;1&#39;, number: &#39;1&#39;, parentId: &#39;&#39; },
+  { id: &#39;2&#39;, number: &#39;2&#39;, parentId: &#39;&#39; },
+  { id: &#39;3&#39;, number: &#39;3&#39;, parentId: &#39;&#39; },
+  { id: &#39;1-1&#39;, number: &#39;1-1&#39;, parentId: &#39;1&#39; },
+  { id: &#39;1-1-1&#39;, number: &#39;1-1-1&#39;, parentId: &#39;1-1&#39; },
+  { id: &#39;3-1&#39;, number: &#39;3-1&#39;, parentId: &#39;3&#39; },
+  { id: &#39;1-2&#39;, number: &#39;1-2&#39;, parentId: &#39;1&#39; }
+], &#39;id&#39;, &#39;parentId&#39;, &#39;children&#39;));
+</code></pre><h2 id="-key-">替换数组对象key值</h2>
+<p><strong>1. 无子级嵌套，id替换为value，name替换为label</strong></p>
+<pre><code>function replaceKey(arr) {
+  const arrCopy = JSON.parse(JSON.stringify(arr));
+  return arrCopy.map(o =&gt; {
+    const { id: value, name: label } = o;
+    delete o.id;
+    delete o.name;
+    return { label, value, ...o }
+  })
+}
+const arr = [
+  { id: 1, name: 1, age: 11, height: 1.1 },
+  { id: 2, name: 2, age: 12, height: 1.2 },
+  { id: 3, name: 3, age: 13, height: 1.3 }
+]
+console.log(replaceKey(arr));
+</code></pre><p><strong>2. 含子级嵌套，id替换为value，name替换为label</strong></p>
+<pre><code>function replaceKey(arr) {
+  const arrCopy = JSON.parse(JSON.stringify(arr));
+  return arrCopy.map(item =&gt; {
+    Object.keys(item).forEach(key =&gt; {
+      if(Object.prototype.toString.call(item[key]) === &#39;[object Array]&#39;) {
+        item[key] = replaceKey(item[key]);
+      }
+      // 如果 arr 中含有其它数组，只替换 children 中 key 值，最好以这种形式判断，当然 children 可以传参形式判断
+      // if(key === &#39;children&#39;) {
+      //   item[key] = replaceKey(item[key]);
+      // }
+    })
+    const { id: value, name: label } = item;
+    delete item.id;
+    delete item.name;
+    return { label, value, ...item }
+  })
+}
+const arr = [
+  { id: &#39;1&#39;, name: &#39;1&#39;, age: &#39;11&#39;, height: &#39;1.1&#39; },
+  { id: &#39;2&#39;, name: &#39;2&#39;, age: &#39;12&#39;, height: &#39;1.2&#39;, children: [
+    { id: &#39;2-1&#39;, name: &#39;2-1&#39;, age: &#39;12-1&#39;, height: &#39;1.2-1&#39; },
+    { id: &#39;2-2&#39;, name: &#39;2-2&#39;, age: &#39;12-2&#39;, height: &#39;1.2-2&#39;, children: [
+      { id: &#39;2-2-1&#39;, name: &#39;2-2-1&#39;, age: &#39;12-2-1&#39;, height: &#39;1.2-2-1&#39;, children: [
+        { id: &#39;2-2-1-1&#39;, name: &#39;2-2-1-1&#39;, age: &#39;12-2-1-1&#39;, height: &#39;1.2-2-1-1&#39;}
+      ]}
+    ]},
+    { id: &#39;2-3&#39;, name: &#39;2-3&#39;, age: &#39;12-3&#39;, height: &#39;1.2-3&#39; }
+  ]},
+  { id: &#39;3&#39;, name: &#39;3&#39;, age: &#39;13&#39;, height: &#39;1.3&#39; },
+  { id: &#39;4&#39;, name: &#39;4&#39;, age: &#39;14&#39;, height: &#39;1.4&#39;, children: [
+    { id: &#39;4-1&#39;, name: &#39;4-1&#39;, age: &#39;14-1&#39;, height: &#39;1.4-1&#39; }
+  ]}
+]
+console.log(replaceKey(arr), arr);
+</code></pre><p><strong>3. 含子级嵌套，自定义更换的key值</strong></p>
+<pre><code>/**
+* @function 替换数组对象key
+* @params arr {Array} 原数组
+* @params obj {Object} 替换配置  sub =&gt; 子级嵌套也需要替换的
+* @return {Array} 替换后的数组
+*/
+function replaceKey(arr, obj) {
+  const arrCopy = JSON.parse(JSON.stringify(arr));
+  return arrCopy.map(item =&gt; {
+    Object.keys(item).forEach(key =&gt; {
+      if(obj.sub.includes(key)) {
+          item[key] = replaceKey(item[key], obj);
+      }
+      // Object.keys(obj.replaceKeys).forEach(replaceKey =&gt; {
+      //   if(key === replaceKey) {
+      //     item[obj.replaceKeys[replaceKey]] = item[key];
+      //     delete item[key];
+      //   }
+      // })
+      for(let replaceKey in obj.replaceKeys) {
+        if(key === replaceKey) {
+          item[obj.replaceKeys[replaceKey]] = item[key];
+          delete item[key];
+          break;
+        }
+      }
+    })
+    return item;
+  })
+}
+const arr = [
+  { id: &#39;1&#39;, name: &#39;1&#39;, age: &#39;11&#39;, height: &#39;1.1&#39;, books: [&#39;a&#39;, &#39;b&#39;] },
+  { id: &#39;2&#39;, name: &#39;2&#39;, age: &#39;12&#39;, height: &#39;1.2&#39;, children: [
+    { id: &#39;2-1&#39;, name: &#39;2-1&#39;, age: &#39;12-1&#39;, height: &#39;1.2-1&#39; },
+    { id: &#39;2-2&#39;, name: &#39;2-2&#39;, age: &#39;12-2&#39;, height: &#39;1.2-2&#39;, children: [
+      { id: &#39;2-2-1&#39;, name: &#39;2-2-1&#39;, age: &#39;12-2-1&#39;, height: &#39;1.2-2-1&#39;, children: [
+        { id: &#39;2-2-1-1&#39;, name: &#39;2-2-1-1&#39;, age: &#39;12-2-1-1&#39;, height: &#39;1.2-2-1-1&#39;}
+      ]}
+    ]},
+    { id: &#39;2-3&#39;, name: &#39;2-3&#39;, age: &#39;12-3&#39;, height: &#39;1.2-3&#39; }
+  ]},
+  { id: &#39;3&#39;, name: &#39;3&#39;, age: &#39;13&#39;, height: &#39;1.3&#39; },
+  { id: &#39;4&#39;, name: &#39;4&#39;, age: &#39;14&#39;, height: &#39;1.4&#39;, children: [
+    { id: &#39;4-1&#39;, name: &#39;4-1&#39;, age: &#39;14-1&#39;, height: &#39;1.4-1&#39;, child: [
+      { id: &#39;4-1-1l&#39;, name: &#39;4-1-1l&#39;, age: &#39;14-1-1l&#39;, height: &#39;1.4-1-1l&#39; }
+  ]}
+  ], child: [
+      { id: &#39;4-1l&#39;, name: &#39;4-1l&#39;, age: &#39;14-1l&#39;, height: &#39;1.4-1l&#39; }
+  ], childC: [
+      { id: &#39;4-1c&#39;, name: &#39;4-1c&#39;, age: &#39;14-1c&#39;, height: &#39;1.4-1c&#39; }
+  ]},
+]
+console.log(replaceKey(arr, { 
+  replaceKeys: { id: &#39;value&#39;, name: &#39;label&#39; },
+  sub: [&#39;children&#39;, &#39;child&#39;]
+}));
 </code></pre><h1 id="-">题库</h1>
 <h2 id="-">小测试</h2>
 <h3 id="-">简单运算</h3>
