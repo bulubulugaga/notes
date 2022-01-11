@@ -101,3 +101,12 @@ LF = Line Feed，换行符号（ \n, 十六进制 ascii 码为 0x0A，十进制 
 <a href="http://www.templatesy.com/" target="_blank">网站模板</a><br />
 <a href="https://www.17sucai.com/pins/tag/1148.html" target="_blank">网站模板</a><br />
 
+
+
+# git报错
+**1、git warning: LF will be replaced by CRLF in 文件名**   
+windows中的换行符为 CRLF， 而在Linux下的换行符为LF，所以在执行add . 时出现提示警告    
+> 删除文件.git  
+  git config --global core.autocrlf false  
+  重新执行git init和git add .
+
