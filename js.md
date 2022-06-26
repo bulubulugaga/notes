@@ -703,6 +703,44 @@ function foo(b) {
 fn = foo.myBind(bar, 2, '多个参数');
 fn('aa');     // 1 + 2 = 3, 多个参数, aa
 ```
+## 防抖节流
+**2、实现**   
+```
+function throttled(fn, delay = 200) {
+  let timer = null;
+  let startTime = Date.now();
+  return () => {
+    let curTime = Date.now();
+    let remaining = delay - (curTime - startTime);   // 从上一次到现在剩下的时间
+    clearTimeout(timer);
+    if(remaining <= 0) {
+      fn.apply(this, arguments);
+      startTime = Date.now();
+    } else {
+      timer = setTimeout(fn, remaining);
+    }
+  }
+}
+
+window.onresize = throttled(() => {
+  console.log(1);
+}, 1000)
+```
+```
+function debounce(fn, delay = 200) {
+  let timer = null;
+  return () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      fn.apply(this, arguments);
+    }, delay);
+  }
+}
+
+window.onresize = debounce(() => {
+  console.log(1);
+}, 1000)
+```
 
 # 数据存储与内存管理
 ## js数据类型及其存储
@@ -765,13 +803,14 @@ color1与color2指向堆内存中同一地址的同一对象，复制的只是�
 浅拷贝函数
 ```
 function simpleClone(initalObj) {    
-  var obj = {};    
+  var obj = Array.isArray(initalObj) ? [] : {};   // 只考虑了数组和对象
   for ( var i in initalObj) {
     obj[i] = initalObj[i];
   }    
   return obj;
 }
 ```
+其它：Object.assign slice concat ...   
 
 2、深拷贝
 深拷贝就是能够实现真正意义上的数组和对象的拷贝。递归调用"浅拷贝"。（深拷贝会另外创造一个一模一样的对象，新对象跟原对象不共享内存，修改新对象不会改到原对象）
@@ -822,7 +861,7 @@ function deepClone(initalObj, finalObj) {
 1、以上深拷贝函数    
 
 2、JSON.stringify 和 JSON.parse   
-> 可以转成 JSON 格式的对象才能使用这种方法，如果对象中包含 function 或 RegExp 这些就不能用这种方法了。 
+> 可以转成 JSON 格式的对象才能使用这种方法，如果对象中包含特殊格式如 function 或 RegExp 这些就不能用这种方法了。 
 
 ```
 function deepClone(obj) {
@@ -833,6 +872,38 @@ function deepClone(obj) {
 或者
 copy = JSON.parse(JSON.stringify(obj));
 ```
+> **注意：**   
+
+a. 时间对象，序列化后会将时间对象转换为字符串格式   
+b. function 和 undefined，序列化后会丢失   
+c. 正则和Error对象，序列化后变成空对象   
+d. NaN、Infinity和-Infinity，序列化后会变成null   
+e. json里有对象是由构造函数生成的，则序列化的结果会丢弃对象的 constructor   
+f. 对象中存在循环引用的情况将抛出错误
+```
+function Person(name) {
+  this.name = name;
+}
+
+let obj = {
+  a: new Date(),
+  b1: function() {},
+  b2: undefined,
+  c1: new Error(),
+  c2: new RegExp(),   //  直接正则格式 /a/g 也可以
+  d1: NaN,
+  d2: Infinity,
+  d3: -Infinity,
+  e: new Person('Ken'),
+  f: null
+}
+console.log(obj);
+console.log(JSON.parse(JSON.stringify(obj)));
+
+obj.f = obj;
+console.log(JSON.parse(JSON.stringify(obj)));
+```
+![上述结果实例](./toc/images/js/深浅拷贝03.png)
 
 3、Object.assign()    
 > 当对象中只有一级属性，没有二级属性的时候，此方法为深拷贝，但是对象中有对象的时候，此方法，在二级属性以后就是浅拷贝。 

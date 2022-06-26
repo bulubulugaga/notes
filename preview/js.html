@@ -636,6 +636,40 @@ function foo(b) {
 }
 fn = foo.myBind(bar, 2, &#39;多个参数&#39;);
 fn(&#39;aa&#39;);     // 1 + 2 = 3, 多个参数, aa
+</code></pre><h2 id="-">防抖节流</h2>
+<p><strong>2、实现</strong>   </p>
+<pre><code>function throttled(fn, delay = 200) {
+  let timer = null;
+  let startTime = Date.now();
+  return () =&gt; {
+    let curTime = Date.now();
+    let remaining = delay - (curTime - startTime);   // 从上一次到现在剩下的时间
+    clearTimeout(timer);
+    if(remaining &lt;= 0) {
+      fn.apply(this, arguments);
+      startTime = Date.now();
+    } else {
+      timer = setTimeout(fn, remaining);
+    }
+  }
+}
+
+window.onresize = throttled(() =&gt; {
+  console.log(1);
+}, 1000)
+</code></pre><pre><code>function debounce(fn, delay = 200) {
+  let timer = null;
+  return () =&gt; {
+    clearTimeout(timer);
+    timer = setTimeout(() =&gt; {
+      fn.apply(this, arguments);
+    }, delay);
+  }
+}
+
+window.onresize = debounce(() =&gt; {
+  console.log(1);
+}, 1000)
 </code></pre><h1 id="-">数据存储与内存管理</h1>
 <h2 id="js-">js数据类型及其存储</h2>
 <p>1、 基本数据类型：数值(number)、字符串(string)、布尔(boolean)、null、undefined、Symbol(ES6新定义)<br>2、 引用数据类型：对象(数组、正则表达式、日期、函数)  </p>
@@ -679,13 +713,14 @@ console.log(color2)  //[&#39;red&#39;,&#39;green&#39;,&#39;black&#39;]
 <p>1、浅拷贝<br>浅拷贝只是拷贝基本类型的数据，如果父对象的属性等于数组或另一个对象，那么实际上，子对象获得的只是一个内存地址，因此存在父对象被篡改的可能，浅拷贝只复制指向某个对象的指针，而不复制对象本身，新旧对象还是共享同一块内存。</p>
 <p>浅拷贝函数</p>
 <pre><code>function simpleClone(initalObj) {    
-  var obj = {};    
+  var obj = Array.isArray(initalObj) ? [] : {};   // 只考虑了数组和对象
   for ( var i in initalObj) {
     obj[i] = initalObj[i];
   }    
   return obj;
 }
-</code></pre><p>2、深拷贝
+</code></pre><p>其它：Object.assign slice concat ...   </p>
+<p>2、深拷贝
 深拷贝就是能够实现真正意义上的数组和对象的拷贝。递归调用&quot;浅拷贝&quot;。（深拷贝会另外创造一个一模一样的对象，新对象跟原对象不共享内存，修改新对象不会改到原对象）</p>
 <p>深拷贝函数<br>写法一</p>
 <pre><code>function deepClone(initalObj, finalObj) {
@@ -726,7 +761,7 @@ console.log(color2)  //[&#39;red&#39;,&#39;green&#39;,&#39;black&#39;]
 <p>1、以上深拷贝函数    </p>
 <p>2、JSON.stringify 和 JSON.parse   </p>
 <blockquote>
-<p>可以转成 JSON 格式的对象才能使用这种方法，如果对象中包含 function 或 RegExp 这些就不能用这种方法了。 </p>
+<p>可以转成 JSON 格式的对象才能使用这种方法，如果对象中包含特殊格式如 function 或 RegExp 这些就不能用这种方法了。 </p>
 </blockquote>
 <pre><code>function deepClone(obj) {
   let _obj = JSON.stringify(obj);
@@ -735,7 +770,33 @@ console.log(color2)  //[&#39;red&#39;,&#39;green&#39;,&#39;black&#39;]
 }
 或者
 copy = JSON.parse(JSON.stringify(obj));
-</code></pre><p>3、Object.assign()    </p>
+</code></pre><blockquote>
+<p><strong>注意：</strong>   </p>
+</blockquote>
+<p>a. 时间对象，序列化后会将时间对象转换为字符串格式<br>b. function 和 undefined，序列化后会丢失<br>c. 正则和Error对象，序列化后变成空对象<br>d. NaN、Infinity和-Infinity，序列化后会变成null<br>e. json里有对象是由构造函数生成的，则序列化的结果会丢弃对象的 constructor<br>f. 对象中存在循环引用的情况将抛出错误</p>
+<pre><code>function Person(name) {
+  this.name = name;
+}
+
+let obj = {
+  a: new Date(),
+  b1: function() {},
+  b2: undefined,
+  c1: new Error(),
+  c2: new RegExp(),   //  直接正则格式 /a/g 也可以
+  d1: NaN,
+  d2: Infinity,
+  d3: -Infinity,
+  e: new Person(&#39;Ken&#39;),
+  f: null
+}
+console.log(obj);
+console.log(JSON.parse(JSON.stringify(obj)));
+
+obj.f = obj;
+console.log(JSON.parse(JSON.stringify(obj)));
+</code></pre><p><img src="./toc/images/js/深浅拷贝03.png" alt="上述结果实例"></p>
+<p>3、Object.assign()    </p>
 <blockquote>
 <p>当对象中只有一级属性，没有二级属性的时候，此方法为深拷贝，但是对象中有对象的时候，此方法，在二级属性以后就是浅拷贝。 </p>
 </blockquote>
