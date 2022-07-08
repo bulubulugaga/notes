@@ -551,6 +551,7 @@ input:-webkit-autofill {
 意味着：浏览器从最右边的选择器（关键选择器）根据关键选择器，浏览器从 DOM 中筛选出元素组成集合，然后向上遍历被选元素的父元素，判断是否匹配，不匹配则去除。选择器匹配语句链越短，浏览器的匹配速度越快。    
 
 <a href="https://github.com/haizlin/fe-interview/issues/123" target="_blank">原文：https://github.com/haizlin/fe-interview/issues/123</a>
+
 ## 编程
 ### 圣杯布局和双飞翼布局   
 > **作用：**    
@@ -688,3 +689,39 @@ input:-webkit-autofill {
     -webkit-overflow-scrolling: touch;
 }
 ```
+### 瀑布流
+利用分栏布局实现    
+注意子 div 增加 break-inside: avoid ，防止dom被分割    
+```
+.goods
+  .goods-item(v-for="item in goods" :key="item.id")
+    img.img(:src="item.img")
+    .name {{ item.title }}
+
+
+.goods
+  padding 0 12px 12px
+  column-count 2
+  column-gap 18rpx
+
+  &-item
+    position relative
+    padding 12px
+    background #fff
+    border-radius 10px
+    margin-bottom 8px
+    break-inside avoid  /* 防止div被拆分 */
+
+    .img 
+      display block
+      width 96px
+      height 96px
+      margin 0 auto 20px
+
+    .name 
+      font-size 15px
+      line-height 22px
+      font-weight 600
+```
+示例：  
+![运行显示](./toc/images/css/题库-编程01-瀑布流.png)
