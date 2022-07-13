@@ -607,7 +607,39 @@ p { color: var(--text-color, red); }
     /*增加弹性滚动,解决滚动不流畅的问题*/
     -webkit-overflow-scrolling: touch;
 }
-</code></pre>
+</code></pre><h3 id="-">瀑布流</h3>
+<p>利用分栏布局实现<br>注意子 div 增加 break-inside: avoid ，防止dom被分割    </p>
+<pre><code>.goods
+  .goods-item(v-for=&quot;item in goods&quot; :key=&quot;item.id&quot;)
+    img.img(:src=&quot;item.img&quot;)
+    .name {{ item.title }}
+
+
+.goods
+  padding 0 12px 12px
+  column-count 2
+  column-gap 18rpx
+
+  &amp;-item
+    position relative
+    padding 12px
+    background #fff
+    border-radius 10px
+    margin-bottom 8px
+    break-inside avoid  /* 防止div被拆分 */
+
+    .img 
+      display block
+      width 96px
+      height 96px
+      margin 0 auto 20px
+
+    .name 
+      font-size 15px
+      line-height 22px
+      font-weight 600
+</code></pre><p>示例：<br><img src="./toc/images/css/题库-编程01-瀑布流.png" alt="运行显示"></p>
+
           	</article>
         </div>
 		</div>

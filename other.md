@@ -103,10 +103,14 @@ LF = Line Feed，换行符号（ \n, 十六进制 ascii 码为 0x0A，十进制 
 
 
 
-# git报错
+# git
+## 相关报错
 **1、git warning: LF will be replaced by CRLF in 文件名**   
 windows中的换行符为 CRLF， 而在Linux下的换行符为LF，所以在执行add . 时出现提示警告    
 > 删除文件.git  
   git config --global core.autocrlf false  
   重新执行git init和git add .
+## 添加ssh
+cmd 下执行 ssh-keygen -t rsa -C "your@email.com"   
+在 c盘 下 user 文件中生成两个文件：id_rsa、id_rsa.pub，复制 .pub 下内容粘贴至 github ssh设置中
 
