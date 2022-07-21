@@ -1248,32 +1248,30 @@ bar(); // 报错
 }
 bar(); // [2, 2]
 </code></pre><p>参考文章：<a href="https://www.gxlcms.com/JavaScript-253414.html">详细介绍JS中“暂时性死区”的概念</a></p>
-<h1 id="-">正则</h1>
-<h2 id="-">用到的例子</h2>
-<h3 id="decimal-val-intlength-flength-">decimal(val, intLength, fLength)</h3>
-<pre><code>/**
-  * 数据过滤，保持 length - 2 位整数，两位小数
-  * @param { String } val 需要过滤的数值 
-  * @param { Number } intLength 整数位数 
-  * @param { Number } fLength 整数位数 
-  * @returns { String } 过滤后的值
-*/
-decimal: function(val = &#39;0&#39;, intLength = 10, fLength = 2) {
-  val = val.replace(/^0*(0\.|[1-9])/, &quot;$1&quot;);
-  val = val.replace(/[^\d.]/g, &quot;&quot;);     // 清除非数字和0
-  val = val.replace(/^\./g, &quot;&quot;);      // 第一个字符不能为.
-  val = val.replace(/\.{1,}/g, &quot;.&quot;);     // 只保留第一个. 清除多余的
-  val = val
-    .replace(&quot;.&quot;, &quot;$#$&quot;)
-    .replace(/\./g, &quot;&quot;)
-    .replace(&quot;$#$&quot;, &quot;.&quot;);
-  // val = val.replace(/^(\-)*(\d*)\.(\d\d).*$/, &quot;$1$2.$3&quot;);    // 两位小数
-  val = val.indexOf(&quot;.&quot;) &gt; 0
-    ? val.split(&quot;.&quot;)[0].substring(0, intLength) + &quot;.&quot; + val.split(&quot;.&quot;)[1].substring(0, fLength)
-    : val.substring(0, intLength);
-  return val;
-}
-</code></pre><h1 id="dom">DOM</h1>
+<h2 id="-">运算符</h2>
+<h3 id="-">||</h3>
+<p>expr1 || expr2 或：如果 expr1 可以转换为 true，就返回 expr1 ，否则返回 expr2。</p>
+<pre><code>console.log(null || undefined)   // undefined
+console.log(undefined || null)   // null
+</code></pre><h1 id="-">其它内置对象方法</h1>
+<h2 id="parseint">parseInt</h2>
+<p>在掘金看到<a href="https://juejin.cn/post/7121899182582923300" _target="_blank">为什么 JavaScript 的 parseInt(0.0000005) 打印“5”？
+</a>这个问题后，深入了解了一下这个方法。    </p>
+<p>parseInt(string, radix) 解析一个字符串并返回指定基数的十进制整数或NaN，radix 是 2-36 之间的整数，表示被解析字符串的基数(10不是默认值)。<br>例如：parseInt(&#39;10&#39;, 2)表示将10当作2进制转换为十进制，结果为2。   </p>
+<p>string 是需要解析的值，如果该参数不是字符串，则会将其使用toString先转换为字符串，再转换为数值类型；   </p>
+<p>如果 radix 是 undefined、0 或未指定的，JavaScript 会假定以下情况：    </p>
+<ol>
+<li>如果输入的 string 以 0x 或 0X（一个 0，后面是小写或大写的 X）开头，那么 radix 被假定为 16，字符串的其余部分被当做十六进制数去解析。    </li>
+<li>如果输入的 string 以 &quot;0&quot;（0）开头，radix 被假定为 8（八进制）或 10（十进制）。具体选择哪一个 radix 取决于实现。ECMAScript 5 澄清了应该使用 10 (十进制)，但不是所有的浏览器都支持。因此，在使用 parseInt 时，一定要指定一个 radix。     </li>
+<li>如果输入的 string 以任何其他值开头，radix 是 10 (十进制)。       </li>
+</ol>
+<p>当radix小于5或大于36，或者第一个非空字符不能转换为数字时就会返回NaN。    </p>
+<p><strong>特殊示例</strong></p>
+<pre><code>parseInt(0.0000005)    // 5  实际为parseInt(&#39;5e-7&#39;)
+parseInt(9999999999)     // 1
+parseInt(&#39;546&#39;, 2)     // NaN
+</code></pre><p><a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/parseInt" target="_blank">MDN_parseInt</a></p>
+<h1 id="dom">DOM</h1>
 <h2 id="attribute-property">attribute和property</h2>
 <h3 id="-">区别</h3>
 <p><strong>property</strong>   </p>
@@ -1485,8 +1483,9 @@ $.ajax({
       console.log(result);
   },
 });
-</code></pre><p>偶尔还是会存在定位不精准，但与百度地图位置完全一致。  </p>
-<h2 id="-">金额转大写</h2>
+</code></pre><p>偶尔还是会存在定位不精准，但与百度地图位置完全一致。   </p>
+<h2 id="-">金额</h2>
+<h3 id="-">金额转大写</h3>
 <pre><code>numberFun: function(n = 0) {
   const fraction = [&#39;角&#39;, &#39;分&#39;];
   const digit = [&#39;零&#39;, &#39;壹&#39;, &#39;贰&#39;, &#39;叁&#39;, &#39;肆&#39;, &#39;伍&#39;, &#39;陆&#39;, &#39;柒&#39;, &#39;捌&#39;, &#39;玖&#39;];
@@ -1515,6 +1514,32 @@ $.ajax({
     .replace(/(零.)+/g, &#39;零&#39;)
     .replace(/^整$/, &#39;零元整&#39;);
 }
+</code></pre><h3 id="decimal-val-intlength-flength-">decimal(val, intLength, fLength)</h3>
+<pre><code>/**
+  * 数据过滤，保持 length - 2 位整数，两位小数
+  * @param { String } val 需要过滤的数值 
+  * @param { Number } intLength 整数位数 
+  * @param { Number } fLength 整数位数 
+  * @returns { String } 过滤后的值
+*/
+decimal: function(val = &#39;0&#39;, intLength = 10, fLength = 2) {
+  val = val.replace(/^0*(0\.|[1-9])/, &quot;$1&quot;);
+  val = val.replace(/[^\d.]/g, &quot;&quot;);     // 清除非数字和0
+  val = val.replace(/^\./g, &quot;&quot;);      // 第一个字符不能为.
+  val = val.replace(/\.{1,}/g, &quot;.&quot;);     // 只保留第一个. 清除多余的
+  val = val
+    .replace(&quot;.&quot;, &quot;$#$&quot;)
+    .replace(/\./g, &quot;&quot;)
+    .replace(&quot;$#$&quot;, &quot;.&quot;);
+  // val = val.replace(/^(\-)*(\d*)\.(\d\d).*$/, &quot;$1$2.$3&quot;);    // 两位小数
+  val = val.indexOf(&quot;.&quot;) &gt; 0
+    ? val.split(&quot;.&quot;)[0].substring(0, intLength) + &quot;.&quot; + val.split(&quot;.&quot;)[1].substring(0, fLength)
+    : val.substring(0, intLength);
+  return val;
+}
+</code></pre><h3 id="format-money">Format money</h3>
+<pre><code>const ThousandNum = num =&gt; num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, &quot;,&quot;);
+console.log(ThousandNum(1000000))    // 1,000,000  不适用于浮点数
 </code></pre><h2 id="webrtc">webRTC</h2>
 <p>在做web推流时了解到这个，查了很多资料，在web端几乎无延迟，在这篇文章下初始并了解，代码亲测可用。<br><a href="https://juejin.cn/post/6884851075887661070" target="_blank">https://juejin.cn/post/6884851075887661070</a><br>此链接代码整合，在一个页面实现推拉流 </p>
 <h3 id="-js">普通js</h3>

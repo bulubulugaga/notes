@@ -1331,7 +1331,6 @@ foo = function () {
   console.log(2);
 }
 ```
-
 ### 题目
 ```
 console.log(v1); 
@@ -1485,35 +1484,39 @@ function bar(x = 2, y = x) {
 bar(); // [2, 2]
 ```
 参考文章：[详细介绍JS中“暂时性死区”的概念](https://www.gxlcms.com/JavaScript-253414.html)
-
-
-# 正则
-## 用到的例子
-###  decimal(val, intLength, fLength)
+## 运算符
+### ||
+expr1 || expr2 或：如果 expr1 可以转换为 true，就返回 expr1 ，否则返回 expr2。
 ```
-/**
-  * 数据过滤，保持 length - 2 位整数，两位小数
-  * @param { String } val 需要过滤的数值 
-  * @param { Number } intLength 整数位数 
-  * @param { Number } fLength 整数位数 
-  * @returns { String } 过滤后的值
-*/
-decimal: function(val = '0', intLength = 10, fLength = 2) {
-  val = val.replace(/^0*(0\.|[1-9])/, "$1");
-  val = val.replace(/[^\d.]/g, "");     // 清除非数字和0
-  val = val.replace(/^\./g, "");      // 第一个字符不能为.
-  val = val.replace(/\.{1,}/g, ".");     // 只保留第一个. 清除多余的
-  val = val
-    .replace(".", "$#$")
-    .replace(/\./g, "")
-    .replace("$#$", ".");
-  // val = val.replace(/^(\-)*(\d*)\.(\d\d).*$/, "$1$2.$3");    // 两位小数
-  val = val.indexOf(".") > 0
-    ? val.split(".")[0].substring(0, intLength) + "." + val.split(".")[1].substring(0, fLength)
-    : val.substring(0, intLength);
-  return val;
-}
+console.log(null || undefined)   // undefined
+console.log(undefined || null)   // null
 ```
+
+# 其它内置对象方法
+## parseInt
+在掘金看到<a href="https://juejin.cn/post/7121899182582923300" _target="_blank">为什么 JavaScript 的 parseInt(0.0000005) 打印“5”？
+</a>这个问题后，深入了解了一下这个方法。    
+
+parseInt(string, radix) 解析一个字符串并返回指定基数的十进制整数或NaN，radix 是 2-36 之间的整数，表示被解析字符串的基数(10不是默认值)。    
+例如：parseInt('10', 2)表示将10当作2进制转换为十进制，结果为2。   
+
+string 是需要解析的值，如果该参数不是字符串，则会将其使用toString先转换为字符串，再转换为数值类型；   
+
+如果 radix 是 undefined、0 或未指定的，JavaScript 会假定以下情况：    
+1. 如果输入的 string 以 0x 或 0X（一个 0，后面是小写或大写的 X）开头，那么 radix 被假定为 16，字符串的其余部分被当做十六进制数去解析。    
+2. 如果输入的 string 以 "0"（0）开头，radix 被假定为 8（八进制）或 10（十进制）。具体选择哪一个 radix 取决于实现。ECMAScript 5 澄清了应该使用 10 (十进制)，但不是所有的浏览器都支持。因此，在使用 parseInt 时，一定要指定一个 radix。     
+3. 如果输入的 string 以任何其他值开头，radix 是 10 (十进制)。       
+
+当radix小于5或大于36，或者第一个非空字符不能转换为数字时就会返回NaN。    
+
+**特殊示例**
+```
+parseInt(0.0000005)    // 5  实际为parseInt('5e-7')
+parseInt(9999999999)     // 1
+parseInt('546', 2)     // NaN
+```
+<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/parseInt" target="_blank">MDN_parseInt</a>
+
 
 # DOM
 ## attribute和property
@@ -1762,7 +1765,6 @@ yield
 "use strict";
 var public = 1500;      // 报错
 ```
-
 ## pc端获取地理位置信息
 ### navigator.geolocation.getCurrentPosition
 ```
@@ -1810,9 +1812,10 @@ $.ajax({
   },
 });
 ```
-偶尔还是会存在定位不精准，但与百度地图位置完全一致。  
+偶尔还是会存在定位不精准，但与百度地图位置完全一致。   
 
-##  金额转大写
+## 金额
+### 金额转大写
 ```
 numberFun: function(n = 0) {
   const fraction = ['角', '分'];
@@ -1843,7 +1846,36 @@ numberFun: function(n = 0) {
     .replace(/^整$/, '零元整');
 }
 ```
-
+### decimal(val, intLength, fLength)
+```
+/**
+  * 数据过滤，保持 length - 2 位整数，两位小数
+  * @param { String } val 需要过滤的数值 
+  * @param { Number } intLength 整数位数 
+  * @param { Number } fLength 整数位数 
+  * @returns { String } 过滤后的值
+*/
+decimal: function(val = '0', intLength = 10, fLength = 2) {
+  val = val.replace(/^0*(0\.|[1-9])/, "$1");
+  val = val.replace(/[^\d.]/g, "");     // 清除非数字和0
+  val = val.replace(/^\./g, "");      // 第一个字符不能为.
+  val = val.replace(/\.{1,}/g, ".");     // 只保留第一个. 清除多余的
+  val = val
+    .replace(".", "$#$")
+    .replace(/\./g, "")
+    .replace("$#$", ".");
+  // val = val.replace(/^(\-)*(\d*)\.(\d\d).*$/, "$1$2.$3");    // 两位小数
+  val = val.indexOf(".") > 0
+    ? val.split(".")[0].substring(0, intLength) + "." + val.split(".")[1].substring(0, fLength)
+    : val.substring(0, intLength);
+  return val;
+}
+```
+### Format money
+```
+const ThousandNum = num => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+console.log(ThousandNum(1000000))    // 1,000,000  不适用于浮点数
+```
 ## webRTC
 在做web推流时了解到这个，查了很多资料，在web端几乎无延迟，在这篇文章下初始并了解，代码亲测可用。    
 <a href="https://juejin.cn/post/6884851075887661070" target="_blank">https://juejin.cn/post/6884851075887661070</a>   
@@ -2603,7 +2635,6 @@ handleCurrentChange (val, index) {
   })
 },
 ```
-
 ## 平级数组转化多层父子级
 ```
 function delTreeData(treeArr, id, parentId, childrenList) {
@@ -2741,6 +2772,7 @@ console.log(replaceKey(arr, {
   sub: ['children', 'child']
 }));
 ```
+
 # 题库
 ## 小测试
 ### 简单运算
