@@ -1515,7 +1515,28 @@ parseInt(0.0000005)    // 5  实际为parseInt('5e-7')
 parseInt(9999999999)     // 1
 parseInt('546', 2)     // NaN
 ```
-<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/parseInt" target="_blank">MDN_parseInt</a>
+<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/parseInt" target="_blank">MDN_parseInt</a>     
+
+## this
+基本上可以归为以下几种情况:    
+全局 this 是 window    
+函数 this 是调用者(该函数的执行上下文)    
+构造函数的 this 是 new 之后的新对象     
+call 和 apply bind 的 this 第一个参数     
+箭头函数不会改变函数的指向(指向上一级的执行上下文)    
+
+以下都摘自：<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/this">MDN_this</a>     
+在绝大多数情况下，函数的调用方式决定了 this 的值（运行时绑定）。this 不能在执行期间被赋值，并且在每次函数被调用时 this 的值也可能会不同。ES5 引入了 bind 方法来设置函数的 this 值，而不用考虑函数如何被调用的。ES2015 引入了箭头函数，箭头函数不提供自身的 this 绑定（this 的值将保持为闭合词法上下文的值）。    
+
+**值：**当前执行上下文（global、function 或 eval）的一个属性，在非严格模式下，总是指向一个对象，在严格模式下可以是任意值。    
+
+### 全局上下文
+无论是否在严格模式下，在全局执行环境中（在任何函数体外部）this 都指向全局对象。
+```
+console.log(this === window)
+```
+注意：globalThis可以直接获取全局对象window     
+### 
 
 
 # DOM

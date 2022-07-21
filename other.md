@@ -46,6 +46,7 @@ LF = Line Feed，换行符号（ \n, 十六进制 ascii 码为 0x0A，十进制 
 # 相关链接
 ## 前端学习
 <a href="https://developer.mozilla.org/zh-CN/" target="_blank">MDN</a><br />
+<a href="http://www.h-camel.com/index.html" target="_blank">前端知识每日3+1</a><br />
 <a href="https://www.yuque.com/kenguba" target="_blank" style="color: red">语雀·一缕清风(强推)</a><br />
 <a href="https://www.cnblogs.com/onepixel/" target="_blank">一像素(偏个人文章类)</a><br />
 <a href="https://www.pipipi.net/" target="_blank">犀牛部落(文章教程含代码)</a><br />
