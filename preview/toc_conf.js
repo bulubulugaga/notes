@@ -100,6 +100,7 @@ function init() {
                     <li class="js"><a href="./js.html">js</a><li>
                     <li class="demo"><a href="./demo.html">demo</a><li>
                     <li class="vue"><a href="./vue.html">vue</a><li>
+                    <li class="mini-h5"><a href="./mini-h5.html">mini-h5</a><li>
                     <li class="algorithm"><a href="./algorithm.html">算法</a><li>
                     <li class="other"><a href="./other.html">other</a><li>
                     <li class="markdown"><a href="./markdown.html">markdown</a><li>

@@ -1272,13 +1272,14 @@ parseInt(9999999999)     // 1
 parseInt(&#39;546&#39;, 2)     // NaN
 </code></pre><p><a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/parseInt" target="_blank">MDN_parseInt</a>     </p>
 <h2 id="this">this</h2>
-<p>基本上可以归为以下几种情况:<br>全局 this 是 window<br>函数 this 是调用者(该函数的执行上下文)<br>构造函数的 this 是new 之后的新对象<br>call 和 apply bind 的 this 第一个参数<br>箭头函数不会改变函数的指向(指向上一级的执行上下文)    </p>
+<p>基本上可以归为以下几种情况:<br>全局 this 是 window<br>函数 this 是调用者(该函数的执行上下文)<br>构造函数的 this 是 new 之后的新对象<br>call 和 apply bind 的 this 第一个参数<br>箭头函数不会改变函数的指向(指向上一级的执行上下文)    </p>
 <p>以下都摘自：<a href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/this">MDN_this</a><br>在绝大多数情况下，函数的调用方式决定了 this 的值（运行时绑定）。this 不能在执行期间被赋值，并且在每次函数被调用时 this 的值也可能会不同。ES5 引入了 bind 方法来设置函数的 this 值，而不用考虑函数如何被调用的。ES2015 引入了箭头函数，箭头函数不提供自身的 this 绑定（this 的值将保持为闭合词法上下文的值）。    </p>
 <p><strong>值：</strong>当前执行上下文（global、function 或 eval）的一个属性，在非严格模式下，总是指向一个对象，在严格模式下可以是任意值。    </p>
 <h3 id="-">全局上下文</h3>
 <p>无论是否在严格模式下，在全局执行环境中（在任何函数体外部）this 都指向全局对象。</p>
 <pre><code>console.log(this === window)
-</code></pre><p>注意：globalThis可以直接获取全局对象window</p>
+</code></pre><p>注意：globalThis可以直接获取全局对象window     </p>
+<p>### </p>
 <h1 id="dom">DOM</h1>
 <h2 id="attribute-property">attribute和property</h2>
 <h3 id="-">区别</h3>
@@ -1376,7 +1377,7 @@ async function req () {
   }
 }
 req()
-</code></pre><h1 id="-">其它</h1>
+</code></pre><h1 id="-">其它（含一些静态方法）</h1>
 <h2 id="-">严格模式</h2>
 <p>&quot;use strict&quot; 指令在 JavaScript 1.8.5 (ECMAScript5) 中新增。<br>它不是一条语句，但是是一个<strong>字面量表达式</strong>，在 JavaScript 旧版本中会被忽略。<br>&quot;use strict&quot; 的目的是指定代码在严格条件下执行。<br>支持严格模式的浏览器:Internet Explorer 10 +、 Firefox 4+ Chrome 13+、 Safari 5.1+、 Opera 12+。  </p>
 <p><strong>声明</strong><br>在脚本或函数的头部添加 use strict; 表达式来声明。</p>
@@ -2191,6 +2192,62 @@ export default {
   }
 };
 &lt;/script&gt;
+</code></pre><h2 id="-">压缩图片</h2>
+<pre><code>// 将base64码转为图片文件类型
+function dataURLtoFile(dataurl: any, fileName: string) {
+  const base64 = window.atob(dataurl.split(&#39;,&#39;)[1]);   // 去掉dataUrl头部，取到base64
+  const type = dataurl.split(&#39;,&#39;)[0].match(/:(.*?);/)[1];   // 从dataUrl头部获取文件类型
+  // 处理异常,将ascii码小于0的转换为大于0
+  const ab = new ArrayBuffer(base64.length);
+  let ia = new Uint8Array(ab);
+  for (let i = 0; i &lt; base64.length; i++) {
+    ia[i] = base64.charCodeAt(i);
+  }
+  const blob = new Blob([ab], { type: type }); // Blob对象
+  const file = new File([blob], fileName + &#39;.gif&#39;); // file对象
+  return file;
+}
+
+// 压缩图片(尽量2M)
+function compressImg(file: File) {
+  const fileSize: number = Number(parseFloat((file[&#39;size&#39;] / 1024 / 1024).toString()).toFixed(2))
+  const read = new FileReader()
+  read.readAsDataURL(file)
+  return new Promise(function(resolve, reject) {
+    read.onload = function(e) {
+      const img = new Image()
+      img.src = &lt;any&gt;e.target?.result
+      img.onload = function() {
+        // 默认按比例压缩
+        const w = img.width
+        const h = img.height
+        // 这三行防止部分ios会因为canvas宽高导致后续生成空白base64
+        const scale = w / h
+        const rw = w &gt; 1400 ? 1400 : w
+        const rh = rw / scale
+        // 生成canvas
+        let canvas = document.createElement(&#39;canvas&#39;)
+        let ctx = canvas.getContext(&#39;2d&#39;)
+        let base64
+        // 创建属性节点  
+        canvas.setAttribute(&#39;width&#39;, rw.toString())
+        canvas.setAttribute(&#39;height&#39;, rh.toString())
+        ctx?.drawImage(img, 0, 0, rw, rh)
+        let quality = 1
+        switch(Math.ceil(fileSize / 2)) {
+          case 1: quality = 0.9; break;
+          case 2: quality = 0.45; break;
+          case 4: quality = 0.2; break;
+          case 5: quality = 0.15; break;
+          default: quality = 0.1
+        }
+        base64 = canvas.toDataURL(file[&#39;type&#39;], quality)
+        // 回调函数返回file的值（将base64编码转成file）
+        resolve(dataURLtoFile(base64, file.name))
+      }
+    }
+  })
+}
 </code></pre><h1 id="-">项目中的一些问题</h1>
 <h2 id="-api-">根据数组某个元素循环请求api，按顺序获得相应值</h2>
 <p><img src="./toc/images/js/项目01.png" alt="项目图片">

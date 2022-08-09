@@ -1,0 +1,101 @@
+<html>
+  <head>
+	  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>i5ting_ztree_toc:mini-h5</title>
+		<link href="toc/style/github-bf51422f4bb36427d391e4b75a1daa083c2d840e.css" media="all" rel="stylesheet" type="text/css"/>
+		<link href="toc/style/github2-d731afd4f624c99a4b19ad69f3083cd6d02b81d5.css" media="all" rel="stylesheet" type="text/css"/>
+		<link href="toc/css/zTreeStyle/zTreeStyle.css" media="all" rel="stylesheet" type="text/css"/>
+	  <style>
+		pre {
+		    counter-reset: line-numbering;
+		    border: solid 1px #d9d9d9;
+		    border-radius: 0;
+		    background: #fff;
+		    padding: 0;
+		    line-height: 23px;
+		    margin-bottom: 30px;
+		    white-space: pre;
+		    overflow-x: auto;
+		    word-break: inherit;
+		    word-wrap: inherit;
+		}
+
+		pre a::before {
+		  content: counter(line-numbering);
+		  counter-increment: line-numbering;
+		  padding-right: 1em; /* space after numbers */
+		  width: 25px;
+		  text-align: right;
+		  opacity: 0.7;
+		  display: inline-block;
+		  color: #aaa;
+		  background: #eee;
+		  margin-right: 16px;
+		  padding: 2px 10px;
+		  font-size: 13px;
+		  -webkit-touch-callout: none;
+		  -webkit-user-select: none;
+		  -khtml-user-select: none;
+		  -moz-user-select: none;
+		  -ms-user-select: none;
+		  user-select: none;
+		}
+
+		pre a:first-of-type::before {
+		  padding-top: 10px;
+		}
+
+		pre a:last-of-type::before {
+		  padding-bottom: 10px;
+		}
+
+		pre a:only-of-type::before {
+		  padding: 10px;
+		}
+
+		.highlight { background-color: #ffffcc } /* RIGHT */
+		</style>
+  </head>
+  <body>
+	  <div>
+				<div style='width:25%;'>
+						<ul id="tree" class="ztree" style='width:100%'>
+
+						</ul>
+				</div>
+        <div id='readme' style='width:70%;margin-left:20%;'>
+          	<article class='markdown-body'>
+            	<h1 id="-">踩坑系列</h1>
+<h2 id="-">兼容性</h2>
+<h3 id="ios-input-">ios input输入框</h3>
+<p>ios 输入框颜色默认是灰色，已输入内容也是灰色，需要手动设置color，但是disable状态下设置color好像没有效果</p>
+<h3 id="ios-">ios拍照上传图片</h3>
+<p>在小程序中只要当前页面有onShow(){}，无论其中是否有逻辑处理，使用wx.chooseImage()都会导致选择图片或拍照之后返回页面刷新<br>小程序嵌套h5时(web-view)，使用原生 &lt; input accept=&quot;image/*&quot; &gt; 上传图片，选择图片时没有问题，拍照上传时候也会刷新页面导致之前的数据丢失    </p>
+<h3 id="canvas">canvas</h3>
+<p>在使用canvas压缩图片时，ios会报错，但是一直查不到原因，猜测是因为canvas宽高过大，导致重新生成图片有问题，然后报错</p>
+<h3 id="ios-">ios底部安全区</h3>
+<p>ios部分机型底部有黑线，有些底部固定dom如按钮，需要留出这个安全区域</p>
+<pre><code>bottom: calc(0px + constant(safe-area-inset-bottom));
+bottom: calc(0px + env(safe-area-inset-bottom));
+</code></pre>
+          	</article>
+        </div>
+		</div>
+  </body>
+</html>
+<script type="text/javascript" src="toc/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="toc/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="toc/js/ztree_toc.js"></script>
+<script type="text/javascript" src="toc_conf.js"></script>
+
+<SCRIPT type="text/javascript" >
+<!--
+$(document).ready(function(){
+    var css_conf = eval(markdown_panel_style);
+    $('#readme').css(css_conf)
+    
+    var conf = eval(jquery_ztree_toc_opts);
+		$('#tree').ztree_toc(conf);
+});
+//-->
+</SCRIPT>

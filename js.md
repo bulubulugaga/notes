@@ -1667,7 +1667,7 @@ async function req () {
 req()
 ```
 
-# 其它
+# 其它（含一些静态方法）
 ## 严格模式
 "use strict" 指令在 JavaScript 1.8.5 (ECMAScript5) 中新增。  
 它不是一条语句，但是是一个**字面量表达式**，在 JavaScript 旧版本中会被忽略。  
@@ -2554,6 +2554,64 @@ export default {
   }
 };
 </script>
+```
+## 压缩图片
+```
+// 将base64码转为图片文件类型
+function dataURLtoFile(dataurl: any, fileName: string) {
+  const base64 = window.atob(dataurl.split(',')[1]);   // 去掉dataUrl头部，取到base64
+  const type = dataurl.split(',')[0].match(/:(.*?);/)[1];   // 从dataUrl头部获取文件类型
+  // 处理异常,将ascii码小于0的转换为大于0
+  const ab = new ArrayBuffer(base64.length);
+  let ia = new Uint8Array(ab);
+  for (let i = 0; i < base64.length; i++) {
+    ia[i] = base64.charCodeAt(i);
+  }
+  const blob = new Blob([ab], { type: type }); // Blob对象
+  const file = new File([blob], fileName + '.gif'); // file对象
+  return file;
+}
+
+// 压缩图片(尽量2M)
+function compressImg(file: File) {
+  const fileSize: number = Number(parseFloat((file['size'] / 1024 / 1024).toString()).toFixed(2))
+  const read = new FileReader()
+  read.readAsDataURL(file)
+  return new Promise(function(resolve, reject) {
+    read.onload = function(e) {
+      const img = new Image()
+      img.src = <any>e.target?.result
+      img.onload = function() {
+        // 默认按比例压缩
+        const w = img.width
+        const h = img.height
+        // 这三行防止部分ios会因为canvas宽高导致后续生成空白base64
+        const scale = w / h
+        const rw = w > 1400 ? 1400 : w
+        const rh = rw / scale
+        // 生成canvas
+        let canvas = document.createElement('canvas')
+        let ctx = canvas.getContext('2d')
+        let base64
+        // 创建属性节点  
+        canvas.setAttribute('width', rw.toString())
+        canvas.setAttribute('height', rh.toString())
+        ctx?.drawImage(img, 0, 0, rw, rh)
+        let quality = 1
+        switch(Math.ceil(fileSize / 2)) {
+          case 1: quality = 0.9; break;
+          case 2: quality = 0.45; break;
+          case 4: quality = 0.2; break;
+          case 5: quality = 0.15; break;
+          default: quality = 0.1
+        }
+        base64 = canvas.toDataURL(file['type'], quality)
+        // 回调函数返回file的值（将base64编码转成file）
+        resolve(dataURLtoFile(base64, file.name))
+      }
+    }
+  })
+}
 ```
 
 # 项目中的一些问题
