@@ -13,7 +13,7 @@ css3为了区分伪类和伪元素，伪元素采用双冒号写法
       content: '\260E';
       font-size: 15px;
     }
-  </style> 
+  </style>
   <p class="phoneNumber">12345645654</p>
 ```
 运行结果：  
